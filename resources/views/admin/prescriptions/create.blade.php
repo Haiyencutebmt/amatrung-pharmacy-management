@@ -48,6 +48,12 @@
         </div>
     </div>
 
+    {{-- ── PANEL: GỢI Ý AI HỖ TRỢ THẦY THUỐC (Giai đoạn 4) ── --}}
+    @can('use_ai_suggestion')
+    @include('admin.records.partials.ai_panel', ['medicalRecord' => $medicalRecord])
+    @include('admin.records.partials.ai_js')
+    @endcan
+
     <form action="{{ route('admin.prescriptions.store') }}" method="POST" id="prescriptionForm">
         @csrf
         <input type="hidden" name="medical_record_id" value="{{ $medicalRecord->id }}">

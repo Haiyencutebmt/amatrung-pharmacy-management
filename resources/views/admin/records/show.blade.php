@@ -641,6 +641,11 @@
             </div>
         </div>
 
+        {{-- ── PANEL: GỢI Ý AI HỖ TRỢ THẦY THUỐC (Giai đoạn 4) ── --}}
+        @can('use_ai_suggestion')
+        @include('admin.records.partials.ai_panel', ['medicalRecord' => $medicalRecord])
+        @endcan
+
         {{-- DANH SÁCH ĐƠN ĐIỀU TRỊ / PHÁC ĐỒ ĐÃ KÊ --}}
         @php
             $activePrescriptions = $medicalRecord->prescriptions->where('status', '!=', 'cancelled');
@@ -1521,76 +1526,12 @@ function setPaperSize(size) {
 // Default layout configurations
 setPaperSize('a5');
 
-let currentAiData = null; // Store fetched AI data globally
-
-function getAiSuggestions() {
-    const aiLoading = document.getElementById('aiLoading');
-    const aiResultsBlock = document.getElementById('aiResultsBlock');
-    
-    // Reset view
-    aiLoading.style.display = 'flex';
-    aiResultsBlock.style.display = 'none';
-    
-    // Symptoms & diagnosis values
-    const pageDataEl = document.getElementById('page-data');
-    const symptomsVal = pageDataEl ? JSON.parse(pageDataEl.dataset.symptoms || 'null') : null;
-    const diagnosisVal = pageDataEl ? JSON.parse(pageDataEl.dataset.diagnosis || 'null') : null;
-    const weightVal = pageDataEl ? JSON.parse(pageDataEl.dataset.weight || 'null') : null;
-    const heightVal = pageDataEl ? JSON.parse(pageDataEl.dataset.height || 'null') : null;
-    const genderVal = pageDataEl ? JSON.parse(pageDataEl.dataset.gender || 'null') : null;
-    const ageVal = pageDataEl ? JSON.parse(pageDataEl.dataset.age || 'null') : null;
-    
-    const aiClinicalContext = {
-        case_type: pageDataEl ? JSON.parse(pageDataEl.dataset.caseType || 'null') : null,
-        injury_type: pageDataEl ? JSON.parse(pageDataEl.dataset.injuryType || 'null') : null,
-        injury_location: pageDataEl ? JSON.parse(pageDataEl.dataset.injuryLocation || 'null') : null,
-        injury_cause: pageDataEl ? JSON.parse(pageDataEl.dataset.injuryCause || 'null') : null,
-        clinical_signs: pageDataEl ? JSON.parse(pageDataEl.dataset.clinicalSigns || 'null') : null,
-        palpation_result: pageDataEl ? JSON.parse(pageDataEl.dataset.palpationResult || 'null') : null,
-        pain_level: pageDataEl ? JSON.parse(pageDataEl.dataset.painLevel || 'null') : null,
-        xray_note: pageDataEl ? JSON.parse(pageDataEl.dataset.xrayNote || 'null') : null
-    };
-    
-    const aiSuggestUrl = pageDataEl ? pageDataEl.dataset.aiSuggestRoute : '';
-    const csrfToken = pageDataEl ? pageDataEl.dataset.csrfToken : '';
-
-    fetch(aiSuggestUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            symptoms: symptomsVal,
-            diagnosis: diagnosisVal,
-            weight: weightVal,
-            height: heightVal,
-            gender: genderVal,
-            age: ageVal,
-            ...aiClinicalContext
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message || 'Lỗi xử lý AI từ server.'); });
-        }
-        return response.json();
-    })
-    .then(res => {
-        aiLoading.style.display = 'none';
-        
-        if (res.status === 'success' && res.data) {
-            currentAiData = res.data;
-            displayAiResults();
-        } else {
-            showToast('Không nhận được dữ liệu phản hồi hợp lệ từ AI.', 'error');
-        }
-    })
-    .catch(err => {
-        aiLoading.style.display = 'none';
-        showToast('Lỗi: ' + err.message, 'error');
-    });
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// [GIAI ĐOẠN 4 – ĐÃ VÔ HIỆU HÓA] Hàm getAiSuggestions() cũ
+// Lý do: Vi phạm nguyên tắc an toàn AI – gửi symptoms/diagnosis/PII từ frontend.
+// Thay thế bằng panel mới (ai_panel.blade.php) chỉ gửi medical_record_id.
+// Xem: resources/views/admin/records/partials/ai_panel.blade.php
+// ─────────────────────────────────────────────────────────────────────────────
 
 function displayAiResults() {
     const aiResultsBlock = document.getElementById('aiResultsBlock');
@@ -1730,12 +1671,12 @@ function displayAiResults() {
     }
 }
 
-function closeAiSuggestions() {
-    document.getElementById('aiResultsBlock').style.display = 'none';
-    currentAiData = null;
-}
-
-function applyAiSelection(type) {
+// ─────────────────────────────────────────────────────────────────────────────
+// [GIAI ĐOẠN 4 – ĐÃ VÔ HIỆU HÓA] closeAiSuggestions() & applyAiSelection()
+// Lý do: applyAiSelection() vi phạm nguyên tắc an toàn AI – tự điền form kê đơn
+// và tự trừ kho. Đã thay thế bằng hệ thống ghi log tương tác (log-status).
+// ─────────────────────────────────────────────────────────────────────────────
+function applyAiSelection_DISABLED(type) {
     if (!currentAiData) return;
     
     const data = currentAiData;
@@ -3406,4 +3347,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </form>
     </div>
 </div>
+
+{{-- ── JS: Gợi ý AI hỗ trợ thầy thuốc (Giai đoạn 4) ── --}}
+@can('use_ai_suggestion')
+@include('admin.records.partials.ai_js')
+@endcan
+
 @endsection

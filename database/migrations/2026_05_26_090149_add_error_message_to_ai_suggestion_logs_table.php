@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ai_suggestion_logs', function (Blueprint $table) {
-            //
+            $table->text('error_message')->nullable()->after('response');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ai_suggestion_logs', function (Blueprint $table) {
-            //
+            $table->dropColumn('error_message');
         });
     }
 };

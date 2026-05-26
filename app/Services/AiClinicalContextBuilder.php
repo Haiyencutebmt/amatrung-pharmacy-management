@@ -100,37 +100,9 @@ class AiClinicalContextBuilder
             return [];
         }
 
-        // Chỉ lấy vị thuốc UỐNG (medicinal_herb) có tồn kho dương
-        // Ưu tiên dùng inventory_batches FEFO nếu bảng tồn tại
-        $hasBatchTable = \Illuminate\Support\Facades\Schema::hasTable('inventory_batches');
-
-        if ($hasBatchTable) {
-            // Tổng tồn theo herb từ inventory_batches chưa hết hạn
-            $rows = DB::table('inventory_batches')
-                ->join('medicinal_herbs', 'inventory_batches.medicinal_herb_id', '=', 'medicinal_herbs.id')
-                ->where('medicinal_herbs.status', 'active')
-                ->where(function ($q) {
-                    $q->whereNull('inventory_batches.expiry_date')
-                      ->orWhere('inventory_batches.expiry_date', '>', now()->toDateString());
-                })
-                ->where('inventory_batches.remaining_quantity', '>', 0)
-                ->groupBy('medicinal_herbs.id', 'medicinal_herbs.name', 'medicinal_herbs.unit')
-                ->select(
-                    'medicinal_herbs.name',
-                    'medicinal_herbs.unit',
-                    DB::raw('SUM(inventory_batches.remaining_quantity) as available_qty')
-                )
-                ->orderBy('medicinal_herbs.name')
-                ->get();
-
-            return $rows->map(fn($r) => [
-                'name'          => $r->name,
-                'unit'          => $r->unit,
-                'available_qty' => (float) $r->available_qty,
-            ])->values()->toArray();
-        }
-
-        // Fallback: dùng stock_quantity từ bảng medicinal_herbs (legacy)
+        // Dùng stock_quantity từ bảng medicinal_herbs
+        // (InventoryBatch liên kết qua InventoryItem chứ không trực tiếp đến MedicinalHerb,
+        //  nên truy vấn stock_quantity đã được đồng bộ là cách an toàn và chính xác nhất)
         return MedicinalHerb::where('status', 'active')
             ->where('stock_quantity', '>', 0)
             ->orderBy('name')

@@ -77,3 +77,7 @@ routes_inventory.txt
 
 # File tạm khi chạy test Laravel
 /storage/framework/testing-views/
+
+# File debug AI tạm thời
+/debug_ai.php
+/tests/Feature/Phase4DebugTest.php
