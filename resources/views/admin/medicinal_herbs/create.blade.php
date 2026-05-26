@@ -1,0 +1,73 @@
+@extends('layouts.admin')
+
+@section('title', 'Thêm Dược Liệu — AmaTrung')
+@section('page-title', 'Thêm Dược Liệu & Chế Phẩm Mới')
+
+@section('content')
+<div class="card" style="max-width: 800px;">
+    <form action="{{ route('admin.medicinal-herbs.store') }}" method="POST">
+        @csrf
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="name" class="form-label">Tên dược liệu/chế phẩm *</label>
+                <input type="text" name="name" id="name" class="form-input" value="{{ old('name') }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category" class="form-label">Phân loại/Nhóm</label>
+                <input type="text" name="category" id="category" class="form-input" value="{{ old('category') }}" placeholder="VD: Thuốc bổ, Thuốc giải biểu...">
+            </div>
+
+            <div class="form-group">
+                <label for="usage_type" class="form-label">Cách dùng</label>
+                <select name="usage_type" id="usage_type" class="form-input">
+                    <option value="">-- Chọn cách dùng --</option>
+                    <option value="Uống" {{ old('usage_type') == 'Uống' ? 'selected' : '' }}>Uống</option>
+                    <option value="Sắc" {{ old('usage_type') == 'Sắc' ? 'selected' : '' }}>Sắc</option>
+                    <option value="Dùng ngoài" {{ old('usage_type') == 'Dùng ngoài' ? 'selected' : '' }}>Dùng ngoài (Xoa bóp, Bôi)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="unit" class="form-label">Đơn vị tính</label>
+                <input type="text" name="unit" id="unit" class="form-input" value="{{ old('unit') }}" placeholder="VD: g, kg, viên, chai...">
+            </div>
+
+            <div class="form-group">
+                <label for="stock_quantity" class="form-label">Số lượng tồn kho *</label>
+                <input type="number" step="0.01" name="stock_quantity" id="stock_quantity" class="form-input" value="{{ old('stock_quantity', 0) }}" required min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="expiry_date" class="form-label">Hạn sử dụng</label>
+                <input type="date" name="expiry_date" id="expiry_date" class="form-input" value="{{ old('expiry_date') }}">
+            </div>
+
+            <div class="form-group">
+                <label for="status" class="form-label">Trạng thái *</label>
+                <select name="status" id="status" class="form-input" required>
+                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Đang dùng (Còn hàng)</option>
+                    <option value="out_of_stock" {{ old('status') == 'out_of_stock' ? 'selected' : '' }}>Hết hàng</option>
+                    <option value="expired" {{ old('status') == 'expired' ? 'selected' : '' }}>Hết hạn / Ngừng dùng</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="warning_note" class="form-label">Cảnh báo/Chống chỉ định</label>
+                <input type="text" name="warning_note" id="warning_note" class="form-input" value="{{ old('warning_note') }}" placeholder="VD: Phụ nữ có thai...">
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <label for="description" class="form-label">Mô tả/Công dụng</label>
+            <textarea name="description" id="description" class="form-input" rows="4">{{ old('description') }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+            <a href="{{ route('admin.medicinal-herbs.index') }}" class="btn btn-secondary">Hủy</a>
+            <button type="submit" class="btn btn-primary">Lưu Dược Liệu</button>
+        </div>
+    </form>
+</div>
+@endsection
