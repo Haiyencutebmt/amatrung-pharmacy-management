@@ -321,7 +321,7 @@
             <form action="{{ route('admin.patients.store') }}" method="POST">
                 @csrf
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem;">
-                    <span style="background: #f0fdf4; color: #16a34a; width: 36px; height: 36px; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👤</span>
+                    <span style="background: #eff6ff; color: #2563eb; width: 36px; height: 36px; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👤</span>
                     <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Thông tin cơ bản</h3>
                 </div>
 
@@ -389,7 +389,7 @@
 
                 <div class="modal-footer" style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 1.25rem;">
                     <button type="button" class="btn btn-secondary" onclick="document.getElementById('addPatientModal').style.display='none'" style="background: #fff; min-width: 100px; padding: 0.6rem 1.5rem; border-radius: 0.25rem; border: 1px solid #cbd5e1; font-weight: 600; cursor: pointer; color: #64748b;">Hủy bỏ</button>
-                    <button type="submit" class="btn btn-primary" style="min-width: 150px; padding: 0.6rem 1.5rem; border-radius: 0.25rem; background: #5eb542; color: white; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 2px 6px rgba(94, 181, 66, 0.15);">
+                    <button type="submit" class="btn btn-primary" style="min-width: 150px; padding: 0.6rem 1.5rem; border-radius: 0.25rem; background: #2563eb; color: white; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);">
                         Lưu Bệnh Nhân
                     </button>
                 </div>
@@ -399,10 +399,19 @@
 </div>
 
 <script>
-    // Auto open modal if validation errors exist
+    const addPatientModal = document.getElementById('addPatientModal');
+    const shouldOpenCreateModal = new URLSearchParams(window.location.search).get('open_create') === '1';
+
+    // Auto open modal if validation errors exist or dashboard asks to add a patient
     @if($errors->any())
-        document.getElementById('addPatientModal').style.display='flex';
+        if (addPatientModal) {
+            addPatientModal.style.display = 'flex';
+        }
     @endif
+
+    if (shouldOpenCreateModal && addPatientModal) {
+        addPatientModal.style.display = 'flex';
+    }
 
     // Handle guardian phone toggle
     const isGuardianPhoneCheckbox = document.getElementById('is_guardian_phone');
@@ -641,7 +650,7 @@
 
 /* CSS Reset & Variables - Note: integrated into index.blade.php for demonstration, normally in app.css */
 .patient-index-container {
-    --primary-green: #5eb542;
+    --primary-green: #2563eb;
     --text-dark: #1e293b;
     --text-muted: #64748b;
     --bg-light: #f8fafc;
@@ -661,8 +670,8 @@
 .header-title .icon-bg {
     width: 48px;
     height: 48px;
-    background: #eef9ee;
-    color: #5eb542;
+    background: #eff6ff;
+    color: #2563eb;
     border-radius: 1rem;
     display: flex;
     align-items: center;
@@ -717,7 +726,7 @@
     height: 36px;
     border-radius: 50%;
     border: 1.5px solid var(--primary-green);
-    background: #f0fdf4;
+    background: #eff6ff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -814,9 +823,9 @@
 }
 
 .bg-green-light {
-    background: #f0fdf4;
-    color: #16a34a;
-    border: 1px solid #dcfce7;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
 }
 
 .stat-footer {
@@ -880,11 +889,11 @@
 .btn-add {
     padding: 0.75rem 1.5rem;
     border-radius: 0.25rem;
-    background: #5eb542;
+    background: #2563eb;
     color: #fff;
     text-decoration: none;
     font-weight: 700;
-    box-shadow: 0 2px 6px rgba(94, 181, 66, 0.15);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
 }
 
 .filter-bottom-row {
@@ -972,13 +981,13 @@
 }
 
 .patient-code {
-    background: #f0fdf4;
-    color: #16a34a;
+    background: #eff6ff;
+    color: #2563eb;
     padding: 0.25rem 0.5rem;
     border-radius: 0.125rem;
     font-weight: 700;
     font-size: 0.8rem;
-    border: 1px solid #bbf7d0;
+    border: 1px solid #bfdbfe;
     font-family: monospace;
 }
 
@@ -1086,9 +1095,9 @@
 }
 
 .page-item.active .page-link {
-    background: #5eb542;
+    background: #2563eb;
     color: #fff;
-    border-color: #5eb542;
+    border-color: #2563eb;
     border-radius: 0.25rem;
 }
 

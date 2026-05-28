@@ -24,6 +24,7 @@ class MedicalRecordCreationTest extends TestCase
             'case_type' => 'normal',
             'symptoms' => 'Ho, sợ lạnh, đau đầu',
             'diagnosis' => 'Cảm mạo phong hàn',
+            'treatment_direction' => 'oral_only',
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -46,6 +47,7 @@ class MedicalRecordCreationTest extends TestCase
             'case_type' => 'general',
             'symptoms' => 'Mệt mỏi, ăn kém',
             'diagnosis' => 'Tỳ vị hư nhược',
+            'treatment_direction' => 'oral_only',
         ])->assertSessionHasNoErrors();
 
         $this->actingAs($admin)->post(route('admin.medical-records.store'), [
@@ -54,6 +56,7 @@ class MedicalRecordCreationTest extends TestCase
             'case_type' => 'both',
             'symptoms' => 'Đau lưng kèm suy nhược',
             'diagnosis' => 'Đau lưng kèm khí huyết hư',
+            'treatment_direction' => 'combined',
         ])->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('medical_records', [
@@ -66,6 +69,28 @@ class MedicalRecordCreationTest extends TestCase
             'patient_id' => $patient->id,
             'case_type' => MedicalRecord::CASE_COMBINED,
             'diagnosis' => 'Đau lưng kèm khí huyết hư',
+        ]);
+    }
+
+    public function test_modal_missing_treatment_direction_is_derived_from_case_type(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $patient = $this->createPatient();
+
+        $this->actingAs($admin)->post(route('admin.medical-records.store'), [
+            'patient_id' => $patient->id,
+            'from_patient' => '1',
+            'visit_date' => '2026-05-26',
+            'case_type' => 'musculoskeletal',
+            'symptoms' => 'Khám Xương khớp - Chấn thương',
+            'diagnosis' => 'Đau khớp gối',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('medical_records', [
+            'patient_id' => $patient->id,
+            'case_type' => MedicalRecord::CASE_MUSCULOSKELETAL,
+            'treatment_direction' => 'external_only',
+            'diagnosis' => 'Đau khớp gối',
         ]);
     }
 

@@ -19,7 +19,7 @@
 <div class="day-view-container" style="font-family: 'Inter', system-ui, sans-serif; margin-top: -1rem;">
     
     {{-- Thanh thao tác --}}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: #fff; padding: 1rem; border-radius: 0.25rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: #fff; padding: 1rem 1.5rem; border-radius: 1rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
         <a href="{{ route('admin.appointments.index') }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border-radius: 0.25rem; font-size: 0.9rem; font-weight: 700; text-decoration: none; border: 1px solid #cbd5e1; background: #fff; color: #475569; transition: all 0.2s;">
             ← Quay lại Lịch tháng
         </a>
@@ -29,14 +29,14 @@
     </div>
 
     @if($appointments->isEmpty())
-        <div style="background: #fff; border-radius: 0.25rem; border: 1px solid #e2e8f0; padding: 5rem 2rem; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+        <div style="background: #fff; border-radius: 1rem; border: 1px solid #f1f5f9; padding: 5rem 2rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <div style="font-size: 4rem; margin-bottom: 1.5rem; color: #cbd5e1;">📅</div>
             <h3 style="font-size: 1.25rem; font-weight: 700; color: #1e3a5f; margin: 0 0 0.5rem 0;">Không có lịch hẹn</h3>
             <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Không ghi nhận bất kỳ lịch hẹn nào của bệnh nhân cho ngày hôm nay.</p>
         </div>
     @else
         {{-- Lưới timeline hiển thị theo dây --}}
-        <div class="timeline-wrapper" style="background: #fff; border-radius: 0.375rem; border: 1px solid #e2e8f0; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+        <div class="timeline-wrapper" style="background: #fff; border-radius: 1rem; border: 1px solid #f1f5f9; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <div class="timeline-container">
                 @foreach($appointments as $app)
                     @php

@@ -102,12 +102,53 @@ class MedicinalHerbController extends Controller implements HasMiddleware
             'expiry_date'    => 'nullable|date',
             'warning_note'   => 'nullable|string|max:255',
             'status'         => 'required|in:active,out_of_stock,expired',
+            'batch_code'     => 'required|string|max:50',
         ]);
 
-        $herb = new MedicinalHerb($validated);
-        $herb->stockLogType = 'manual_update';
-        $herb->stockLogNote = 'Khởi tạo dược liệu mới (Tồn kho đầu kỳ: ' . floatval($validated['stock_quantity']) . ' ' . ($validated['unit'] ?? 'g') . ')';
-        $herb->save();
+        $herb = \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
+            $herb = new MedicinalHerb(collect($validated)->except('batch_code')->toArray());
+            $herb->stockLogType = 'manual_update';
+            $herb->stockLogNote = 'Khởi tạo dược liệu mới (Tồn kho đầu kỳ: ' . floatval($validated['stock_quantity']) . ' ' . ($validated['unit'] ?? 'g') . ')';
+            $herb->save();
+
+            // Đồng bộ sang hệ thống kho mới (InventoryItem + InventoryBatch + StockMovement)
+            $usageRoute = 'oral';
+            if ($validated['usage_type'] === 'Dùng ngoài' || $validated['category'] === 'Chế phẩm dùng ngoài') {
+                $usageRoute = 'external';
+            }
+
+            $item = \App\Models\InventoryItem::create([
+                'name'         => $validated['name'],
+                'item_type'    => 'herb',
+                'usage_route'  => $usageRoute,
+                'unit'         => $validated['unit'] ?? 'g',
+                'description'  => $validated['description'] ?? null,
+                'warning_note' => $validated['warning_note'] ?? null,
+                'is_active'    => true,
+            ]);
+
+            $expiryDate = $validated['expiry_date'] ? \Carbon\Carbon::parse($validated['expiry_date']) : null;
+            $batchStatus = ($expiryDate && $expiryDate->isBefore(now()->startOfDay())) ? 'expired' : 'available';
+
+            $batch = \App\Models\InventoryBatch::create([
+                'inventory_item_id'  => $item->id,
+                'batch_number'       => $validated['batch_code'],
+                'expiry_date'        => $expiryDate,
+                'quantity'           => $validated['stock_quantity'],
+                'quantity_remaining' => $validated['stock_quantity'],
+                'status'             => $batchStatus,
+            ]);
+
+            \App\Models\StockMovement::create([
+                'inventory_batch_id' => $batch->id,
+                'movement_type'      => 'import',
+                'quantity'           => $validated['stock_quantity'],
+                'performed_by'       => auth()->id(),
+                'note'               => 'Nhập lô hàng đầu tiên khi khởi tạo dược liệu mới',
+            ]);
+
+            return $herb;
+        });
 
         session()->put('last_action', [
             'model' => MedicinalHerb::class,
@@ -116,7 +157,7 @@ class MedicinalHerbController extends Controller implements HasMiddleware
             'redirect_url' => route('admin.medicinal-herbs.index'),
         ]);
 
-        return redirect()->route('admin.medicinal-herbs.index')->with('success', 'Thêm dược liệu thành công.');
+        return redirect()->route('admin.medicinal-herbs.index')->with('success', 'Thêm dược liệu và khởi tạo lô kho thành công.');
     }
 
     public function edit(MedicinalHerb $medicinalHerb)
@@ -136,11 +177,91 @@ class MedicinalHerbController extends Controller implements HasMiddleware
             'expiry_date'    => 'nullable|date',
             'warning_note'   => 'nullable|string|max:255',
             'status'         => 'required|in:active,out_of_stock,expired',
+            'batch_code'     => 'required|string|max:50',
         ]);
 
         $originalData = $medicinalHerb->getOriginal();
         $medicinalHerb->stockLogType = 'manual_update';
-        $medicinalHerb->update($validated);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($medicinalHerb, $validated) {
+            $medicinalHerb->update(collect($validated)->except('batch_code')->toArray());
+
+            // Đồng bộ sang hệ thống kho mới (InventoryItem + InventoryBatch)
+            $usageRoute = 'oral';
+            if ($validated['usage_type'] === 'Dùng ngoài' || $validated['category'] === 'Chế phẩm dùng ngoài') {
+                $usageRoute = 'external';
+            }
+
+            // Tìm hoặc tạo InventoryItem
+            $item = \App\Models\InventoryItem::where('name', $validated['name'])->first();
+            if (!$item) {
+                $item = \App\Models\InventoryItem::create([
+                    'name'         => $validated['name'],
+                    'item_type'    => 'herb',
+                    'usage_route'  => $usageRoute,
+                    'unit'         => $validated['unit'] ?? 'g',
+                    'description'  => $validated['description'] ?? null,
+                    'warning_note' => $validated['warning_note'] ?? null,
+                    'is_active'    => true,
+                ]);
+            } else {
+                $item->update([
+                    'name'         => $validated['name'],
+                    'usage_route'  => $usageRoute,
+                    'unit'         => $validated['unit'] ?? 'g',
+                    'description'  => $validated['description'] ?? null,
+                    'warning_note' => $validated['warning_note'] ?? null,
+                ]);
+            }
+
+            $expiryDate = $validated['expiry_date'] ? \Carbon\Carbon::parse($validated['expiry_date']) : null;
+            $batchStatus = ($expiryDate && $expiryDate->isBefore(now()->startOfDay())) ? 'expired' : 'available';
+
+            // Tìm hoặc tạo InventoryBatch
+            $batch = \App\Models\InventoryBatch::where('inventory_item_id', $item->id)
+                ->where('batch_number', $validated['batch_code'])
+                ->first();
+
+            if ($batch) {
+                // Tính lượng chênh lệch để làm StockMovement
+                $diff = $validated['stock_quantity'] - $batch->quantity_remaining;
+                
+                $batch->update([
+                    'expiry_date'        => $expiryDate,
+                    'quantity'           => $validated['stock_quantity'],
+                    'quantity_remaining' => $validated['stock_quantity'],
+                    'status'             => $batchStatus,
+                ]);
+
+                if ($diff != 0) {
+                    \App\Models\StockMovement::create([
+                        'inventory_batch_id' => $batch->id,
+                        'movement_type'      => 'adjustment',
+                        'quantity'           => $diff,
+                        'performed_by'       => auth()->id(),
+                        'note'               => 'Điều chỉnh số lượng khi cập nhật dược liệu',
+                    ]);
+                }
+            } else {
+                // Tạo lô mới
+                $batch = \App\Models\InventoryBatch::create([
+                    'inventory_item_id'  => $item->id,
+                    'batch_number'       => $validated['batch_code'],
+                    'expiry_date'        => $expiryDate,
+                    'quantity'           => $validated['stock_quantity'],
+                    'quantity_remaining' => $validated['stock_quantity'],
+                    'status'             => $batchStatus,
+                ]);
+
+                \App\Models\StockMovement::create([
+                    'inventory_batch_id' => $batch->id,
+                    'movement_type'      => 'import',
+                    'quantity'           => $validated['stock_quantity'],
+                    'performed_by'       => auth()->id(),
+                    'note'               => 'Nhập lô hàng khi cập nhật dược liệu',
+                ]);
+            }
+        });
 
         session()->put('last_action', [
             'model' => MedicinalHerb::class,
@@ -150,7 +271,7 @@ class MedicinalHerbController extends Controller implements HasMiddleware
             'redirect_url' => route('admin.medicinal-herbs.index'),
         ]);
 
-        return redirect()->route('admin.medicinal-herbs.index')->with('success', 'Cập nhật dược liệu thành công.');
+        return redirect()->route('admin.medicinal-herbs.index')->with('success', 'Cập nhật dược liệu và đồng bộ lô kho thành công.');
     }
 
     public function destroy(MedicinalHerb $medicinalHerb)
@@ -158,12 +279,25 @@ class MedicinalHerbController extends Controller implements HasMiddleware
         $hasPrescription = \DB::table('prescription_items')->where('medicinal_herb_id', $medicinalHerb->id)->exists();
         $hasRetail = \DB::table('retail_order_items')->where('medicinal_herb_id', $medicinalHerb->id)->exists();
 
-        if ($hasPrescription || $hasRetail) {
+        // Kiểm tra thêm trong hệ thống kho mới
+        $item = \App\Models\InventoryItem::where('name', $medicinalHerb->name)->first();
+        $hasNewPrescription = false;
+        if ($item) {
+            $hasNewPrescription = \DB::table('prescription_items')->where('inventory_item_id', $item->id)->exists();
+        }
+
+        if ($hasPrescription || $hasRetail || $hasNewPrescription) {
             return back()->with('error', "Không thể xóa dược liệu \"{$medicinalHerb->name}\" vì đã được sử dụng trong bệnh án/đơn thuốc hoặc đơn bán lẻ.");
         }
 
         $originalData = [$medicinalHerb->getOriginal()];
-        $medicinalHerb->delete();
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($medicinalHerb, $item) {
+            $medicinalHerb->delete();
+            if ($item) {
+                $item->delete(); // Sẽ tự động cascade xóa batches và stock movements
+            }
+        });
 
         session()->put('last_action', [
             'model' => MedicinalHerb::class,
@@ -172,7 +306,7 @@ class MedicinalHerbController extends Controller implements HasMiddleware
             'redirect_url' => route('admin.medicinal-herbs.index'),
         ]);
 
-        return redirect()->route('admin.medicinal-herbs.index')->with('success', 'Đã xóa dược liệu.');
+        return redirect()->route('admin.medicinal-herbs.index')->with('success', 'Đã xóa dược liệu và đồng bộ kho.');
     }
 
     public function bulkDestroy(Request $request)

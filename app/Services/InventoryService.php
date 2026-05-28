@@ -26,28 +26,29 @@ class InventoryService
             return true; // Nothing to deduct
         }
 
-        // Get available batches, not expired, ordered by nearest expiry date
-        $batches = InventoryBatch::where('inventory_item_id', $itemId)
-            ->where('status', 'available')
-            ->where('quantity_remaining', '>', 0)
-            ->where(function($query) {
-                $query->whereNull('expiry_date')
-                      ->orWhereDate('expiry_date', '>=', now()->toDateString());
-            })
-            ->orderBy('expiry_date', 'asc')
-            ->orderBy('id', 'asc') // tie breaker
-            ->get();
+        DB::transaction(function () use ($itemId, $quantityToDeduct, $prescriptionItemId, $userId) {
+            // Get available batches, not expired, ordered by nearest expiry date, with lockForUpdate
+            $batches = InventoryBatch::where('inventory_item_id', $itemId)
+                ->where('status', 'available')
+                ->where('quantity_remaining', '>', 0)
+                ->where(function($query) {
+                    $query->whereNull('expiry_date')
+                          ->orWhereDate('expiry_date', '>=', now()->toDateString());
+                })
+                ->orderBy('expiry_date', 'asc')
+                ->orderBy('id', 'asc') // tie breaker
+                ->lockForUpdate()
+                ->get();
 
-        $totalAvailable = $batches->sum('quantity_remaining');
+            $totalAvailable = $batches->sum('quantity_remaining');
 
-        if ($totalAvailable < $quantityToDeduct) {
-            $item = InventoryItem::find($itemId);
-            throw new Exception("Không đủ tồn kho hợp lệ cho mặt hàng '{$item->name}'. Yêu cầu: {$quantityToDeduct}, Hiện có hợp lệ: {$totalAvailable}.");
-        }
+            if ($totalAvailable < $quantityToDeduct) {
+                $item = InventoryItem::find($itemId);
+                throw new Exception("Không đủ tồn kho hợp lệ cho mặt hàng '{$item->name}'. Yêu cầu: {$quantityToDeduct}, Hiện có hợp lệ: {$totalAvailable}.");
+            }
 
-        $remainingToDeduct = $quantityToDeduct;
+            $remainingToDeduct = $quantityToDeduct;
 
-        DB::transaction(function () use ($batches, &$remainingToDeduct, $prescriptionItemId, $userId) {
             foreach ($batches as $batch) {
                 if ($remainingToDeduct <= 0) {
                     break;

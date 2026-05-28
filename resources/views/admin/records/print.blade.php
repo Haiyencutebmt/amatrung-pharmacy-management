@@ -310,7 +310,7 @@
                     <tr>
                         <td>{{ $stt++ }}</td>
                         <td style="font-weight: bold;">{{ $item->display_name }}</td>
-                        <td style="text-align: right; font-weight: bold;">{{ $item->sessions ? $item->sessions . ' buổi' : '1 lần' }}</td>
+                        <td style="text-align: right; font-weight: bold;">{{ $item->sessions ? $item->sessions . ' lần' : '1 lần' }}</td>
                         <td style="font-size: 9.5pt; color: #333;">
                             @if($item->usage_area) <strong>Vùng:</strong> {{ $item->usage_area }}<br>@endif
                             {{ $item->usage_instruction ?? $item->note }}

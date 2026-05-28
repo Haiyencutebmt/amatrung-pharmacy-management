@@ -6,7 +6,7 @@
     
     <!-- Hero Section -->
     <div class="max-w-[1400px] mx-auto px-4 mt-12 md:mt-16">
-        <div class="relative bg-cover bg-center bg-no-repeat rounded-[2.5rem] pt-28 sm:pt-32 md:pt-44 pb-20 md:pb-32 text-center shadow-lg border border-sky-100" style="background-image: url('{{ asset('images/home-imagecute.png') }}');">
+        <div class="relative bg-cover bg-center bg-no-repeat rounded-[2.5rem] pt-16 sm:pt-20 md:pt-28 pb-12 md:pb-20 text-center shadow-lg border border-sky-100" style="background-image: url('{{ asset('images/home-imagecute.png') }}');">
             
             <!-- Logo -->
             <div class="absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 z-20">
@@ -16,7 +16,7 @@
             </div>
 
             <!-- Golden Badge -->
-            <div class="flex justify-center mb-5 md:mb-7">
+            <div class="flex justify-center mb-4 md:mb-5">
                 <div class="inline-flex items-center gap-2.5 px-5 py-1.5 rounded-full border border-[#d4af37]/45 bg-[#fffdf9]/90 text-[#b58e3d] font-bold text-xs md:text-sm tracking-wider shadow-sm transition-transform hover:scale-105 duration-300">
                     <span class="text-sm opacity-80">⚜️</span>
                     <span>Tinh hoa thảo dược – Chăm sóc từ tâm</span>
@@ -25,12 +25,12 @@
             </div>
             
             <!-- Title -->
-            <h1 class="text-2xl md:text-5xl font-extrabold text-[#1a5b8f] tracking-wide mb-2 md:mb-3 drop-shadow-sm leading-tight">NHÀ THUỐC Y HỌC CỔ TRUYỀN</h1>
-            <h2 class="text-3xl md:text-6xl lg:text-7xl font-black text-[#1a5b8f] uppercase tracking-widest drop-shadow-md mb-6 md:mb-8">AMATRUNG</h2>
+            <h1 class="text-xl md:text-4xl font-extrabold text-[#1a5b8f] tracking-wide mb-1.5 md:mb-2 drop-shadow-sm leading-tight">NHÀ THUỐC Y HỌC CỔ TRUYỀN</h1>
+            <h2 class="text-2.5xl md:text-5.5xl lg:text-6.5xl font-black text-[#1a5b8f] uppercase tracking-widest drop-shadow-md mb-4 md:mb-6">AMATRUNG</h2>
             
             <!-- Quote -->
-            <div class="max-w-3xl mx-auto mb-10 md:mb-12 relative px-2 md:px-4">
-                <p class="text-base md:text-xl text-[#1a5b8f] font-semibold italic leading-relaxed text-center drop-shadow-sm">
+            <div class="max-w-3xl mx-auto mb-6 md:mb-8 relative px-2 md:px-4">
+                <p class="text-sm md:text-lg text-[#1a5b8f] font-semibold italic leading-relaxed text-center drop-shadow-sm">
                     "Thuốc đắng dã tật, sự sống đơm hoa.<br>
                     Mỗi vị thuốc đều mang trong mình linh khí của đất trời,<br class="hidden md:block">
                     kết nối hệ tự nhiên với sức khỏe con người."
@@ -38,7 +38,7 @@
             </div>
 
             <!-- 5 Elements Characters (Overlapping bottom edge) -->
-            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-5xl px-2 md:px-4 flex justify-center items-end gap-1 sm:gap-4 md:gap-6 z-50 h-[100px] sm:h-[200px] md:h-[280px]">
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-5xl px-2 md:px-4 flex justify-center items-end gap-1 sm:gap-4 md:gap-6 z-50 h-[100px] sm:h-[180px] md:h-[240px]">
                 <!-- KIM -->
                 <a href="{{ url('/bai-viet/ngu-hanh-kim') }}" class="w-[16%] max-w-[180px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12">
                     <img src="{{ asset('images/Kim.png') }}" alt="Kim" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
@@ -79,7 +79,7 @@
             <div class="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 mt-8 md:mt-6 px-2 md:px-4">
                 <!-- Item 1 -->
                 <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/Thao-duoc-chat-luong.png') }}" class="w-40 md:w-full h-auto object-contain group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Thảo dược chất lượng">
+                    <img src="{{ asset('images/Thao-duoc-chat-luong.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Thảo dược chất lượng">
                 </div>
                 
                 <!-- Arrow -->
@@ -89,7 +89,7 @@
 
                 <!-- Item 2 -->
                 <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/An-toan-lanh-tinh.png') }}" class="w-40 md:w-full h-auto object-contain group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="An toàn lành tính">
+                    <img src="{{ asset('images/An-toan-lanh-tinh.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="An toàn lành tính">
                 </div>
 
                 <!-- Arrow -->
@@ -99,7 +99,7 @@
 
                 <!-- Item 3 -->
                 <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}" class="w-40 md:w-full h-auto object-contain group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Y học cổ truyền bài bản">
+                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Y học cổ truyền bài bản">
                 </div>
 
                 <!-- Arrow -->
@@ -109,7 +109,7 @@
 
                 <!-- Item 4 -->
                 <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/Tan-tam-trach-nhiem.png') }}" class="w-40 md:w-full h-auto object-contain group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Tận tâm trách nhiệm">
+                    <img src="{{ asset('images/Tan-tam-trach-nhiem.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Tận tâm trách nhiệm">
                 </div>
 
                 <!-- Arrow -->
@@ -119,7 +119,7 @@
 
                 <!-- Item 5 -->
                 <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/Ket-noi-tu-nhien.png') }}" class="w-40 md:w-full h-auto object-contain group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Kết nối tự nhiên">
+                    <img src="{{ asset('images/Ket-noi-tu-nhien.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Kết nối tự nhiên">
                 </div>
             </div>
         </div>
@@ -176,7 +176,7 @@
                                     @endif
                                     @if($latestArticle->category)
                                     <div class="absolute top-3 left-3 bg-[#1a5b8f]/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm border border-white/20">
-                                        {{ $latestArticle->category->name }}
+                                        {{ $latestArticle->category_label }}
                                     </div>
                                     @endif
                                 </div>

@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
 class Phase1DatabaseTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * Test the required tables exist.
      */

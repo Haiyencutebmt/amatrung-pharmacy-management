@@ -92,15 +92,33 @@ class Phase4AiSafetyTest extends TestCase
         ]);
     }
 
-    private function createHerb(string $name = 'Đương Quy', float $stock = 500): MedicinalHerb
+    private function createHerb(string $name = 'Đương Quy', float $stock = 500, string $usageRoute = 'oral'): MedicinalHerb
     {
-        return MedicinalHerb::create([
+        $herb = MedicinalHerb::create([
             'name'           => $name,
             'unit'           => 'g',
             'stock_quantity' => $stock,
             'status'         => 'active',
             'price'          => 50000,
         ]);
+
+        $item = \App\Models\InventoryItem::create([
+            'name'        => $name,
+            'item_type'   => ($usageRoute === 'external') ? 'external_product' : 'herb',
+            'usage_route' => $usageRoute,
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+
+        \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $item->id,
+            'batch_number'       => 'BATCH-' . uniqid(),
+            'expiry_date'        => now()->addYear()->toDateString(),
+            'quantity_remaining' => $stock,
+            'status'             => 'available',
+        ]);
+
+        return $herb;
     }
 
     private function getAiRoute(): string
@@ -344,7 +362,7 @@ class Phase4AiSafetyTest extends TestCase
     /** TC16: external_only → inventory vẫn trả về (cho tra cứu), nhưng AI post-verify sẽ lọc */
     public function test_tc16_external_only_direction_returns_inventory_for_lookup(): void
     {
-        $this->createHerb('Cam Thảo', 100);
+        $this->createHerb('Cam Thảo', 100, 'external');
 
         $builder   = new AiClinicalContextBuilder();
         $inventory = $builder->buildAvailableInventory('external_only');
@@ -482,7 +500,7 @@ class Phase4AiSafetyTest extends TestCase
         $this->assertDatabaseHas('ai_suggestion_logs', [
             'user_id'           => $admin->id,
             'medical_record_id' => $record->id,
-            'status'            => 'pending',
+            'status'            => 'failed', // key is null in test setup -> failed
         ]);
     }
 
@@ -521,7 +539,7 @@ class Phase4AiSafetyTest extends TestCase
         $response = $this->actingAs($admin)
                          ->postJson($this->getLogStatusRoute(), [
                              'log_id'             => $log->id,
-                             'interaction_status' => 'accepted',
+                             'interaction_status' => 'referenced',
                          ]);
 
         $response->assertStatus(200)
@@ -529,7 +547,7 @@ class Phase4AiSafetyTest extends TestCase
 
         $this->assertDatabaseHas('ai_suggestion_logs', [
             'id'     => $log->id,
-            'status' => 'accepted',
+            'status' => 'referenced',
         ]);
     }
 
@@ -547,7 +565,7 @@ class Phase4AiSafetyTest extends TestCase
             'medical_record_id' => null,
             'payload'           => [],
             'response'          => [],
-            'status'            => 'pending',
+            'status'            => 'generated',
         ]);
 
         $response = $this->actingAs($admin)
@@ -570,13 +588,13 @@ class Phase4AiSafetyTest extends TestCase
             'medical_record_id' => null,
             'payload'           => [],
             'response'          => [],
-            'status'            => 'pending',
+            'status'            => 'generated',
         ]);
 
         $response = $this->actingAs($otherStaff)
                          ->postJson($this->getLogStatusRoute(), [
                              'log_id'             => $log->id,
-                             'interaction_status' => 'ignored',
+                             'interaction_status' => 'not_used',
                          ]);
 
         $response->assertStatus(403);
@@ -594,5 +612,303 @@ class Phase4AiSafetyTest extends TestCase
         $this->assertTrue(Schema::hasColumn('ai_suggestion_logs', 'payload'));
         $this->assertTrue(Schema::hasColumn('ai_suggestion_logs', 'response'));
         $this->assertTrue(Schema::hasColumn('ai_suggestion_logs', 'status'));
+    }
+
+    public function test_staff_permissions_only_use_spatie_no_legacy_fallback(): void
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+            'legacy_permissions_json' => ['use_ai_suggestion'],
+        ]);
+        
+        $patient = $this->createPatient();
+        $record  = $this->createRecord($patient->id, $staff->id);
+
+        // Even though they have 'use_ai_suggestion' in legacy JSON, they must be blocked
+        $response = $this->actingAs($staff)
+                         ->postJson($this->getAiRoute(), ['medical_record_id' => $record->id]);
+        $response->assertStatus(403);
+
+        // Grant permission via Spatie
+        $staff->givePermissionTo('use_ai_suggestion');
+
+        $response = $this->actingAs($staff)
+                         ->postJson($this->getAiRoute(), ['medical_record_id' => $record->id]);
+        $response->assertStatus(200);
+
+        // Revoke permission via Spatie
+        $staff->revokePermissionTo('use_ai_suggestion');
+
+        $response = $this->actingAs($staff)
+                         ->postJson($this->getAiRoute(), ['medical_record_id' => $record->id]);
+        $response->assertStatus(403);
+    }
+
+    public function test_ai_only_reads_new_inventory_batches_not_legacy_stock(): void
+    {
+        // 1. Seed legacy herb with stock > 0
+        MedicinalHerb::create([
+            'name'           => 'Nhân Sâm',
+            'unit'           => 'g',
+            'stock_quantity' => 500,
+            'status'         => 'active',
+            'price'          => 50000,
+        ]);
+
+        // Do not seed new inventory for 'Nhân Sâm'
+        $builder = new AiClinicalContextBuilder();
+        $inventory = $builder->buildAvailableInventory('oral_only');
+
+        // Confirm 'Nhân Sâm' is not in available inventory
+        $names = array_column($inventory, 'name');
+        $this->assertNotContains('Nhân Sâm', $names);
+
+        // 2. Seed a new inventory item but with expired batch
+        $item = \App\Models\InventoryItem::create([
+            'name'        => 'Linh Chi',
+            'item_type'   => 'herb',
+            'usage_route' => 'oral',
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+        \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $item->id,
+            'batch_number'       => 'BATCH-EXP',
+            'expiry_date'        => now()->subDay()->toDateString(),
+            'quantity_remaining' => 100,
+            'status'             => 'available',
+        ]);
+
+        $inventory = $builder->buildAvailableInventory('oral_only');
+        $names = array_column($inventory, 'name');
+        $this->assertNotContains('Linh Chi', $names);
+
+        // 3. Seed a new inventory item with null expiry date
+        $item2 = \App\Models\InventoryItem::create([
+            'name'        => 'Táo Tàu',
+            'item_type'   => 'herb',
+            'usage_route' => 'oral',
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+        \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $item2->id,
+            'batch_number'       => 'BATCH-NULL',
+            'expiry_date'        => null,
+            'quantity_remaining' => 100,
+            'status'             => 'available',
+        ]);
+
+        $inventory = $builder->buildAvailableInventory('oral_only');
+        $names = array_column($inventory, 'name');
+        $this->assertNotContains('Táo Tàu', $names);
+
+        // 4. Seed a valid new inventory item (no legacy herb)
+        $item3 = \App\Models\InventoryItem::create([
+            'name'        => 'Đương Quy',
+            'item_type'   => 'herb',
+            'usage_route' => 'oral',
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+        \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $item3->id,
+            'batch_number'       => 'BATCH-OK',
+            'expiry_date'        => now()->addYear()->toDateString(),
+            'quantity_remaining' => 100,
+            'status'             => 'available',
+        ]);
+
+        $inventory = $builder->buildAvailableInventory('oral_only');
+        $names = array_column($inventory, 'name');
+        $this->assertContains('Đương Quy', $names);
+    }
+
+    public function test_ai_response_post_verification_filters_out_of_stock_items(): void
+    {
+        Config::set('services.gemini.api_key', 'test-key');
+
+        $geminiResponse = [
+            'candidates' => [[
+                'content' => [
+                    'parts' => [[
+                        'text' => json_encode([
+                            'reasoning'            => 'Test reasoning',
+                            'safety_note'          => 'Test safety',
+                            'follow_up_suggestion' => 'Follow up',
+                            'oral_herbs'           => [
+                                ['herb_name' => 'Nhân Sâm', 'usage_note' => 'Bổ khí (không có trong kho)'],
+                                ['herb_name' => 'Đương Quy', 'usage_note' => 'Bổ huyết (có trong kho)'],
+                            ],
+                            'external_herbs'   => [],
+                            'therapy_services' => [],
+                        ]),
+                    ]],
+                ],
+            ]],
+        ];
+
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response($geminiResponse, 200),
+        ]);
+
+        $admin   = $this->createAdmin();
+        $patient = $this->createPatient();
+        $record  = $this->createRecord($patient->id, $admin->id);
+
+        $this->createHerb('Đương Quy', 500);
+
+        $response = $this->actingAs($admin)
+                         ->postJson($this->getAiRoute(), ['medical_record_id' => $record->id]);
+
+        $response->assertStatus(200);
+        $suggestions = $response->json('suggestions');
+
+        $oralNames = array_column($suggestions['oral_herbs'], 'herb_name');
+        $this->assertContains('Đương Quy', $oralNames);
+        $this->assertNotContains('Nhân Sâm', $oralNames);
+    }
+
+    public function test_ai_response_post_verification_forces_empty_on_referral(): void
+    {
+        $admin   = $this->createAdmin();
+        $patient = $this->createPatient();
+        $record  = $this->createRecord($patient->id, $admin->id, 'referral');
+
+        $response = $this->actingAs($admin)
+                         ->postJson($this->getAiRoute(), ['medical_record_id' => $record->id]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('referral', $response->json('status'));
+        $this->assertEmpty($response->json('suggestions'));
+    }
+
+    public function test_double_dispense_request_deducts_stock_only_once(): void
+    {
+        $admin   = $this->createAdmin();
+        $patient = $this->createPatient();
+        $record  = $this->createRecord($patient->id, $admin->id);
+
+        $item = \App\Models\InventoryItem::create([
+            'name'        => 'Đương Quy',
+            'item_type'   => 'herb',
+            'usage_route' => 'oral',
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+        $batch = \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $item->id,
+            'batch_number'       => 'BATCH-OK',
+            'expiry_date'        => now()->addYear()->toDateString(),
+            'quantity_remaining' => 100,
+            'status'             => 'available',
+        ]);
+
+        $service = app(\App\Services\PrescriptionService::class);
+        $prescription = $service->createPrescription([
+            'medical_record_id' => $record->id,
+            'num_of_doses' => 2,
+            'items' => [
+                ['inventory_item_id' => $item->id, 'quantity_per_dose' => 10, 'unit' => 'g'],
+            ],
+        ], $admin->id);
+
+        $res1 = $service->dispensePrescription($prescription, $admin->id);
+        $this->assertTrue($res1);
+        $this->assertEquals(80, $batch->fresh()->quantity_remaining);
+        $this->assertEquals('dispensed', $prescription->fresh()->status);
+
+        $this->expectException(\Exception::class);
+        $service->dispensePrescription($prescription, $admin->id);
+    }
+
+    public function test_insufficient_stock_rolls_back_status_and_movements(): void
+    {
+        $admin   = $this->createAdmin();
+        $patient = $this->createPatient();
+        $record  = $this->createRecord($patient->id, $admin->id);
+
+        $itemA = \App\Models\InventoryItem::create([
+            'name'        => 'Đương Quy',
+            'item_type'   => 'herb',
+            'usage_route' => 'oral',
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+        $batchA = \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $itemA->id,
+            'batch_number'       => 'BATCH-A',
+            'expiry_date'        => now()->addYear()->toDateString(),
+            'quantity_remaining' => 100,
+            'status'             => 'available',
+        ]);
+
+        $itemB = \App\Models\InventoryItem::create([
+            'name'        => 'Nhân Sâm',
+            'item_type'   => 'herb',
+            'usage_route' => 'oral',
+            'unit'        => 'g',
+            'is_active'   => true,
+        ]);
+        $batchB = \App\Models\InventoryBatch::create([
+            'inventory_item_id'  => $itemB->id,
+            'batch_number'       => 'BATCH-B',
+            'expiry_date'        => now()->addYear()->toDateString(),
+            'quantity_remaining' => 5,
+            'status'             => 'available',
+        ]);
+
+        $service = app(\App\Services\PrescriptionService::class);
+        $prescription = $service->createPrescription([
+            'medical_record_id' => $record->id,
+            'num_of_doses' => 2,
+            'items' => [
+                ['inventory_item_id' => $itemA->id, 'quantity_per_dose' => 10, 'unit' => 'g'],
+                ['inventory_item_id' => $itemB->id, 'quantity_per_dose' => 10, 'unit' => 'g'],
+            ],
+        ], $admin->id);
+
+        $initialMovementsCount = \App\Models\StockMovement::count();
+
+        try {
+            $service->dispensePrescription($prescription, $admin->id);
+            $this->fail('Dispense should have failed due to insufficient stock.');
+        } catch (\Exception $e) {
+            $this->assertStringContainsString('Không đủ tồn kho', $e->getMessage());
+        }
+
+        $this->assertEquals('confirmed', $prescription->fresh()->status);
+        $this->assertEquals(100, $batchA->fresh()->quantity_remaining);
+        $this->assertEquals(5, $batchB->fresh()->quantity_remaining);
+        $this->assertEquals($initialMovementsCount, \App\Models\StockMovement::count());
+    }
+
+    public function test_interaction_status_only_updates_log_no_prescription_or_stock_changes(): void
+    {
+        $admin   = $this->createAdmin();
+        $patient = $this->createPatient();
+        $record  = $this->createRecord($patient->id, $admin->id);
+
+        $log = AiSuggestionLog::create([
+            'user_id'           => $admin->id,
+            'medical_record_id' => $record->id,
+            'payload'           => [],
+            'response'          => [],
+            'status'            => 'generated',
+        ]);
+
+        $initialPrescriptionsCount = \App\Models\Prescription::count();
+        $initialMovementsCount     = \App\Models\StockMovement::count();
+
+        $response = $this->actingAs($admin)->postJson($this->getLogStatusRoute(), [
+            'log_id'             => $log->id,
+            'interaction_status' => 'referenced',
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertEquals('referenced', $log->fresh()->status);
+        $this->assertEquals($initialPrescriptionsCount, \App\Models\Prescription::count());
+        $this->assertEquals($initialMovementsCount, \App\Models\StockMovement::count());
     }
 }

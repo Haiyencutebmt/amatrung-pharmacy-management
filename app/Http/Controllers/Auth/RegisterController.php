@@ -27,7 +27,7 @@ class RegisterController extends Controller
         $request->validate([
             'name'          => 'required|string|max:100',
             'email'         => 'required|string|email|max:150|unique:users,email',
-            'phone'         => 'nullable|string|max:15|unique:users,phone',
+            'phone'         => 'required|string|max:15|unique:users,phone',
             'password'      => 'required|string|min:6|confirmed',
             'agree_privacy' => 'accepted',
         ], [
@@ -35,6 +35,7 @@ class RegisterController extends Controller
             'email.required'         => 'Vui lòng nhập email.',
             'email.email'            => 'Email không hợp lệ.',
             'email.unique'           => 'Email đã được sử dụng.',
+            'phone.required'         => 'Vui lòng nhập số điện thoại.',
             'phone.unique'           => 'Số điện thoại đã được sử dụng.',
             'password.required'      => 'Vui lòng nhập mật khẩu.',
             'password.min'           => 'Mật khẩu phải có ít nhất 6 ký tự.',

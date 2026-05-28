@@ -8,6 +8,7 @@ use App\Models\Article;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -30,27 +31,34 @@ class ArticleController extends Controller implements HasMiddleware
         }
 
         $articles = $query->orderByDesc('created_at')->paginate(20);
+        $articleCategories = Article::CATEGORIES;
 
-        return view('admin.articles.index', compact('articles'));
+        return view('admin.articles.index', compact('articles', 'articleCategories'));
     }
 
     public function create()
     {
-        return view('admin.articles.create');
+        $articleCategories = Article::CATEGORIES;
+
+        return view('admin.articles.create', compact('articleCategories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title'          => 'required|string|max:255',
+            'summary'        => 'nullable|string|max:200',
+            'category'       => ['required', Rule::in(array_keys(Article::CATEGORIES))],
+            'tags'           => 'nullable|string|max:1000',
             'content'        => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             'is_published'   => 'boolean',
         ]);
 
         $validated['user_id'] = auth()->id();
         $validated['is_published'] = $request->has('is_published');
         $validated['published_at'] = $validated['is_published'] ? now() : null;
+        $validated['tags'] = $this->parseTags($validated['tags'] ?? null);
 
         // Xử lý ảnh base64 trong content
         $validated['content'] = $this->processBase64Images($validated['content']);
@@ -74,15 +82,20 @@ class ArticleController extends Controller implements HasMiddleware
 
     public function edit(Article $article)
     {
-        return view('admin.articles.edit', compact('article'));
+        $articleCategories = Article::CATEGORIES;
+
+        return view('admin.articles.edit', compact('article', 'articleCategories'));
     }
 
     public function update(Request $request, Article $article)
     {
         $validated = $request->validate([
             'title'          => 'required|string|max:255',
+            'summary'        => 'nullable|string|max:200',
+            'category'       => ['required', Rule::in(array_keys(Article::CATEGORIES))],
+            'tags'           => 'nullable|string|max:1000',
             'content'        => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120',
             'is_published'   => 'boolean',
         ]);
 
@@ -94,6 +107,9 @@ class ArticleController extends Controller implements HasMiddleware
         
         $data = [
             'title'        => $newTitle,
+            'summary'      => $validated['summary'] ?? null,
+            'category'     => $validated['category'],
+            'tags'         => $this->parseTags($validated['tags'] ?? null),
             'content'      => $processedContent,
             'is_published' => $is_published,
             'published_at' => $is_published && !$article->published_at ? now() : $article->published_at,
@@ -127,6 +143,21 @@ class ArticleController extends Controller implements HasMiddleware
         $article->update($data);
 
         return redirect()->route('admin.articles.index')->with('success', 'Đã cập nhật bài viết.');
+    }
+
+    private function parseTags(?string $tags): array
+    {
+        if (empty($tags)) {
+            return [];
+        }
+
+        return collect(preg_split('/[,;\n]+/', $tags))
+            ->map(fn ($tag) => trim($tag))
+            ->filter()
+            ->unique()
+            ->take(12)
+            ->values()
+            ->all();
     }
 
     /**
@@ -181,6 +212,27 @@ class ArticleController extends Controller implements HasMiddleware
         $html = str_replace('<?xml encoding="UTF-8">', '', $html);
 
         return $html;
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:articles,id',
+        ], [
+            'ids.required' => 'Vui lòng chọn ít nhất một bài viết để xóa.',
+            'ids.min' => 'Vui lòng chọn ít nhất một bài viết để xóa.',
+        ]);
+
+        $ids = collect($validated['ids'])->map(fn ($id) => (int) $id)->unique()->values();
+        $deletedCount = 0;
+
+        Article::whereIn('id', $ids)->get()->each(function (Article $article) use (&$deletedCount) {
+            $article->delete();
+            $deletedCount++;
+        });
+
+        return redirect()->route('admin.articles.index')->with('success', "Đã xóa {$deletedCount} bài viết.");
     }
 
     public function destroy(Article $article)

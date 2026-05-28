@@ -4,49 +4,9 @@
 
 @section('content')
 <div class="relative bg-gradient-to-b from-sky-50 via-white to-sky-100 min-h-screen pb-20 overflow-hidden font-sans">
-    
-    <!-- Decorative Floating Leaf/Flower (Abstract CSS shapes & gradients) -->
-    <div class="absolute top-20 left-10 w-72 h-72 bg-sky-200/30 rounded-full blur-3xl pointer-events-none z-0"></div>
-    <div class="absolute bottom-40 right-10 w-96 h-96 bg-green-100/40 rounded-full blur-3xl pointer-events-none z-0"></div>
-
-    <!-- Hero Title Section -->
-    <div class="max-w-[1400px] mx-auto px-4 mt-8 md:mt-12 relative z-10">
-        <div class="bg-gradient-to-r from-[#1a5b8f] to-[#4292d6] rounded-[2.5rem] py-12 md:py-16 px-6 md:px-12 text-center md:text-left shadow-lg border border-sky-100 text-white relative overflow-hidden">
-            <!-- Decorative background pattern overlay -->
-            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
-            
-            <div class="max-w-4xl relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
-                <div class="bg-white/10 backdrop-blur-sm p-4 rounded-full border border-white/20">
-                    <img src="{{ asset('images/amatrung_logo.png') }}" class="w-16 h-16 md:w-20 md:h-20 object-contain rounded-full" alt="Logo">
-                </div>
-                <div>
-                    <!-- Badge -->
-                    <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider mb-3 border border-white/20">
-                        KIẾN THỨC Y KHOA — AMATRUNG
-                    </span>
-                    <h1 class="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight mb-4 leading-tight">
-                        {{ $article->title }}
-                    </h1>
-                    
-                    <div class="flex flex-wrap justify-center md:justify-start items-center gap-6 text-sm text-sky-100 font-medium">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center font-bold text-xs">
-                                {{ mb_substr($article->author->name ?? 'A', 0, 1) }}
-                            </div>
-                            <span>Tác giả: {{ $article->author->name ?? 'AmaTrung' }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span>Ngày đăng: {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Back Button -->
-    <div class="max-w-[1400px] mx-auto px-4 mt-6 relative z-10">
+    <div class="max-w-[1360px] mx-auto px-4 pt-8 md:pt-10 relative z-10">
         <a href="{{ route('articles.index') }}" class="inline-flex items-center gap-2 text-[#1a5b8f] hover:text-[#2978c4] font-bold transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Quay lại danh sách bài viết
@@ -54,29 +14,65 @@
     </div>
 
     <!-- Main Content Layout -->
-    <div class="max-w-[1400px] mx-auto px-4 mt-6 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+    <div class="max-w-[1360px] mx-auto px-4 mt-6 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
             
             <!-- Left Side: Article Content & Comments (Column span 8) -->
             <div class="lg:col-span-8 flex flex-col gap-8">
                 
                 <!-- Main Article Content Card -->
-                <article class="bg-white rounded-[2.5rem] shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100 overflow-hidden">
+                <article class="bg-white rounded-2xl shadow-[0_10px_35px_rgba(15,23,42,0.05)] border border-sky-100 overflow-hidden">
+                    <header class="p-7 md:p-10 border-b border-slate-100 bg-white">
+                        @if($article->category_label)
+                            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-blue-700">
+                                {{ $article->category_label }}
+                            </span>
+                        @endif
+
+                        <h1 class="mt-4 text-2xl md:text-4xl font-black leading-tight text-blue-950">
+                            {{ $article->title }}
+                        </h1>
+
+                        @if($article->summary)
+                            <p class="mt-4 max-w-3xl text-sm md:text-base font-semibold leading-relaxed text-slate-600">
+                                {{ $article->summary }}
+                            </p>
+                        @endif
+
+                        <div class="mt-6 flex flex-wrap items-center gap-3 text-sm font-bold text-slate-500">
+                            <div class="inline-flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-[#1a5b8f] flex items-center justify-center font-black text-xs">
+                                    {{ mb_substr($article->author->name ?? 'A', 0, 1) }}
+                                </div>
+                                <span>{{ $article->author->name ?? 'AmaTrung' }}</span>
+                            </div>
+                            <span class="hidden sm:inline text-slate-300">•</span>
+                            <div class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span>{{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}</span>
+                            </div>
+                            <span class="hidden sm:inline text-slate-300">•</span>
+                            <div class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>{{ max(1, ceil(str_word_count(strip_tags($article->content)) / 200)) }} phút đọc</span>
+                            </div>
+                        </div>
+                    </header>
                     
                     {{-- Featured Image Banner --}}
                     @if($article->featured_image)
-                        <div class="w-full relative overflow-hidden border-b border-slate-100 max-h-[480px]">
+                        <div class="w-full relative overflow-hidden border-b border-slate-100 max-h-[420px] bg-slate-50">
                             <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="w-full h-full object-cover">
                         </div>
                     @endif
 
                     {{-- Body Content --}}
-                    <div class="p-8 md:p-12 prose prose-lg prose-slate max-w-none prose-headings:font-black prose-headings:text-[#1a5b8f] prose-a:text-blue-600 prose-img:rounded-[2rem] prose-img:shadow-md prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50/50 prose-blockquote:p-4 prose-blockquote:rounded-r-2xl">
+                    <div class="p-7 md:p-10 prose prose-lg prose-slate max-w-none prose-headings:font-black prose-headings:text-[#1a5b8f] prose-a:text-blue-600 prose-img:rounded-xl prose-img:shadow-md prose-img:max-w-[80%] prose-img:mx-auto prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50/50 prose-blockquote:p-4 prose-blockquote:rounded-r-2xl">
                     {!! $article->content !!}
                     </div>
 
                     <!-- Like / Useful Button Section -->
-                    <div class="px-8 md:px-12 pb-8 border-t border-slate-100 pt-6 flex justify-between items-center bg-slate-50/50">
+                    <div class="px-7 md:px-10 pb-7 border-t border-slate-100 pt-6 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-slate-50/50">
                         <div class="flex items-center gap-2">
                             @auth
                                 <button id="like-btn" data-article-id="{{ $article->id }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 transition-all font-bold text-sm {{ $article->isLikedBy(auth()->user()) ? 'bg-[#1a5b8f] border-[#1a5b8f] text-white shadow-md shadow-blue-500/10' : 'border-sky-200 text-[#1a5b8f] hover:bg-sky-50' }} shadow-sm">
@@ -106,7 +102,7 @@
                 </article>
 
                 <!-- Comments Section Card -->
-                <section class="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100">
+                <section class="bg-white rounded-2xl p-6 md:p-10 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100">
                     <h3 class="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3 border-b border-slate-100 pb-4">
                         <span class="bg-blue-50 text-[#1a5b8f] p-2 rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
@@ -191,7 +187,7 @@
             <div class="lg:col-span-4 flex flex-col gap-8">
                 
                 <!-- Author Profile Card (Earthy / High-end design similar to doctor specs card) -->
-                <div class="bg-white rounded-[2.5rem] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100 flex flex-col items-center text-center">
+                <div class="bg-white rounded-2xl p-6 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100 flex flex-col items-center text-center">
                     <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-[#1a5b8f] to-[#4292d6] text-white font-black flex items-center justify-center text-2xl shadow-md border-4 border-white ring-4 ring-sky-100">
                         {{ mb_substr($article->author->name ?? 'A', 0, 1) }}
                     </div>
@@ -209,7 +205,7 @@
                 </div>
 
                 <!-- Recent Articles Card -->
-                <div class="bg-white rounded-[2.5rem] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100">
+                <div class="bg-white rounded-2xl p-6 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-sky-100">
                     <h3 class="text-lg font-black text-slate-800 mb-6 pb-3 border-b border-slate-100 flex items-center gap-2">
                         <span class="bg-blue-50 text-[#1a5b8f] p-1.5 rounded-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
@@ -315,5 +311,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
-
 

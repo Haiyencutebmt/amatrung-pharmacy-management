@@ -642,21 +642,75 @@
                 </div>
 
                 {{-- Row: Case Type --}}
-                <div style="margin-bottom: 1rem; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.85rem; border-radius: 0.25rem;">
-                    <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 0.4rem;">Phân loại ca khám bệnh</label>
-                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-                        <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; font-weight: 600; color: #1e293b;">
-                            <input type="radio" name="case_type" value="normal" {{ in_array(old('case_type', 'normal'), ['normal', 'general'], true) ? 'checked' : '' }} onchange="toggleCaseTypeModalPatient(this.value)"> 
-                            Khám thông thường (Bốc thuốc uống...)
+                <div class="patient-case-type-panel">
+                    <div class="patient-section-title">
+                        <span>🛡️</span>
+                        Phân loại ca khám bệnh
+                    </div>
+                    <div class="patient-case-type-grid">
+                        <label class="patient-case-type-card patient-case-type-card-green">
+                            <input type="radio" name="case_type" value="normal" {{ in_array(old('case_type', 'normal'), ['normal', 'general'], true) ? 'checked' : '' }} onchange="toggleCaseTypeModalPatient(this.value)">
+                            <span class="patient-case-radio-dot"></span>
+                            <span class="patient-case-icon patient-case-icon-green">🩺</span>
+                            <span class="patient-case-copy">
+                                <strong>Khám thông thường</strong>
+                                <small>(Bốc thuốc uống...)</small>
+                            </span>
                         </label>
-                        <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; font-weight: 700; color: #b91c1c;">
-                            <input type="radio" name="case_type" value="musculoskeletal" {{ old('case_type') === 'musculoskeletal' ? 'checked' : '' }} onchange="toggleCaseTypeModalPatient(this.value)"> 
-                            🦴 Xương khớp - Chấn thương - Trị liệu ngoài
+                        <label class="patient-case-type-card patient-case-type-card-purple">
+                            <input type="radio" name="case_type" value="musculoskeletal" {{ old('case_type') === 'musculoskeletal' ? 'checked' : '' }} onchange="toggleCaseTypeModalPatient(this.value)">
+                            <span class="patient-case-radio-dot"></span>
+                            <span class="patient-case-icon patient-case-icon-purple">🦴</span>
+                            <span class="patient-case-copy">
+                                <strong>Xương khớp - Chấn thương - Trị liệu ngoài</strong>
+                            </span>
                         </label>
-                        <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; font-weight: 700; color: #2563eb;">
-                            <input type="radio" name="case_type" value="combined" {{ in_array(old('case_type'), ['combined', 'both'], true) ? 'checked' : '' }} onchange="toggleCaseTypeModalPatient(this.value)"> 
-                            🔄 Khám kết hợp cả hai
+                        <label class="patient-case-type-card patient-case-type-card-blue">
+                            <input type="radio" name="case_type" value="combined" {{ in_array(old('case_type'), ['combined', 'both'], true) ? 'checked' : '' }} onchange="toggleCaseTypeModalPatient(this.value)">
+                            <span class="patient-case-radio-dot"></span>
+                            <span class="patient-case-icon patient-case-icon-blue">🔄</span>
+                            <span class="patient-case-copy">
+                                <strong>Khám kết hợp cả hai</strong>
+                            </span>
                         </label>
+                    </div>
+                </div>
+
+                {{-- Row: Traditional Diagnosis Helper --}}
+                <div id="traditional_exam_modal_patient" class="patient-tcm-panel">
+                    <div class="patient-section-title patient-section-title-green">
+                        <span>🌿</span>
+                        Tứ chẩn & Biện chứng
+                    </div>
+                    <div class="patient-tcm-grid">
+                        <div class="patient-tcm-card">
+                            <span class="patient-tcm-icon">💬</span>
+                            <div class="patient-tcm-body">
+                                <label for="tcm_inquiry_modal_patient">Hỏi bệnh</label>
+                                <textarea id="tcm_inquiry_modal_patient" name="tcm_inquiry" rows="2" oninput="syncTraditionalExamPatient()" placeholder="Ghi nhận diễn biến bệnh, hoàn cảnh, thói quen, khẩu vị, giấc ngủ...">{{ old('tcm_inquiry') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="patient-tcm-card">
+                            <span class="patient-tcm-icon">👁️</span>
+                            <div class="patient-tcm-body">
+                                <label for="tcm_observation_modal_patient">Vọng + Văn chẩn</label>
+                                <textarea id="tcm_observation_modal_patient" name="tcm_observation" rows="2" oninput="syncTraditionalExamPatient()" placeholder="Quan sát thần sắc, hình thái, lưỡi, rêu lưỡi, sắc mặt, khí sắc...">{{ old('tcm_observation') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="patient-tcm-card">
+                            <span class="patient-tcm-icon">〰️</span>
+                            <div class="patient-tcm-body">
+                                <label for="tcm_pulse_modal_patient">Bắt mạch</label>
+                                <textarea id="tcm_pulse_modal_patient" name="tcm_pulse" rows="2" oninput="syncTraditionalExamPatient()" placeholder="Ghi nhận mạch tượng: tả - hữu, phù - trầm, khẩn - hoãn...">{{ old('tcm_pulse') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="patient-tcm-card">
+                            <span class="patient-tcm-icon">⚖️</span>
+                            <div class="patient-tcm-body">
+                                <label for="tcm_pattern_modal_patient">Biện chứng và luận pháp</label>
+                                <textarea id="tcm_pattern_modal_patient" name="tcm_pattern" rows="2" oninput="syncTraditionalExamPatient()" placeholder="Kết luận tứ chẩn, xác định chứng thể, hư - thực, hàn - nhiệt...">{{ old('tcm_pattern') }}</textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -722,12 +776,12 @@
                 {{-- Row 2: Symptoms & Diagnosis (2 columns side-by-side) --}}
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
                     <div id="symptoms_col_modal_patient">
-                        <label style="display:block; font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:0.4rem;">Triệu chứng <span style="color:#ef4444;">*</span></label>
-                        <textarea name="symptoms" required rows="3" placeholder="Ghi nhận lời khai và triệu chứng của bệnh nhân..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('symptoms') }}</textarea>
+                        <label class="patient-bottom-field-label"><span>📋</span> Triệu chứng <strong>*</strong></label>
+                        <textarea id="symptoms_modal_patient" name="symptoms" required rows="3" oninput="markTraditionalFieldManualPatient('symptoms')" placeholder="Ghi nhận lời khai và triệu chứng của bệnh nhân..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('symptoms') }}</textarea>
                     </div>
                     <div id="diagnosis_col_modal_patient">
-                        <label style="display:block; font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:0.4rem;">Chẩn đoán <span style="color:#ef4444;">*</span></label>
-                        <textarea name="diagnosis" required rows="3" placeholder="Kết luận chẩn đoán (theo YHCT hoặc YHHĐ)..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('diagnosis') }}</textarea>
+                        <label class="patient-bottom-field-label"><span>🎯</span> Chẩn đoán <strong>*</strong></label>
+                        <textarea id="diagnosis_modal_patient" name="diagnosis" required rows="3" oninput="markTraditionalFieldManualPatient('diagnosis')" placeholder="Kết luận chẩn đoán (theo YHCT hoặc YHHĐ)..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('diagnosis') }}</textarea>
                     </div>
                 </div>
 
@@ -959,6 +1013,192 @@
     .record-expand-header:hover {
         background: #fafbfc;
     }
+    .patient-case-type-panel,
+    .patient-tcm-panel {
+        margin-bottom: 1rem;
+        border: 1px solid #d9f5e4;
+        border-radius: 0.6rem;
+        padding: 0.9rem;
+        background: linear-gradient(135deg, #f7fef9 0%, #ffffff 100%);
+    }
+    .patient-section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.8rem;
+        color: #15803d;
+        font-size: 0.9rem;
+        font-weight: 800;
+    }
+    .patient-section-title-green {
+        color: #047857;
+    }
+    .patient-case-type-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    .patient-case-type-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: auto auto 1fr;
+        align-items: center;
+        gap: 0.75rem;
+        min-height: 74px;
+        padding: 0.8rem 1rem;
+        border: 1px solid #dbe5ef;
+        border-radius: 0.5rem;
+        background: #fff;
+        color: #1e293b;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    .patient-case-type-card:hover {
+        border-color: #86efac;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+        transform: translateY(-1px);
+    }
+    .patient-case-type-card input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .patient-case-radio-dot {
+        width: 17px;
+        height: 17px;
+        border: 2px solid #94a3b8;
+        border-radius: 9999px;
+        box-shadow: inset 0 0 0 4px #fff;
+    }
+    .patient-case-type-card:has(input:checked) {
+        border-color: #22c55e;
+        background: #f0fdf4;
+        box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.16);
+    }
+    .patient-case-type-card:has(input:checked) .patient-case-radio-dot {
+        background: #059669;
+        border-color: #059669;
+    }
+    .patient-case-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 0.45rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .patient-case-icon-green,
+    .patient-tcm-icon {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    .patient-case-icon-purple {
+        background: #f3e8ff;
+        color: #7e22ce;
+    }
+    .patient-case-icon-blue {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    .patient-case-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        line-height: 1.35;
+    }
+    .patient-case-copy strong {
+        font-size: 0.88rem;
+        font-weight: 800;
+    }
+    .patient-case-copy small {
+        color: #475569;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+    .patient-tcm-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem 1rem;
+    }
+    .patient-tcm-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.75rem;
+        align-items: flex-start;
+        padding: 0.75rem;
+        border: 1px solid #dbe5ef;
+        border-radius: 0.5rem;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    }
+    .patient-tcm-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 0.45rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    .patient-tcm-body label {
+        display: block;
+        margin-bottom: 0.2rem;
+        color: #1e293b;
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+    .patient-tcm-body textarea {
+        width: 100%;
+        min-height: 46px;
+        padding: 0.3rem 0.1rem;
+        border: none;
+        outline: none;
+        resize: vertical;
+        box-sizing: border-box;
+        color: #1e293b;
+        font-size: 0.84rem;
+        line-height: 1.45;
+        background: transparent;
+    }
+    .patient-tcm-body textarea::placeholder {
+        color: #94a3b8;
+    }
+    .patient-bottom-field-label {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 0.4rem;
+        color: #334155;
+        font-size: 0.82rem;
+        font-weight: 800;
+    }
+    .patient-bottom-field-label span {
+        width: 28px;
+        height: 28px;
+        border-radius: 0.4rem;
+        background: #ecfdf5;
+        color: #16a34a;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #bbf7d0;
+    }
+    .patient-bottom-field-label strong {
+        color: #ef4444;
+    }
+    @media (max-width: 900px) {
+        .patient-case-type-grid,
+        .patient-tcm-grid {
+            grid-template-columns: 1fr;
+        }
+        .patient-case-type-card {
+            grid-template-columns: auto auto 1fr;
+        }
+    }
     @keyframes slideDown {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -967,6 +1207,58 @@
 
 @push('scripts')
 <script>
+function getTraditionalExamPatientValue(id) {
+    return (document.getElementById(id)?.value || '').trim();
+}
+
+function markTraditionalFieldManualPatient(field) {
+    const input = field === 'diagnosis'
+        ? document.getElementById('diagnosis_modal_patient')
+        : document.getElementById('symptoms_modal_patient');
+
+    if (input) {
+        input.dataset.tcmAuto = '0';
+    }
+}
+
+function syncTraditionalExamPatient() {
+    const caseType = document.querySelector('#createRecordInline input[name="case_type"]:checked')?.value || 'normal';
+    if (caseType === 'musculoskeletal') {
+        return;
+    }
+
+    const symptomsInput = document.getElementById('symptoms_modal_patient');
+    const diagnosisInput = document.getElementById('diagnosis_modal_patient');
+    const inquiry = getTraditionalExamPatientValue('tcm_inquiry_modal_patient');
+    const observation = getTraditionalExamPatientValue('tcm_observation_modal_patient');
+    const pulse = getTraditionalExamPatientValue('tcm_pulse_modal_patient');
+    const pattern = getTraditionalExamPatientValue('tcm_pattern_modal_patient');
+
+    const symptomsText = [
+        inquiry ? `Hỏi bệnh: ${inquiry}` : '',
+        observation ? `Vọng + Văn chẩn: ${observation}` : '',
+        pulse ? `Bắt mạch: ${pulse}` : '',
+    ].filter(Boolean).join("\n");
+
+    if (symptomsInput && symptomsText && (!symptomsInput.value.trim() || symptomsInput.dataset.tcmAuto === '1')) {
+        symptomsInput.value = symptomsText;
+        symptomsInput.dataset.tcmAuto = '1';
+    }
+
+    if (symptomsInput && !symptomsText && symptomsInput.dataset.tcmAuto === '1') {
+        symptomsInput.value = '';
+    }
+
+    if (diagnosisInput && pattern && (!diagnosisInput.value.trim() || diagnosisInput.dataset.tcmAuto === '1')) {
+        diagnosisInput.value = pattern;
+        diagnosisInput.dataset.tcmAuto = '1';
+    }
+
+    if (diagnosisInput && !pattern && diagnosisInput.dataset.tcmAuto === '1') {
+        diagnosisInput.value = '';
+    }
+}
+
 function updateRecordFieldsModalPatient() {
     const caseType = document.querySelector('#createRecordInline input[name="case_type"]:checked')?.value || 'normal';
     const injuryTypeSelect = document.querySelector('#createRecordInline select[name="injury_type"]');
@@ -975,9 +1267,14 @@ function updateRecordFieldsModalPatient() {
     const symptomsCol = document.getElementById('symptoms_col_modal_patient');
     const diagnosisCol = document.getElementById('diagnosis_col_modal_patient');
     const gridRow = symptomsCol?.parentElement;
+    const traditionalExam = document.getElementById('traditional_exam_modal_patient');
 
     const symptomsInput = document.querySelector('#createRecordInline textarea[name="symptoms"]');
     const diagnosisInput = document.querySelector('#createRecordInline textarea[name="diagnosis"]');
+
+    if (traditionalExam) {
+        traditionalExam.style.display = caseType === 'musculoskeletal' ? 'none' : 'block';
+    }
 
     if (caseType === 'musculoskeletal') {
         // Hide symptoms
@@ -1042,6 +1339,8 @@ function updateRecordFieldsModalPatient() {
             gridRow.style.display = 'none'; // both hidden
         }
     }
+
+    syncTraditionalExamPatient();
 }
 
 function toggleCaseTypeModalPatient(value) {

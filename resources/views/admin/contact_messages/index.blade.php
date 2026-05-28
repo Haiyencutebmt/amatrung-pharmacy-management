@@ -16,19 +16,19 @@
 @endsection
 
 @section('content')
-<div class="record-index-container" style="margin-top: -1rem;">
+<div class="contact-container" style="font-family: 'Inter', sans-serif; margin-top: -1rem;">
 
     <div class="main-content-card">
         <div class="table-container">
-            <table class="patient-table">
+            <table class="data-table">
                 <thead>
                     <tr>
-                        <th>NGƯỜI GỬI</th>
-                        <th>EMAIL</th>
-                        <th style="width: 40%;">NỘI DUNG YÊU CẦU</th>
-                        <th>NGÀY GỬI</th>
-                        <th>TRẠNG THÁI</th>
-                        <th>HÀNH ĐỘNG</th>
+                        <th style="font-size: 0.75rem;">NGƯỜI GỬI</th>
+                        <th style="font-size: 0.75rem;">EMAIL</th>
+                        <th style="font-size: 0.75rem; width: 40%;">NỘI DUNG YÊU CẦU</th>
+                        <th style="font-size: 0.75rem;">NGÀY GỬI</th>
+                        <th style="font-size: 0.75rem;">TRẠNG THÁI</th>
+                        <th style="font-size: 0.75rem;">HÀNH ĐỘNG</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,12 +59,12 @@
                             @endif
                         </td>
                         <td>
-                            <div style="display: flex; flex-direction: column; gap: 0.5rem; max-width: 130px;">
+                            <div style="display: flex; gap: 0.4rem; align-items: center; max-width: 150px;">
                                 @if($msg->status === 'pending')
                                     <form action="{{ route('admin.contact-messages.update', $msg) }}" method="POST">
                                         @csrf @method('PUT')
                                         <input type="hidden" name="status" value="resolved">
-                                        <button type="submit" class="btn-icon view" style="width: 100%; justify-content: center; border-color: #5eb542; color: #5eb542; font-weight: 700; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.2rem; font-size: 0.8rem;" title="Đánh dấu đã giải quyết">
+                                        <button type="submit" class="btn-action" style="color: #2563eb; border-color: #bfdbfe; background: #eff6ff;" title="Đánh dấu đã giải quyết">
                                             ✅ Giải quyết
                                         </button>
                                     </form>
@@ -72,15 +72,15 @@
                                     <form action="{{ route('admin.contact-messages.update', $msg) }}" method="POST">
                                         @csrf @method('PUT')
                                         <input type="hidden" name="status" value="pending">
-                                        <button type="submit" class="btn-icon view" style="width: 100%; justify-content: center; font-weight: 700; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.2rem; font-size: 0.8rem;" title="Mở lại yêu cầu">
-                                            Mở lại
+                                        <button type="submit" class="btn-action" style="color: #64748b; border-color: #e2e8f0; background: #f8fafc;" title="Mở lại yêu cầu">
+                                            🔄 Mở lại
                                         </button>
                                     </form>
                                 @endif
 
                                 <form action="{{ route('admin.contact-messages.destroy', $msg) }}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa yêu cầu hỗ trợ này?');">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn-icon delete" style="width: 100%; justify-content: center; border-color: #ef4444; color: #ef4444; font-weight: 700; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 0.2rem; font-size: 0.8rem;" title="Xóa">
+                                    <button type="submit" class="btn-action" style="color: #ef4444; border-color: #fecaca; background: #fef2f2;" title="Xóa">
                                         🗑️ Xóa
                                     </button>
                                 </form>
@@ -89,8 +89,8 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" style="text-align: center; color: #64748b; padding: 3rem 1rem; font-weight: 500;">
-                            Không có yêu cầu hỗ trợ nào.
+                        <td colspan="6" style="padding: 3rem; text-align: center; color: #64748b; font-size: 0.95rem; font-weight: 500;">
+                            🔍 Không có yêu cầu hỗ trợ nào.
                         </td>
                     </tr>
                     @endforelse
@@ -108,4 +108,116 @@
         @endif
     </div>
 </div>
+
+<style>
+/* Same CSS structure as users/patients page */
+.main-content-card {
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    border: 1px solid #f1f5f9;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+    text-align: left;
+}
+
+.data-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-table tr:hover {
+    background: #f8fafc;
+}
+
+.patient-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.name {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.9rem;
+}
+
+.btn-action {
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.4rem;
+    border: 1px solid;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-action:hover {
+    filter: brightness(0.95);
+    transform: scale(1.02);
+}
+
+.pagination-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+.pagination-area .summary {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Pagination Overrides for Laravel */
+.custom-pagination nav {
+    display: flex;
+    align-items: center;
+}
+.custom-pagination nav > div:first-child {
+    display: none;
+}
+.custom-pagination svg {
+    width: 14px;
+    height: 14px;
+}
+</style>
+
 @endsection

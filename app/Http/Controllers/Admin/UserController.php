@@ -17,6 +17,10 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
+        if ($request->has('status') && $request->status != '') {
+            $query->where('is_active', $request->status);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -28,7 +32,12 @@ class UserController extends Controller
 
         $users = $query->orderBy('role')->orderByDesc('created_at')->paginate(20);
 
-        return view('admin.users.index', compact('users'));
+        $totalUsers = User::count();
+        $adminCount = User::where('role', 'admin')->count();
+        $staffCount = User::where('role', 'staff')->count();
+        $activeCount = User::where('is_active', 1)->count();
+
+        return view('admin.users.index', compact('users', 'totalUsers', 'adminCount', 'staffCount', 'activeCount'));
     }
 
     public function create()
@@ -144,5 +153,39 @@ class UserController extends Controller
 
         $user->update(['password' => Hash::make('amatrung@123')]);
         return redirect()->back()->with('success', "Đã đặt lại mật khẩu thành 'amatrung@123'.");
+    }
+
+    public function destroy(User $user)
+    {
+        if ($user->role === 'user') {
+            return redirect()->route('admin.users.index')->with('error', 'Không được phép xóa tài khoản của khách hàng.');
+        }
+
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Bạn không thể tự xóa tài khoản của chính mình.');
+        }
+
+        $user->delete();
+        return redirect()->back()->with('success', 'Đã xóa tài khoản nhân viên thành công.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids');
+        if (empty($ids)) {
+            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một tài khoản để xóa.');
+        }
+
+        // Only allow deleting staff accounts
+        $deleted = User::whereIn('id', $ids)
+            ->where('role', 'staff')
+            ->where('id', '!=', auth()->id())
+            ->delete();
+
+        if ($deleted > 0) {
+            return redirect()->back()->with('success', "Đã xóa thành công $deleted tài khoản nhân viên.");
+        }
+
+        return redirect()->back()->with('error', 'Không có tài khoản nào được xóa (chỉ có thể xóa tài khoản nhân viên).');
     }
 }

@@ -5,7 +5,7 @@
 
 @section('header-left')
 <div class="header-title" style="display: flex; align-items: center; gap: 1rem;">
-    <div class="icon-bg" style="width: 44px; height: 44px; background: #eef9ee; color: #5eb542; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+    <div class="icon-bg" style="width: 44px; height: 44px; background: #eff6ff; color: #2563eb; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
         <span class="icon">📋</span>
     </div>
     <div>
@@ -23,7 +23,7 @@
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-title-group">
-                    <div class="stat-icon-outline" style="border-color: #5eb542; color: #5eb542; background: #f0fdf4;">
+                    <div class="stat-icon-outline" style="border-color: #2563eb; color: #2563eb; background: #eff6ff;">
                         <span class="icon">📋</span>
                     </div>
                     <span class="stat-title">Tổng Bệnh Án</span>
@@ -151,7 +151,7 @@
             <table class="patient-table">
                 <thead>
                     <tr>
-                        <th style="width: 40px;" class="screen-only"><input type="checkbox" id="selectAll" style="accent-color: #5eb542; cursor: pointer; width: 1.1rem; height: 1.1rem;"></th>
+                        <th style="width: 40px;" class="screen-only"><input type="checkbox" id="selectAll" style="accent-color: #2563eb; cursor: pointer; width: 1.1rem; height: 1.1rem;"></th>
                         <th style="width: 90px;">MÃ BA</th>
                         <th style="width: 100px;">NGÀY KHÁM</th>
                         <th style="width: 250px;">BỆNH NHÂN</th>
@@ -259,7 +259,7 @@ window.onclick = function(event) {
 
 <style>
 .record-index-container {
-    --primary-green: #5eb542;
+    --primary-green: #2563eb;
     --text-dark: #1e293b;
     --text-muted: #64748b;
     --bg-light: #f8fafc;
@@ -275,8 +275,8 @@ window.onclick = function(event) {
 .header-title .icon-bg {
     width: 48px;
     height: 48px;
-    background: #eef9ee;
-    color: #5eb542;
+    background: #eff6ff;
+    color: #2563eb;
     border-radius: 1rem;
     display: flex;
     align-items: center;
@@ -427,9 +427,9 @@ window.onclick = function(event) {
 }
 
 .bg-green-light {
-    background: #f0fdf4;
-    color: #16a34a;
-    border: 1px solid #dcfce7;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
 }
 
 .stat-footer {
@@ -513,11 +513,11 @@ window.onclick = function(event) {
 .btn-add {
     padding: 0.75rem 1.5rem;
     border-radius: 0.25rem;
-    background: #5eb542;
+    background: #2563eb;
     color: #fff;
     text-decoration: none;
     font-weight: 700;
-    box-shadow: 0 2px 6px rgba(94, 181, 66, 0.15);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -608,13 +608,13 @@ window.onclick = function(event) {
 }
 
 .patient-code {
-    background: #f0fdf4;
-    color: #16a34a;
+    background: #eff6ff;
+    color: #2563eb;
     padding: 0.25rem 0.5rem;
     border-radius: 0.125rem;
     font-weight: 700;
     font-size: 0.8rem;
-    border: 1px solid #bbf7d0;
+    border: 1px solid #bfdbfe;
     font-family: monospace;
 }
 
@@ -689,9 +689,9 @@ window.onclick = function(event) {
 }
 
 .page-item.active .page-link {
-    background: #5eb542;
+    background: #2563eb;
     color: #fff;
-    border-color: #5eb542;
+    border-color: #2563eb;
 }
 
 @keyframes modalSlideIn {
@@ -724,7 +724,7 @@ window.onclick = function(event) {
     <div style="background:#fff; border-radius:0.5rem; width:95%; max-width:1250px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); animation: modalSlideIn 0.25s ease-out; margin:0 auto; box-sizing:border-box;">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:1.25rem 2rem; border-bottom:1px solid #f1f5f9;">
             <div style="display:flex; align-items:center; gap:0.75rem;">
-                <div style="width:40px; height:40px; background:#f0fdf4; color:#16a34a; border-radius:0.25rem; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🩺</div>
+                <div style="width:40px; height:40px; background:#eff6ff; color:#2563eb; border-radius:0.25rem; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🩺</div>
                 <div>
                     <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#0f172a;">Tạo Bệnh Án Mới</h3>
                     <p style="margin:0; font-size:0.8rem; color:#64748b;">Lập bệnh án cho lượt khám hiện tại</p>
@@ -875,7 +875,7 @@ window.onclick = function(event) {
             {{-- Footer Action Buttons --}}
             <div style="display:flex; gap:1rem; justify-content:flex-end; border-top:1px solid #f1f5f9; padding-top:1.25rem;">
                 <button type="button" onclick="document.getElementById('createRecordModal').style.display='none'" style="padding:0.6rem 1.5rem; background:#fff; color:#64748b; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; font-weight:600; cursor:pointer;">Hủy</button>
-                <button type="submit" style="padding:0.6rem 1.5rem; background:#5eb542; color:#fff; border:none; border-radius:0.25rem; font-size:0.9rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(94,181,66,0.15);">Lưu Bệnh Án</button>
+                <button type="submit" style="padding:0.6rem 1.5rem; background:#2563eb; color:#fff; border:none; border-radius:0.25rem; font-size:0.9rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(37,99,235,0.15);">Lưu Bệnh Án</button>
             </div>
         </form>
     </div>

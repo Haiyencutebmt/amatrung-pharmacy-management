@@ -237,4 +237,15 @@ class MedicinalHerb extends Model
             default        => 'Không xác định',
         };
     }
+
+    /** Lấy mã lô hàng mới nhất từ hệ thống kho mới để hiển thị/sửa trên UI */
+    public function getLatestBatchCodeAttribute(): string
+    {
+        $item = \App\Models\InventoryItem::where('name', $this->name)->first();
+        if ($item) {
+            $batch = $item->batches()->orderBy('id', 'desc')->first();
+            return $batch ? ($batch->batch_number ?? '') : '';
+        }
+        return '';
+    }
 }

@@ -7,6 +7,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'AmaTrung — Y Học Cổ Truyền')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .goog-te-banner-frame,
+        .goog-te-banner-frame.skiptranslate,
+        iframe.skiptranslate,
+        .skiptranslate iframe,
+        .goog-te-gadget,
+        #google_translate_element {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+    </style>
 </head>
 <body class="bg-[var(--color-surface-bg)] text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
@@ -72,15 +86,20 @@
                 @auth
                     <!-- Tài khoản dropdown pill -->
                     <div class="relative group/user">
-                        <button class="inline-flex items-center gap-1.5 px-5 py-2.5 text-base font-bold bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all shadow-md shadow-blue-500/10 focus:outline-none">
-                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            <span>Tài khoản</span>
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        <button class="inline-flex items-center gap-1.5 pl-1.5 pr-4 py-1 text-base font-bold bg-white border border-slate-200 hover:border-blue-200 text-slate-700 rounded-full transition-all shadow-sm focus:outline-none">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover">
+                            @else
+                                <div class="w-9 h-9 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black">
+                                    {{ mb_substr(auth()->user()->name, 0, 1) }}
+                                </div>
+                            @endif
+                            <span class="max-w-[100px] truncate">{{ auth()->user()->name }}</span>
+                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <!-- User Dropdown Menu -->
                         <div class="absolute right-0 mt-2.5 w-52 bg-white rounded-2xl shadow-xl py-2 z-50 hidden group-hover/user:block border border-slate-100 overflow-hidden">
                             <a href="{{ url('/dashboard') }}" class="block px-5 py-3 text-base font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Bảng điều khiển</a>
-                            <a href="{{ url('/profile') }}" class="block px-5 py-3 text-base font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Hồ sơ cá nhân</a>
                             <div class="border-t border-slate-100 my-1"></div>
                             <form action="{{ url('/logout') }}" method="POST" class="block w-full">
                                 @csrf
@@ -97,6 +116,21 @@
                         <span>Đăng nhập</span>
                     </a>
                 @endauth
+
+                <!-- Favorites Heart Button -->
+                <a href="{{ route('profile.favorites') }}" class="w-11 h-11 rounded-full bg-slate-50 hover:bg-rose-50 flex items-center justify-center text-slate-400 hover:text-rose-500 border border-slate-100 transition-all focus:outline-none relative group/fav cursor-pointer" title="Mục yêu thích">
+                    <svg class="w-6 h-6 fill-none group-hover/fav:fill-rose-500 transition-all" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    @auth
+                        @php
+                            $favCount = auth()->user()->likedArticles()->count() + auth()->user()->herbDictionaryFavorites()->count();
+                        @endphp
+                        @if($favCount > 0)
+                            <span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0 min-w-[18px] border border-white">
+                                {{ $favCount }}
+                            </span>
+                        @endif
+                    @endauth
+                </a>
 
                 <!-- Settings/Theme Toggle Dropdown -->
                 <div class="relative group/settings">
@@ -120,21 +154,41 @@
         </header>
     </div>
 
-    {{-- Flash messages --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    {{-- Floating Toast Notifications (Bottom Right) --}}
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[99999] flex flex-col gap-3.5 max-w-sm w-full pointer-events-none">
         @if(session('status'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                {{ session('status') }}
+            <div class="toast-item bg-emerald-500 text-white px-5 py-4 rounded-2xl shadow-xl flex items-center gap-3 pointer-events-auto transition-all duration-500 translate-y-10 opacity-0 border border-emerald-400/30">
+                <span class="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 font-black">✓</span>
+                <div class="text-sm font-bold tracking-wide">{{ session('status') }}</div>
             </div>
         @endif
         @if(session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm font-medium flex items-center gap-2">
-                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                {{ session('error') }}
+            <div class="toast-item bg-rose-500 text-white px-5 py-4 rounded-2xl shadow-xl flex items-center gap-3 pointer-events-auto transition-all duration-500 translate-y-10 opacity-0 border border-rose-400/30">
+                <span class="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 font-black">✕</span>
+                <div class="text-sm font-bold tracking-wide">{{ session('error') }}</div>
             </div>
         @endif
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toasts = document.querySelectorAll('.toast-item');
+            toasts.forEach(toast => {
+                // Show toast with slide & fade
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-10', 'opacity-0');
+                }, 150);
+
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-[-20px]');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
 
     <main class="flex-grow">
         @yield('content')
@@ -194,18 +248,115 @@
     <!-- Google Translate Script -->
     <div id="google_translate_element" class="hidden"></div>
     <script type="text/javascript">
+        const AmaTrungLanguage = {
+            defaultLanguage: 'vi',
+            supportedLanguages: ['vi', 'en', 'zh-CN'],
+            storageKey: 'amatrung-language',
+
+            cookieValue(langCode) {
+                return `/vi/${langCode}`;
+            },
+
+            canUseDomainCookie() {
+                return window.location.hostname
+                    && window.location.hostname !== 'localhost'
+                    && !/^\d{1,3}(\.\d{1,3}){3}$/.test(window.location.hostname);
+            },
+
+            setCookie(langCode) {
+                const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+                const value = this.cookieValue(langCode);
+
+                document.cookie = `googtrans=${value}; expires=${expires}; path=/`;
+
+                if (this.canUseDomainCookie()) {
+                    document.cookie = `googtrans=${value}; expires=${expires}; domain=.${window.location.hostname}; path=/`;
+                }
+            },
+
+            clearCookie() {
+                document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+
+                if (this.canUseDomainCookie()) {
+                    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.${window.location.hostname}; path=/`;
+                }
+            },
+
+            getStoredLanguage() {
+                const stored = localStorage.getItem(this.storageKey);
+                return this.supportedLanguages.includes(stored) ? stored : this.defaultLanguage;
+            },
+
+            remember(langCode) {
+                if (langCode === this.defaultLanguage) {
+                    localStorage.removeItem(this.storageKey);
+                    this.clearCookie();
+                    return;
+                }
+
+                localStorage.setItem(this.storageKey, langCode);
+                this.setCookie(langCode);
+            },
+
+            apply(langCode, retry = 0) {
+                if (langCode === this.defaultLanguage) {
+                    return;
+                }
+
+                const selectField = document.querySelector('.goog-te-combo');
+
+                if (selectField) {
+                    selectField.value = langCode;
+                    selectField.dispatchEvent(new Event('change', { bubbles: true }));
+                    return;
+                }
+
+                if (retry < 10) {
+                    window.setTimeout(() => this.apply(langCode, retry + 1), 300);
+                }
+            },
+
+            change(langCode) {
+                if (!this.supportedLanguages.includes(langCode)) {
+                    return;
+                }
+
+                this.remember(langCode);
+
+                if (langCode === this.defaultLanguage) {
+                    window.location.reload();
+                    return;
+                }
+
+                const selectField = document.querySelector('.goog-te-combo');
+                if (selectField) {
+                    selectField.value = langCode;
+                    selectField.dispatchEvent(new Event('change', { bubbles: true }));
+                    return;
+                }
+
+                window.setTimeout(() => window.location.reload(), 150);
+            },
+        };
+
         function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'vi', includedLanguages: 'en,vi,zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+            new google.translate.TranslateElement({
+                pageLanguage: 'vi',
+                includedLanguages: 'en,vi,zh-CN',
+                autoDisplay: false,
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+
+            window.setTimeout(() => {
+                AmaTrungLanguage.apply(AmaTrungLanguage.getStoredLanguage());
+            }, 500);
         }
+
         function changeLanguage(langCode) {
-            var selectField = document.querySelector(".goog-te-combo");
-            if (selectField) {
-                selectField.value = langCode;
-                selectField.dispatchEvent(new Event('change'));
-            }
+            AmaTrungLanguage.change(langCode);
         }
     </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <!-- Dark Mode Script -->
     <script>
@@ -352,7 +503,7 @@
         });
     </script>
     <!-- Floating Social Contacts Sidebar -->
-    <div class="fixed right-4 md:right-6 top-1/2 -translate-y-1/2 z-[9990] flex flex-col items-center gap-4 bg-white/90 backdrop-blur-md rounded-full py-6 px-3 shadow-[0_15px_45px_rgba(0,0,0,0.12)] border border-sky-100/70 hover:shadow-[0_20px_55px_rgba(0,0,0,0.18)] transition-all duration-300">
+    <div id="floating-social-contacts" data-floating-social class="fixed right-4 md:right-6 top-1/2 -translate-y-1/2 z-[9990] flex flex-col items-center gap-4 bg-white/90 backdrop-blur-md rounded-full py-6 px-3 shadow-[0_15px_45px_rgba(0,0,0,0.12)] border border-sky-100/70 hover:shadow-[0_20px_55px_rgba(0,0,0,0.18)] transition-all duration-300">
         <!-- Facebook -->
         <a href="https://www.facebook.com/hieu.trieu.3382" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full flex items-center justify-center bg-[#1877F2]/10 hover:bg-[#1877F2] text-[#1877F2] hover:text-white transition-all duration-300 hover:scale-110 shadow-sm" title="Facebook">
             <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
@@ -379,5 +530,6 @@
             </svg>
         </a>
     </div>
-</body>
+
+    </div>
 </html>

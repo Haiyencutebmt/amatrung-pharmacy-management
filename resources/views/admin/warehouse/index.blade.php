@@ -200,6 +200,7 @@
                                            data-unit="{{ e($herb->unit) }}"
                                            data-stock_quantity="{{ floatval($herb->stock_quantity) }}"
                                            data-expiry_date="{{ $herb->expiry_date?->format('Y-m-d') }}"
+                                           data-batch_code="{{ e($herb->latest_batch_code) }}"
                                            data-status="{{ e($herb->status) }}"
                                            data-warning_note="{{ e($herb->warning_note) }}"
                                            data-description="{{ e($herb->description) }}">
@@ -623,6 +624,10 @@
                         <input type="date" name="expiry_date" class="wh-form-input" value="{{ old('expiry_date') }}">
                     </div>
                     <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <label style="font-weight:700; color:#475569; font-size:0.9rem;">Mã lô hàng <span style="color:#ef4444;">*</span></label>
+                        <input type="text" name="batch_code" class="wh-form-input" placeholder="VD: LO-001..." value="{{ old('batch_code') }}" required>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
                         <label style="font-weight:700; color:#475569; font-size:0.9rem;">Trạng thái <span style="color:#ef4444;">*</span></label>
                         <select name="status" class="wh-form-input" required>
                             <option value="active" {{ old('status')=='active'?'selected':'' }}>Đang sử dụng</option>
@@ -694,6 +699,10 @@
                     <div style="display:flex; flex-direction:column; gap:0.5rem;">
                         <label style="font-weight:700; color:#475569; font-size:0.9rem;">Hạn sử dụng</label>
                         <input type="date" name="expiry_date" id="edit_expiry_date" class="wh-form-input">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <label style="font-weight:700; color:#475569; font-size:0.9rem;">Mã lô hàng <span style="color:#ef4444;">*</span></label>
+                        <input type="text" name="batch_code" id="edit_batch_code" class="wh-form-input" placeholder="VD: LO-001..." required>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:0.5rem;">
                         <label style="font-weight:700; color:#475569; font-size:0.9rem;">Trạng thái <span style="color:#ef4444;">*</span></label>
@@ -959,6 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('edit_unit').value = this.dataset.unit || '';
                 document.getElementById('edit_stock_quantity').value = this.dataset.stock_quantity || '0';
                 document.getElementById('edit_expiry_date').value = this.dataset.expiry_date || '';
+                document.getElementById('edit_batch_code').value = this.dataset.batch_code || '';
                 document.getElementById('edit_status').value = this.dataset.status || 'active';
                 document.getElementById('edit_warning_note').value = this.dataset.warning_note || '';
                 document.getElementById('edit_description').value = this.dataset.description || '';

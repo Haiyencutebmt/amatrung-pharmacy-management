@@ -11,6 +11,12 @@ class AccountManagementSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+    }
+
     public function test_admin_cannot_edit_update_or_delete_user_role_account(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

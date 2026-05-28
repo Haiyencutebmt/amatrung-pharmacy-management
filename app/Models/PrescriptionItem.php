@@ -52,6 +52,16 @@ class PrescriptionItem extends Model
         return $this->belongsTo(InventoryItem::class);
     }
 
+    public function medicinalHerb()
+    {
+        return $this->belongsTo(MedicinalHerb::class);
+    }
+
+    public function packagedProduct()
+    {
+        return $this->belongsTo(PackagedProduct::class);
+    }
+
     // ── Helpers ───────────────────────────────────────────────
 
     /** Lấy tên hiển thị: ưu tiên tên kho, fallback custom_name */

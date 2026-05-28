@@ -311,11 +311,24 @@ PROMPT;
         if (!empty($data['external_herbs']) && is_array($data['external_herbs'])) {
             foreach ($data['external_herbs'] as $item) {
                 if (empty($item['custom_name'])) continue;
-                $externalHerbs[] = [
-                    'custom_name'       => $item['custom_name'],
-                    'usage_area'        => $item['usage_area'] ?? '',
-                    'usage_instruction' => $item['usage_instruction'] ?? '',
-                ];
+                $itemNameLower = mb_strtolower(trim($item['custom_name']));
+                // Kiểm tra kho: tên item phải khớp một phần với tên trong kho
+                $inStock = !empty($inventoryNames) && (function () use ($itemNameLower, $inventoryNames) {
+                    foreach ($inventoryNames as $inv) {
+                        if (str_contains($inv, $itemNameLower) || str_contains($itemNameLower, $inv)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })();
+
+                if ($inStock) {
+                    $externalHerbs[] = [
+                        'custom_name'       => $item['custom_name'],
+                        'usage_area'        => $item['usage_area'] ?? '',
+                        'usage_instruction' => $item['usage_instruction'] ?? '',
+                    ];
+                }
             }
         }
 

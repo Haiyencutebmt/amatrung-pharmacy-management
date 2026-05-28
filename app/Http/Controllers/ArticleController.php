@@ -7,14 +7,50 @@ use App\Models\Article;
 
 class ArticleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $articleCategories = Article::CATEGORIES;
+        $selectedCategory = array_key_exists($request->query('category'), $articleCategories)
+            ? $request->query('category')
+            : null;
+        $search = trim((string) $request->query('search', ''));
+
         $articles = Article::with('author')
-            ->published()
+            ->withCount('likedByUsers')
+            ->published();
+
+        if (auth()->check()) {
+            $articles->with([
+                'likedByUsers' => fn ($query) => $query->where('user_id', auth()->id()),
+            ]);
+        }
+
+        if ($selectedCategory) {
+            $articles->where('category', $selectedCategory);
+        }
+
+        if ($search !== '') {
+            $matchingCategories = collect($articleCategories)
+                ->filter(fn ($label) => str_contains(mb_strtolower($label, 'UTF-8'), mb_strtolower($search, 'UTF-8')))
+                ->keys()
+                ->all();
+
+            $articles->where(function ($query) use ($search, $matchingCategories) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('summary', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+
+                if (!empty($matchingCategories)) {
+                    $query->orWhereIn('category', $matchingCategories);
+                }
+            });
+        }
+
+        $articles = $articles
             ->latest('published_at')
             ->paginate(12);
 
-        return view('articles.index', compact('articles'));
+        return view('articles.index', compact('articles', 'articleCategories', 'selectedCategory', 'search'));
     }
 
     public function show($slug)
@@ -54,9 +90,14 @@ class ArticleController extends Controller
 
         $likesCount = $article->likedByUsers()->count();
 
-        return response()->json([
-            'liked' => $liked,
-            'likes_count' => $likesCount,
-        ]);
+        if (request()->expectsJson()) {
+            return response()->json([
+                'liked' => $liked,
+                'likes_count' => $likesCount,
+            ]);
+        }
+
+        $statusMessage = $liked ? 'Đã thêm bài viết vào danh sách yêu thích.' : 'Đã bỏ bài viết khỏi danh sách yêu thích.';
+        return back()->with('status', $statusMessage);
     }
 }

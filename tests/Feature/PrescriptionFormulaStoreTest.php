@@ -8,6 +8,9 @@ use App\Models\Patient;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 use App\Models\User;
+use App\Models\InventoryItem;
+use App\Models\InventoryBatch;
+use App\Models\StockMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -48,6 +51,26 @@ class PrescriptionFormulaStoreTest extends TestCase
             'status' => 'active',
         ]);
 
+        // Seed new inventory tables
+        $item = InventoryItem::create([
+            'name' => 'Kim tiền thảo',
+            'item_type' => 'herb',
+            'usage_route' => 'oral',
+            'unit' => 'g',
+            'is_active' => true,
+            'legacy_source_table' => 'medicinal_herbs',
+            'legacy_source_id' => $herb->id,
+        ]);
+
+        $batch = InventoryBatch::create([
+            'inventory_item_id' => $item->id,
+            'batch_number' => 'BATCH-TEST',
+            'expiry_date' => now()->addYear()->toDateString(),
+            'quantity_remaining' => 100.0,
+            'status' => 'available',
+        ]);
+
+        // 1. Post to store
         $response = $this->actingAs($admin)->post(route('admin.prescriptions.store'), [
             'medical_record_id' => $record->id,
             'treatment_type' => 'herbal_only',
@@ -57,13 +80,11 @@ class PrescriptionFormulaStoreTest extends TestCase
             'course_days' => 3,
             'items' => [
                 [
-                    'item_type' => 'formula_herb',
-                    'herb_id' => $herb->id,
-                    'custom_name' => 'Kim tiền thảo',
-                    'quantity' => 10,
+                    'item_type' => 'herb',
+                    'inventory_item_id' => $item->id,
+                    'quantity_per_dose' => 10,
                     'unit' => 'g',
                     'dosage' => 'Sắc cùng thang thuốc',
-                    'formula_group_id' => 'formula_test_1',
                     'affects_stock' => '1',
                 ],
             ],
@@ -77,13 +98,20 @@ class PrescriptionFormulaStoreTest extends TestCase
 
         $this->assertDatabaseHas('prescription_items', [
             'prescription_id' => $prescription->id,
-            'medicinal_herb_id' => $herb->id,
-            'item_type' => 'formula_herb',
-            'quantity' => 10,
+            'inventory_item_id' => $item->id,
+            'item_type' => 'herb',
+            'quantity' => 30, // 10 * 3
             'unit' => 'g',
         ]);
 
-        $this->assertSame(70.0, (float) $herb->fresh()->stock_quantity);
-        $this->assertSame(1, PrescriptionItem::where('item_type', 'formula_herb')->count());
+        // Before dispense, stock is untouched
+        $this->assertSame(100.0, (float) $batch->fresh()->quantity_remaining);
+
+        // 2. Dispense
+        $this->actingAs($admin)->post(route('admin.prescriptions.dispense', $prescription))
+            ->assertRedirect();
+
+        $this->assertEquals('dispensed', $prescription->fresh()->status);
+        $this->assertSame(70.0, (float) $batch->fresh()->quantity_remaining);
     }
 }

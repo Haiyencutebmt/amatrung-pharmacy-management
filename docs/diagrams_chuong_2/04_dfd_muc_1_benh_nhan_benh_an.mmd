@@ -1,0 +1,32 @@
+flowchart TB
+    Staff[Staff / Admin]
+    PatientUI[Man hinh benh nhan va benh an]
+    P31((3.1 Quan ly benh nhan))
+    P32((3.2 Kiem tra trung va import ho so cu))
+    P33((3.3 Tao / cap nhat benh an))
+    P34((3.4 File dinh kem va in benh an))
+    P35((3.5 Tao lich tai kham))
+
+    DPatient[(patients)]
+    DRecord[(medical_records)]
+    DAttach[(medical_record_attachments)]
+    DAppt[(appointments)]
+    DUser[(users)]
+
+    Staff --> PatientUI
+    PatientUI --> P31
+    P31 <--> DPatient
+    P31 --> P32
+    P32 <--> DPatient
+
+    PatientUI --> P33
+    P33 --> DPatient
+    P33 <--> DRecord
+    P33 --> DUser
+
+    PatientUI --> P34
+    P34 --> DRecord
+    P34 <--> DAttach
+
+    P33 --> P35
+    P35 <--> DAppt

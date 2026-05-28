@@ -3,102 +3,292 @@
 @section('title', 'Bài Viết — AmaTrung')
 
 @section('content')
-<div class="bg-[var(--color-surface-bg)] min-h-screen pb-20">
-    
-    {{-- Hero Section --}}
-    <section class="bg-primary-900 pt-16 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <!-- Background elements -->
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-[20%] right-[10%] w-[50%] h-[50%] bg-primary-700/20 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-green-500/10 rounded-full blur-3xl"></div>
-        </div>
+@php
+    $categoryIcons = [
+        'duoc-lieu-bai-thuoc' => [
+            'label' => 'Dược liệu & bài thuốc',
+            'icon' => 'M12 3.75c2.9 0 5.25 2.35 5.25 5.25 0 4.08-3.28 7.25-5.25 8.94C10.03 16.25 6.75 13.08 6.75 9A5.25 5.25 0 0 1 12 3.75Zm0 14.19V21m0-3.06c-2.9-.83-6.75-3.6-6.75-8.94A6.75 6.75 0 0 1 12 2.25 6.75 6.75 0 0 1 18.75 9c0 5.34-3.85 8.11-6.75 8.94Z',
+            'tone' => 'text-emerald-600 bg-emerald-50',
+        ],
+        'benh-hoc-phuong-phap-dieu-tri' => [
+            'label' => 'Bệnh học & điều trị',
+            'icon' => 'M12 3.75 19.5 7.5v4.88c0 4.66-3.18 7.82-7.5 8.87-4.32-1.05-7.5-4.21-7.5-8.87V7.5L12 3.75Zm0 4.5v7.5m-3.75-3.75h7.5',
+            'tone' => 'text-blue-600 bg-blue-50',
+        ],
+        'cham-soc-suc-khoe-duong-sinh' => [
+            'label' => 'Chăm sóc & dưỡng sinh',
+            'icon' => 'M12 21c-3.86-3.16-7.5-6.5-7.5-10.88A4.12 4.12 0 0 1 8.62 6c1.32 0 2.55.63 3.38 1.62A4.42 4.42 0 0 1 15.38 6a4.12 4.12 0 0 1 4.12 4.12C19.5 14.5 15.86 17.84 12 21Z',
+            'tone' => 'text-cyan-600 bg-cyan-50',
+        ],
+        'tin-tuc-phong-kham' => [
+            'label' => 'Tin tức phòng khám',
+            'icon' => 'M5.25 4.5h13.5v15H5.25v-15Zm3 3h7.5m-7.5 3h7.5m-7.5 3h4.5',
+            'tone' => 'text-indigo-600 bg-indigo-50',
+        ],
+        'y-hoc-hien-dai-ket-hop' => [
+            'label' => 'Y học hiện đại kết hợp',
+            'icon' => 'M12 3.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5Zm0 3v10.5m-4.5-5.25h9',
+            'tone' => 'text-violet-600 bg-violet-50',
+        ],
+    ];
 
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <div class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-primary-800/60 border border-primary-700/50 mb-6 backdrop-blur-sm text-green-50 font-semibold text-sm">
-                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                Góc thư viện
-            </div>
-            
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-                Kiến thức <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-200">Y Học Cổ Truyền</span>
-            </h1>
-            
-            <p class="text-xl text-primary-100/90 leading-relaxed max-w-2xl mx-auto">
-                Cập nhật những thông tin y khoa chuẩn xác, các bài thuốc dân gian và phương pháp điều trị hiệu quả từ đội ngũ bác sĩ chuyên môn.
-            </p>
-        </div>
-    </section>
+    $latestArticles = $articles->getCollection()->take(3);
+@endphp
 
-    {{-- Main Content --}}
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
-        @if($articles->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($articles as $article)
-                    <article class="relative bg-white rounded-[2rem] overflow-hidden shadow-sm border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group h-full">
-                        
-                        {{-- Article Image / Decorative Header --}}
-                        <div class="h-48 relative overflow-hidden flex-shrink-0 border-b border-slate-100">
-                            @if($article->featured_image)
-                                <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                            @else
-                                <div class="w-full h-full bg-gradient-to-br from-primary-50 to-green-50 flex items-center justify-center">
-                                    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, #047857 1px, transparent 0); background-size: 20px 20px;"></div>
-                                </div>
-                            @endif
-                            
-                            <div class="absolute bottom-4 left-6 flex gap-2 z-10">
-                                <span class="bg-white/90 backdrop-blur-sm text-primary-700 text-xs font-extrabold px-3 py-1.5 rounded-full shadow-sm">
-                                    {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
-                                </span>
-                            </div>
-                        </div>
+<div class="bg-[var(--color-surface-bg)] min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
 
-                        {{-- Article Content --}}
-                        <div class="p-8 flex flex-col flex-grow">
-                            <h2 class="text-xl font-extrabold text-slate-800 mb-3 line-clamp-2 leading-snug group-hover:text-primary-600 transition-colors">
-                                <a href="{{ route('articles.show', $article->slug) }}" class="focus:outline-none">
-                                    <span class="absolute inset-0" aria-hidden="true"></span>
-                                    {{ $article->title }}
-                                </a>
-                            </h2>
-                            
-                            <p class="text-slate-500 mb-6 line-clamp-3 leading-relaxed flex-grow">
-                                {{ $article->excerpt }}
-                            </p>
-                            
-                            {{-- Footer Info --}}
-                            <div class="flex items-center justify-between pt-6 border-t border-slate-100 mt-auto relative z-10">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary-100 to-green-100 text-primary-700 font-bold flex items-center justify-center border border-white shadow-sm ring-2 ring-primary-50">
-                                        {{ mb_substr($article->author->name ?? 'A', 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-slate-800">{{ $article->author->name ?? 'Quản trị viên' }}</p>
-                                        <p class="text-xs text-slate-500">Tác giả</p>
-                                    </div>
-                                </div>
-                                <div class="text-primary-600 group-hover:translate-x-1 transition-transform bg-primary-50 p-2 rounded-full">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-
-            {{-- Pagination --}}
-            <div class="mt-16 pagination-wrapper rounded-3xl shadow-sm">
-                {{ $articles->links() }}
-            </div>
-        @else
-            <div class="bg-white border border-slate-200 rounded-[2rem] p-16 text-center shadow-xl">
-                <div class="w-24 h-24 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-6 text-primary-300">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+        {{-- Hero Section (Shorter banner) --}}
+        <div class="relative overflow-hidden rounded-[2rem] border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-sky-50 shadow-[0_12px_35px_rgba(37,99,235,0.06)]">
+            <div class="grid items-center gap-8 px-7 py-8 md:px-12 lg:grid-cols-[1.1fr_0.9fr]">
+                <div class="relative z-10">
+                    <p class="text-xl font-black text-sky-500 md:text-2xl">Kiến thức</p>
+                    <h1 class="mt-1 text-2xl md:text-4xl font-black leading-tight text-blue-900 uppercase">
+                        Y Học Cổ Truyền
+                    </h1>
+                    <p class="mt-3 max-w-xl text-xs md:text-sm font-semibold leading-relaxed text-slate-600">
+                        Cập nhật những thông tin y khoa chuẩn xác, các bài thuốc dân gian và phương pháp điều trị hiệu quả từ đội ngũ bác sĩ chuyên môn.
+                    </p>
                 </div>
-                <h3 class="text-2xl font-bold text-slate-800 mb-3">Chưa có bài viết</h3>
-                <p class="text-slate-500 text-lg">Hiện tại phòng khám chưa đăng tải bài viết nào. Vui lòng quay lại sau nhé!</p>
+
+                <div class="relative hidden h-full items-center justify-center lg:flex">
+                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}"
+                         alt="Kiến thức Y học cổ truyền"
+                         class="h-[160px] w-full object-contain object-center drop-shadow-sm">
+                </div>
             </div>
-        @endif
-    </section>
+        </div>
+
+        {{-- Search & Category Dropdown --}}
+        <form action="{{ route('articles.index') }}" method="GET" class="flex flex-col md:flex-row gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 max-w-3xl mx-auto w-full">
+            {{-- Keyword Input --}}
+            <div class="flex-1 relative">
+                <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"/><path d="m21 21-4.3-4.3" stroke-width="2" stroke-linecap="round"/></svg>
+                <input type="text" name="search" value="{{ $search }}" placeholder="Tìm bài viết..." class="w-full pl-11 pr-4 py-2.5 bg-transparent border-none focus:ring-0 text-slate-800 text-sm placeholder-slate-400 focus:outline-none font-bold">
+            </div>
+
+            {{-- Category Dropdown Selector --}}
+            <div class="w-full md:w-60 relative border-t md:border-t-0 md:border-l border-slate-100 pt-2 md:pt-0 md:pl-3 flex items-center">
+                <select name="category" onchange="this.form.submit()" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 text-sm font-bold focus:outline-none appearance-none pr-8 cursor-pointer">
+                    <option value="">Tất cả danh mục</option>
+                    @foreach($articleCategories as $categoryKey => $categoryLabel)
+                        <option value="{{ $categoryKey }}" {{ $selectedCategory === $categoryKey ? 'selected' : '' }}>
+                            {{ $categoryLabel }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 flex items-center text-slate-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex gap-2 shrink-0 pt-2 md:pt-0">
+                <button type="submit" class="flex-1 md:flex-initial px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-extrabold rounded-xl transition-all shadow-sm text-xs cursor-pointer">
+                    Tra cứu
+                </button>
+                @if($search || $selectedCategory)
+                    <a href="{{ route('articles.index') }}" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-extrabold rounded-xl transition-all text-xs flex items-center justify-center">
+                        Reset
+                    </a>
+                @endif
+            </div>
+        </form>
+
+        {{-- Content Area --}}
+        <div class="pt-2">
+            @if($articles->count() > 0)
+                <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+                    
+                    {{-- Main list --}}
+                    <div>
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="flex items-center gap-3 text-lg font-black text-blue-950">
+                                <span class="h-6 w-1 rounded-full bg-blue-600"></span>
+                                Bài viết nổi bật
+                            </h2>
+                            @if($selectedCategory || $search)
+                                <a href="{{ route('articles.index') }}" class="text-xs font-black text-blue-600 hover:text-blue-800">Xem tất cả</a>
+                            @endif
+                        </div>
+
+                        <div class="grid gap-5 md:grid-cols-2">
+                            @foreach($articles as $article)
+                                @php
+                                    $isLiked = auth()->check()
+                                        && $article->relationLoaded('likedByUsers')
+                                        && $article->likedByUsers->contains('id', auth()->id());
+                                @endphp
+                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)]">
+                                    <div class="relative">
+                                        <a href="{{ route('articles.show', $article->slug) }}" class="block">
+                                            <div class="relative aspect-[4/2.6] overflow-hidden bg-blue-50">
+                                                @if($article->featured_image)
+                                                    <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
+                                                @else
+                                                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}" alt="{{ $article->title }}" class="h-full w-full object-cover object-center opacity-90 transition duration-700 group-hover:scale-105">
+                                                @endif
+
+                                                <div class="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-blue-600 shadow-sm">
+                                                    {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
+                                                </div>
+
+                                                <div class="absolute left-3 top-3 max-w-[74%] rounded-full bg-blue-600/95 px-2.5 py-1 text-[10px] font-black text-white shadow-sm truncate">
+                                                    {{ $article->category_label }}
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <button type="button"
+                                                class="article-like-btn absolute right-3 top-3 z-10 flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border px-2 text-xs font-black shadow-md backdrop-blur transition {{ $isLiked ? 'border-rose-200 bg-rose-500 text-white' : 'border-white/70 bg-white/95 text-slate-500 hover:text-rose-500' }}"
+                                                data-like-url="{{ route('articles.like', $article->id) }}"
+                                                data-login-url="{{ route('login') }}"
+                                                data-liked="{{ $isLiked ? '1' : '0' }}"
+                                                data-authenticated="{{ auth()->check() ? '1' : '0' }}"
+                                                title="{{ $isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}">
+                                            <svg class="h-4.5 w-4.5 {{ $isLiked ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c-3.86-3.16-7.5-6.5-7.5-10.88A4.12 4.12 0 0 1 8.62 6c1.32 0 2.55.63 3.38 1.62A4.42 4.42 0 0 1 15.38 6a4.12 4.12 0 0 1 4.12 4.12C19.5 14.5 15.86 17.84 12 21Z"/>
+                                            </svg>
+                                            <span class="article-like-count text-[11px]">{{ $article->liked_by_users_count }}</span>
+                                        </button>
+                                    </div>
+
+                                    <a href="{{ route('articles.show', $article->slug) }}" class="block">
+                                        <div class="p-4">
+                                            <h3 class="line-clamp-2 min-h-[3rem] text-base font-black leading-6 text-blue-950 transition group-hover:text-blue-700">
+                                                {{ $article->title }}
+                                            </h3>
+                                            <p class="mt-2 line-clamp-3 min-h-[3.75rem] text-xs font-semibold leading-relaxed text-slate-650">
+                                                {{ $article->summary ?: $article->excerpt }}
+                                            </p>
+
+                                            <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] font-bold text-slate-500">
+                                                <span class="inline-flex items-center gap-1">
+                                                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0 1 19.5 6.75v12A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5.25Z"/></svg>
+                                                    {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
+                                                </span>
+                                                <span class="inline-flex items-center gap-1">
+                                                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12s3.5-6.75 9.75-6.75S21.75 12 21.75 12 18.25 18.75 12 18.75 2.25 12 2.25 12Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"/></svg>
+                                                    Xem bài
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </article>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-10">
+                            {{ $articles->withQueryString()->links() }}
+                        </div>
+                    </div>
+
+                    {{-- Sidebar (Latest Articles) --}}
+                    <aside class="space-y-6">
+                        <section class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                            <h3 class="mb-3 text-sm font-black text-blue-950">Bài viết mới nhất</h3>
+                            <div class="space-y-3">
+                                @foreach($latestArticles as $article)
+                                    <a href="{{ route('articles.show', $article->slug) }}" class="group flex gap-2.5">
+                                        <div class="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-blue-50">
+                                            @if($article->featured_image)
+                                                <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                            @else
+                                                <img src="{{ asset('images/y-hoc-co-truyen.png') }}" alt="{{ $article->title }}" class="h-full w-full object-cover">
+                                            @endif
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="line-clamp-2 text-xs font-black leading-4 text-blue-950 transition group-hover:text-blue-700">
+                                                {{ $article->title }}
+                                            </p>
+                                            <p class="mt-0.5 text-[10px] font-bold text-slate-400">
+                                                {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
+                                            </p>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                            <a href="{{ route('articles.index') }}" class="mt-4 flex h-9 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-600 transition hover:bg-blue-600 hover:text-white">
+                                Xem tất cả bài viết mới
+                            </a>
+                        </section>
+                    </aside>
+
+                </div>
+            @else
+                <div class="rounded-[2rem] border border-slate-100 bg-white p-12 text-center shadow-sm">
+                    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50 text-blue-550">
+                        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2M7 16h6M7 8h6v4H7V8Z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-black text-blue-950">Không tìm thấy bài viết phù hợp</h3>
+                    <p class="mt-2 text-xs font-semibold text-slate-500">Thử đổi danh mục hoặc nhập từ khóa khác để tìm lại nhé.</p>
+                    <a href="{{ route('articles.index') }}" class="mt-4 inline-flex rounded-2xl bg-sky-500 hover:bg-sky-600 px-5 py-2.5 text-xs font-black text-white shadow-sm">
+                        Xem tất cả bài viết
+                    </a>
+                </div>
+            @endif
+        </div>
+
+    </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.article-like-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            if (button.dataset.authenticated !== '1') {
+                window.location.href = button.dataset.loginUrl;
+                return;
+            }
+
+            button.disabled = true;
+
+            fetch(button.dataset.likeUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(function (response) {
+                if (response.status === 401) {
+                    window.location.href = button.dataset.loginUrl;
+                    return null;
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data) return;
+
+                const icon = button.querySelector('svg');
+                const count = button.querySelector('.article-like-count');
+
+                button.dataset.liked = data.liked ? '1' : '0';
+                button.title = data.liked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích';
+                if (count) count.textContent = data.likes_count;
+
+                button.classList.toggle('border-rose-200', data.liked);
+                button.classList.toggle('bg-rose-500', data.liked);
+                button.classList.toggle('text-white', data.liked);
+                button.classList.toggle('border-white/70', !data.liked);
+                button.classList.toggle('bg-white/95', !data.liked);
+                button.classList.toggle('text-slate-500', !data.liked);
+                button.classList.toggle('hover:text-rose-500', !data.liked);
+
+                if (icon) {
+                    icon.classList.toggle('fill-current', data.liked);
+                    icon.classList.toggle('fill-none', !data.liked);
+                }
+            })
+            .finally(function () {
+                button.disabled = false;
+            });
+        });
+    });
+});
+</script>
+@endpush

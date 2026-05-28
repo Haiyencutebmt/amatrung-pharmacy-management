@@ -4,403 +4,515 @@
 @section('page-title', '')
 
 @section('header-left')
-<div class="header-title" style="display: flex; align-items: center; gap: 1rem;">
-    <div class="icon-bg" style="width: 44px; height: 44px; background: #eef9ee; color: #5eb542; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-        <span class="icon">👥</span>
-    </div>
-    <div>
-        <h1 style="font-size: 1.5rem; font-weight: 850; color: #1e293b; margin: 0; line-height: 1.2;">Quản lý tài khoản</h1>
-        <p style="margin: 0; color: #64748b; font-size: 0.85rem; font-weight: 500;">Quản lý người dùng, phân quyền và trạng thái truy cập</p>
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-right: 2rem;">
+    <div class="header-title" style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="icon-bg" style="width: 44px; height: 44px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <span class="icon">👥</span>
+        </div>
+        <div>
+            <h1 style="font-size: 1.4rem; font-weight: 850; color: #1e293b; margin: 0; line-height: 1.2;">Quản lý tài khoản</h1>
+            <p style="margin: 0; color: #64748b; font-size: 0.85rem; font-weight: 500;">Quản lý người dùng, phân quyền và trạng thái truy cập hệ thống.</p>
+        </div>
     </div>
 </div>
 @endsection
 
 @section('content')
-<div class="record-index-container" style="margin-top: -1rem;">
+<div class="users-container" style="font-family: 'Inter', sans-serif; margin-top: -1rem;">
 
-    <div class="main-content-card">
-        <form action="{{ route('admin.users.index') }}" method="GET" class="filter-form">
-            <div class="filter-row">
-                <div style="display: flex; gap: 1.5rem; align-items: flex-end; flex: 1;">
-                    <div class="filter-item" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-                        <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tìm tài khoản</label>
-                        <div class="search-input-group" style="width: 350px;">
-                            <span class="icon">🔍</span>
-                            <input type="text" name="search" placeholder="Tìm tên, email, SĐT..." value="{{ request('search') }}">
-                        </div>
+    {{-- Stats Cards --}}
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title-group">
+                    <div class="stat-icon-outline">
+                        <span class="icon">👥</span>
                     </div>
-                    <div class="filter-item" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-                        <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Vai trò</label>
-                        <select name="role" style="padding: 0.8rem 1rem; border-radius: 0.75rem; border: 1px solid var(--border-color); background: #fcfdfe; width: 160px; color: var(--text-dark); font-weight: 600;">
-                            <option value="">-- Tất cả vai trò --</option>
+                    <span class="stat-title">Tổng Tài Khoản</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <h3 class="stat-value">{{ number_format($totalUsers) }}</h3>
+            </div>
+            <div class="stat-footer">
+                Tất cả người dùng
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title-group">
+                    <div class="stat-icon-outline" style="border-color: #ef4444; background: #fef2f2; color: #ef4444;">
+                        <span class="icon">🛡️</span>
+                    </div>
+                    <span class="stat-title">Admin</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <h3 class="stat-value">{{ number_format($adminCount) }}</h3>
+            </div>
+            <div class="stat-footer">
+                Quản trị viên hệ thống
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title-group">
+                    <div class="stat-icon-outline" style="border-color: #3b82f6; background: #eff6ff; color: #3b82f6;">
+                        <span class="icon">👤</span>
+                    </div>
+                    <span class="stat-title">Nhân viên (Staff)</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <h3 class="stat-value">{{ number_format($staffCount) }}</h3>
+            </div>
+            <div class="stat-footer">
+                Nhân viên nội bộ
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title-group">
+                    <div class="stat-icon-outline" style="border-color: #16a34a; background: #f0fdf4; color: #16a34a;">
+                        <span class="icon">📈</span>
+                    </div>
+                    <span class="stat-title">Đang hoạt động</span>
+                </div>
+            </div>
+            <div class="stat-body">
+                <h3 class="stat-value">{{ number_format($activeCount) }}</h3>
+            </div>
+            <div class="stat-footer">
+                Tài khoản đang hoạt động
+            </div>
+        </div>
+    </div>
+
+    {{-- Main Content Area (Filters + Table) --}}
+    <div class="main-content-card">
+        {{-- Filter Form --}}
+        <form id="filterForm" action="{{ route('admin.users.index') }}" method="GET" class="filter-form">
+            <div class="filter-row">
+                <div class="search-input-group">
+                    <button type="submit" class="icon" title="Tìm kiếm" style="background: none; border: none; cursor: pointer; padding: 0; outline: none; color: #3b82f6;">🔍</button>
+                    <input type="text" id="searchInput" name="search" placeholder="Tìm tên, email, SĐT..." value="{{ request('search') }}">
+                </div>
+                
+                <div class="action-buttons" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">Vai trò</span>
+                        <select name="role" onchange="this.form.submit()" style="padding: 0.65rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.85rem; min-width: 130px; outline: none;">
+                            <option value="">Tất cả</option>
                             <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                             <option value="staff" {{ request('role') === 'staff' ? 'selected' : '' }}>Staff</option>
                             <option value="user" {{ request('role') === 'user' ? 'selected' : '' }}>User</option>
                         </select>
                     </div>
-                    <div class="action-buttons" style="margin-bottom: 2px;">
-                        <button type="submit" class="btn-filter">
-                            <span class="icon">🔍</span> Lọc
-                        </button>
-                        <a href="{{ route('admin.users.index') }}" class="btn-reset-box">
-                            <span class="icon">🔄</span> Reset
-                        </a>
+
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">Trạng thái</span>
+                        <select name="status" onchange="this.form.submit()" style="padding: 0.65rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.85rem; min-width: 140px; outline: none;">
+                            <option value="">Tất cả</option>
+                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Hoạt động</option>
+                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Đã khóa</option>
+                        </select>
                     </div>
-                </div>
-                
-                <div class="action-buttons" style="margin-bottom: 2px;">
-                    <a href="{{ route('admin.users.create') }}" class="btn-add">
-                        <span class="icon">+</span> Tạo Tài Khoản
+
+                    <a href="{{ route('admin.users.index') }}" class="btn-reset" style="padding: 0.65rem 1.25rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; color: #64748b; font-weight: 700; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; transition: background 0.2s;">
+                        ↻ Đặt lại
+                    </a>
+                    <div style="width: 1px; background: #e2e8f0; margin: 0 0.25rem; height: 32px;"></div>
+                    <a href="{{ route('admin.users.create') }}" class="btn-add" style="padding: 0.65rem 1.25rem; background: #3b82f6; color: #fff; border-radius: 0.5rem; font-weight: 700; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);">
+                        <span class="icon">👤+</span> Tạo tài khoản
                     </a>
                 </div>
             </div>
         </form>
 
+        {{-- Table --}}
         <div class="table-container">
-            <table class="patient-table">
-                <thead>
-                    <tr>
-                        <th>HỌ TÊN</th>
-                        <th>EMAIL</th>
-                        <th>SĐT</th>
-                        <th>VAI TRÒ</th>
-                        <th>TRẠNG THÁI</th>
-                        <th>NGÀY TẠO</th>
-                        <th>HÀNH ĐỘNG</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($users as $user)
-                    <tr>
-                        <td>
-                            <div class="patient-name-cell">
-                                <div class="avatar-circle" style="background: {{ '#' . substr(md5($user->name), 0, 6) }}20; color: {{ '#' . substr(md5($user->name), 0, 6) }}">
-                                    {{ mb_substr($user->name, 0, 1) }}
-                                </div>
-                                <div class="name">{{ $user->name }}</div>
-                            </div>
-                        </td>
-                        <td>
-                            <span style="color: #475569; font-weight: 500;">{{ $user->email }}</span>
-                        </td>
-                        <td>
-                            <span style="color: #475569; font-weight: 500;">{{ $user->phone ?? '---' }}</span>
-                        </td>
-                        <td>
-                            @if($user->role === 'admin')
-                                <span style="background: #fef2f2; color: #ef4444; padding: 0.3rem 0.75rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.75rem;">Admin</span>
-                            @elseif($user->role === 'staff')
-                                <span style="background: #eff6ff; color: #3b82f6; padding: 0.3rem 0.75rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.75rem;">Staff</span>
-                            @else
-                                <span style="background: #f1f5f9; color: #64748b; padding: 0.3rem 0.75rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.75rem;">User</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($user->is_active)
-                                <span style="background: #eef9ee; color: #16a34a; padding: 0.3rem 0.75rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.75rem;">Hoạt động</span>
-                            @else
-                                <span style="background: #f1f5f9; color: #64748b; padding: 0.3rem 0.75rem; border-radius: 0.5rem; font-weight: 800; font-size: 0.75rem;">Đã khóa</span>
-                            @endif
-                        </td>
-                        <td>
-                            <span style="font-weight: 600; color: #64748b; font-size: 0.85rem;">{{ $user->created_at->format('d/m/Y') }}</span>
-                        </td>
-                        <td>
-                            <div class="action-cell" style="flex-wrap: wrap;">
-                                @if($user->role !== 'user')
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="btn-icon edit" title="Sửa/Phân quyền">
-                                        <span class="icon">✏️</span> Sửa
-                                    </a>
-                                    
-                                    @if(auth()->id() !== $user->id)
-                                        <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn {{ $user->is_active ? 'khóa' : 'mở khóa' }} tài khoản này?');">
-                                            @csrf @method('PATCH')
-                                            @if($user->is_active)
-                                                <button type="submit" class="btn-icon delete" title="Khóa">
-                                                    <span class="icon">🔒</span> Khóa
-                                                </button>
-                                            @else
-                                                <button type="submit" class="btn-icon view" style="border-color: #5eb542; color: #5eb542;" title="Mở khóa">
-                                                    <span class="icon">🔓</span> Mở khóa
-                                                </button>
-                                            @endif
-                                        </form>
-
-                                        <form action="{{ route('admin.users.reset-password', $user) }}" method="POST" style="display:inline;" onsubmit="return confirm('Mật khẩu sẽ được đặt lại thành amatrung@123. Bạn có chắc chắn?');">
-                                            @csrf @method('PATCH')
-                                            <button type="submit" class="btn-icon view" title="Đặt lại mật khẩu">
-                                                <span class="icon">🔑</span> Reset mật khẩu
-                                            </button>
-                                        </form>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="font-size: 0.75rem;">HỌ TÊN</th>
+                            <th style="font-size: 0.75rem;">EMAIL</th>
+                            <th style="font-size: 0.75rem;">SĐT</th>
+                            <th style="font-size: 0.75rem;">VAI TRÒ</th>
+                            <th style="font-size: 0.75rem;">TRẠNG THÁI</th>
+                            <th style="font-size: 0.75rem;">NGÀY TẠO</th>
+                            <th style="font-size: 0.75rem; width: 220px;">HÀNH ĐỘNG</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $user)
+                            <tr style="transition: background 0.2s;">
+                                <td style="padding: 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: {{ '#' . substr(md5($user->name), 0, 6) }}20; color: {{ '#' . substr(md5($user->name), 0, 6) }}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;">
+                                            {{ mb_substr($user->name, 0, 1) }}
+                                        </div>
+                                        <div style="font-weight: 700; color: #1e293b; font-size: 0.85rem;">{{ $user->name }}</div>
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem; color: #475569; font-size: 0.85rem;">{{ $user->email }}</td>
+                                <td style="padding: 1rem; color: #475569; font-size: 0.85rem;">{{ $user->phone ?? '---' }}</td>
+                                <td style="padding: 1rem;">
+                                    @if($user->role === 'admin')
+                                        <span style="background: #fef2f2; color: #ef4444; padding: 0.25rem 0.65rem; border-radius: 1rem; font-weight: 700; font-size: 0.7rem;">Admin</span>
+                                    @elseif($user->role === 'staff')
+                                        <span style="background: #eff6ff; color: #3b82f6; padding: 0.25rem 0.65rem; border-radius: 1rem; font-weight: 700; font-size: 0.7rem;">Staff</span>
+                                    @else
+                                        <span style="background: #f1f5f9; color: #64748b; padding: 0.25rem 0.65rem; border-radius: 1rem; font-weight: 700; font-size: 0.7rem;">User</span>
                                     @endif
-                                @else
-                                    <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 600; font-style: italic; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">Chỉ xem</span>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: #64748b; padding: 3rem 1rem; font-weight: 500;">
-                            Không tìm thấy tài khoản nào.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    @if($user->is_active)
+                                        <span style="background: #eef9ee; color: #16a34a; padding: 0.25rem 0.65rem; border-radius: 1rem; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #16a34a;"></div> Hoạt động
+                                        </span>
+                                    @else
+                                        <span style="background: #fef2f2; color: #ef4444; padding: 0.25rem 0.65rem; border-radius: 1rem; font-weight: 700; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                            <div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444;"></div> Đã khóa
+                                        </span>
+                                    @endif
+                                </td>
+                                <td style="padding: 1rem; color: #64748b; font-size: 0.8rem; font-weight: 500;">{{ $user->created_at->format('d/m/Y') }}</td>
+                                <td style="padding: 1rem;">
+                                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                        @if($user->role !== 'user')
+                                            <a href="{{ route('admin.users.edit', $user) }}" class="btn-action" style="color: #3b82f6; border-color: #bfdbfe; background: #eff6ff;">
+                                                ✏️ Sửa
+                                            </a>
+                                            
+                                            @if(auth()->id() !== $user->id)
+                                                <button type="button" onclick="document.getElementById('form-toggle-{{ $user->id }}').submit();" class="btn-action" style="color: {{ $user->is_active ? '#ef4444' : '#16a34a' }}; border-color: {{ $user->is_active ? '#fecaca' : '#bbf7d0' }}; background: {{ $user->is_active ? '#fef2f2' : '#f0fdf4' }};">
+                                                    {{ $user->is_active ? '🔒 Khóa' : '🔓 Mở khóa' }}
+                                                </button>
+                                                
+                                                <button type="button" onclick="showResetConfirm('{{ $user->id }}', '{{ addslashes($user->name) }}')" class="btn-action" style="color: #d97706; border-color: #fde68a; background: #fffbeb;">
+                                                    🔑 Reset
+                                                </button>
 
-        @if($users->hasPages())
-        <div class="pagination-area">
-            <p class="summary">Hiển thị {{ $users->firstItem() }} đến {{ $users->lastItem() }} của {{ $users->total() }} tài khoản</p>
-            <div class="pagination-controls">
-                {{ $users->withQueryString()->links() }}
+                                                @if($user->role === 'staff')
+                                                    <button type="button" onclick="if(confirm('Bạn có chắc chắn muốn xóa tài khoản nhân viên này? Hành động này không thể hoàn tác.')) document.getElementById('form-destroy-{{ $user->id }}').submit();" class="btn-action" style="color: #ef4444; border-color: #fecaca; background: #fef2f2;">
+                                                        🗑️ Xóa
+                                                    </button>
+                                                @endif
+                                            @endif
+                                            <a href="#" class="btn-action" style="color: #3b82f6; border-color: #bfdbfe; background: #fff;">
+                                                ℹ️ Chi tiết
+                                            </a>
+                                        @else
+                                            <span class="btn-action" style="color: #94a3b8; border-color: #e2e8f0; background: #f8fafc; cursor: not-allowed;">Chỉ xem</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="{{ auth()->user()->role === 'admin' ? '8' : '7' }}" style="padding: 3rem; text-align: center; color: #64748b; font-size: 0.95rem; font-weight: 500;">
+                                    🔍 Không tìm thấy tài khoản nào phù hợp.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            
+            @if($users->hasPages())
+                <div style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9;">
+                    <div style="font-size: 0.85rem; color: #64748b; font-weight: 500;">
+                        Hiển thị {{ $users->firstItem() }} đến {{ $users->lastItem() }} của {{ $users->total() }} kết quả
+                    </div>
+                    <div class="custom-pagination">
+                        {{ $users->withQueryString()->links() }}
+                    </div>
+                </div>
+            @endif
+
+        {{-- Hidden forms for actions --}}
+        @foreach($users as $user)
+            @if($user->role !== 'user' && auth()->id() !== $user->id)
+                <form id="form-toggle-{{ $user->id }}" action="{{ route('admin.users.toggle-status', $user) }}" method="POST" style="display: none;">
+                    @csrf @method('PATCH')
+                </form>
+                <form id="form-reset-{{ $user->id }}" action="{{ route('admin.users.reset-password', $user) }}" method="POST" style="display: none;">
+                    @csrf @method('PATCH')
+                </form>
+                @if($user->role === 'staff')
+                <form id="form-destroy-{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST" style="display: none;">
+                    @csrf @method('DELETE')
+                </form>
+                @endif
+            @endif
+        @endforeach
+
+        {{-- Custom Reset Password Modal --}}
+        <div id="resetConfirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 999999; justify-content: center; align-items: center; padding: 1.5rem; opacity: 0; transition: opacity 0.3s ease;">
+            <div style="background: #fff; width: 400px; max-width: 95vw; border-radius: 1.25rem; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div style="padding: 2rem 1.5rem 1.5rem; text-align: center;">
+                    <div style="width: 56px; height: 56px; background: #fffbeb; color: #d97706; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1.25rem;">
+                        🔑
+                    </div>
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 800; color: #1e293b;">Đặt lại mật khẩu</h3>
+                    <p style="margin: 0; font-size: 0.95rem; color: #64748b; line-height: 1.5;">
+                        Mật khẩu của tài khoản <strong id="resetUserName" style="color: #1e293b;"></strong> sẽ được đưa về mật khẩu mặc định. Hành động này không thể hoàn tác.
+                    </p>
+                </div>
+                <div style="background: #f8fafc; padding: 1rem 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" onclick="closeResetConfirm()" style="padding: 0.65rem 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem; font-weight: 700; color: #64748b; cursor: pointer; transition: background 0.2s; font-size: 0.9rem;">
+                        Hủy bỏ
+                    </button>
+                    <button type="button" id="confirmResetBtn" style="padding: 0.65rem 1.25rem; background: #d97706; border: none; border-radius: 0.75rem; font-weight: 700; color: #fff; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.2);">
+                        Xác nhận đặt lại
+                    </button>
+                </div>
             </div>
         </div>
-        @endif
+
     </div>
 </div>
 
 <style>
-.record-index-container {
-    --primary-green: #5eb542;
-    --text-dark: #1e293b;
-    --text-muted: #64748b;
-    --bg-light: #f8fafc;
-    --border-color: #e2e8f0;
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
 }
 
-.header-title {
+.stat-card {
+    background: #fff;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    border: 1px solid rgba(241, 245, 249, 0.8);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-title-group {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.6rem;
 }
 
-.header-title .icon-bg {
-    width: 48px;
-    height: 48px;
-    background: #eef9ee;
-    color: #5eb542;
-    border-radius: 1rem;
+.stat-icon-outline {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid #3b82f6;
+    background: #eff6ff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    color: #3b82f6;
 }
 
-.header-title h1 {
+.stat-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.stat-body {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.stat-value {
+    margin: 0;
     font-size: 1.75rem;
     font-weight: 850;
-    color: var(--text-dark);
-    margin: 0;
+    color: #1e293b;
+    line-height: 1;
 }
 
-.header-title p {
-    margin: 0.25rem 0 0 0;
-    color: var(--text-muted);
+.stat-footer {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+    padding-top: 0.25rem;
 }
 
+/* Main Content Card (mimicking patient index) */
 .main-content-card {
     background: #fff;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.01);
+    border: 1px solid #f1f5f9;
 }
 
 .filter-form {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .filter-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .search-input-group {
     position: relative;
-    width: 400px;
+    width: 320px;
 }
 
 .search-input-group input {
     width: 100%;
-    padding: 0.8rem 1rem 0.8rem 2.75rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--border-color);
-    background: #fcfdfe;
+    padding: 0.65rem 1rem 0.65rem 2.25rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input-group input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .search-input-group .icon {
     position: absolute;
-    left: 1rem;
+    left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    font-size: 0.95rem;
 }
 
-.action-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-.btn-filter {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid #eef2ff;
-    background: #f8fbff;
-    color: #3b82f6;
+.btn-action {
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.4rem;
+    border: 1px solid;
+    font-size: 0.75rem;
     font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    transition: all 0.2s;
+}
+.btn-action:hover {
+    filter: brightness(0.95);
+    transform: scale(1.02);
 }
 
-.btn-reset-box {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid var(--border-color);
-    background: #fff;
-    color: var(--text-muted);
-    font-weight: 700;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.table-container {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    border: 1px solid #f1f5f9;
 }
 
-.btn-reset-box:hover {
-    background: #f8fafc;
-}
-
-.btn-add {
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    background: #5eb542;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgba(94, 181, 66, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.patient-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.patient-table th {
+.data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
     text-align: left;
-    padding: 1.25rem 1rem;
-    font-size: 0.75rem;
-    font-weight: 850;
-    color: #1e3a5f;
-    letter-spacing: 0.05em;
-    border-bottom: 1.5px solid #f1f5f9;
 }
 
-.patient-table td {
-    padding: 1.25rem 1rem;
-    border-bottom: 1px solid #f8fafc;
+.data-table td {
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.patient-code {
-    background: #f0f7ff;
-    color: #3b82f6;
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.6rem;
-    font-weight: 800;
-    font-size: 0.8rem;
-    border: 1px solid #dbeafe;
-}
-
-.patient-name-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.avatar-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 0.9rem;
-}
-
-.patient-name-cell .name {
-    font-weight: 750;
-    color: var(--text-dark);
-}
-
-.action-cell {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.btn-icon {
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.6rem;
-    font-size: 0.75rem;
-    font-weight: 750;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    border: 1px solid var(--border-color);
-}
-
-.btn-icon.view { background: #fff; color: var(--text-dark); }
-.btn-icon.edit { background: #fff; color: #3b82f6; }
-.btn-icon.delete { background: #fff; color: #ef4444; }
-
-.btn-icon:hover {
+.data-table tr:hover {
     background: #f8fafc;
-}
-
-.pagination-area {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-}
-
-.pagination-area .summary {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 600;
 }
 
 /* Pagination Overrides for Laravel */
-.pagination {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.page-item .page-link {
-    width: 36px;
-    height: 36px;
+.custom-pagination nav {
     display: flex;
     align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-    background: #fff;
-    border: 1px solid var(--border-color);
-    color: var(--text-dark);
-    text-decoration: none;
-    font-weight: 700;
 }
-
-.page-item.active .page-link {
-    background: #5eb542;
-    color: #fff;
-    border-color: #5eb542;
+.custom-pagination nav > div:first-child {
+    display: none;
+}
+.custom-pagination svg {
+    width: 14px;
+    height: 14px;
 }
 </style>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout = null;
+
+        if (searchInput) {
+            // Đưa con trỏ vào cuối chữ trong ô search khi trang load (nếu có chữ)
+            if (searchInput.value) {
+                const len = searchInput.value.length;
+                searchInput.focus();
+                searchInput.setSelectionRange(len, len);
+            }
+
+            // Gõ xong tự lọc sau 600ms
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    document.getElementById('filterForm').submit();
+                }, 600);
+            });
+            
+            // Xóa chữ khi nhấn ESC và tự động reload
+            searchInput.addEventListener('keydown', function(e) {
+                if(e.key === 'Escape') {
+                    this.value = '';
+                    document.getElementById('filterForm').submit();
+                }
+            });
+        }
+    });
+
+    // Modal Logic
+    let currentResetFormId = null;
+
+    function showResetConfirm(userId, userName) {
+        currentResetFormId = 'form-reset-' + userId;
+        document.getElementById('resetUserName').textContent = userName;
+        
+        const modal = document.getElementById('resetConfirmModal');
+        modal.style.display = 'flex';
+        // Trigger reflow for animation
+        void modal.offsetWidth;
+        modal.style.opacity = '1';
+        modal.children[0].style.transform = 'scale(1)';
+    }
+
+    function closeResetConfirm() {
+        const modal = document.getElementById('resetConfirmModal');
+        modal.style.opacity = '0';
+        modal.children[0].style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            currentResetFormId = null;
+        }, 300);
+    }
+
+    document.getElementById('confirmResetBtn').addEventListener('click', function() {
+        if (currentResetFormId) {
+            document.getElementById(currentResetFormId).submit();
+        }
+    });
+</script>
+@endpush
 @endsection

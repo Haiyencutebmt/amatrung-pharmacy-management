@@ -101,6 +101,8 @@ class MedicalRecordController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
+        $this->mergeDefaultTreatmentDirection($request);
+
         $validated = $request->validate([
             'patient_id'     => 'required|exists:patients,id',
             'visit_date'     => 'required|date',
@@ -216,9 +218,13 @@ class MedicalRecordController extends Controller implements HasMiddleware
 
     public function update(Request $request, MedicalRecord $medicalRecord)
     {
+        $this->mergeDefaultTreatmentDirection($request);
+
         $validated = $request->validate([
             'patient_id'     => 'required|exists:patients,id',
             'visit_date'     => 'required|date',
+            'weight'         => 'nullable|numeric|min:0|max:500',
+            'height'         => 'nullable|numeric|min:0|max:300',
             'symptoms'       => 'required|string',
             'diagnosis'      => 'required|string',
             'treatment_plan' => 'nullable|string',
@@ -301,6 +307,21 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'both' => MedicalRecord::CASE_COMBINED,
             default => $caseType,
         };
+    }
+
+    private function mergeDefaultTreatmentDirection(Request $request): void
+    {
+        if ($request->filled('treatment_direction')) {
+            return;
+        }
+
+        $direction = match ($this->normalizeCaseType($request->input('case_type'))) {
+            MedicalRecord::CASE_MUSCULOSKELETAL => 'external_only',
+            MedicalRecord::CASE_COMBINED => 'combined',
+            default => 'oral_only',
+        };
+
+        $request->merge(['treatment_direction' => $direction]);
     }
 
     public function downloadXray(MedicalRecord $medicalRecord)

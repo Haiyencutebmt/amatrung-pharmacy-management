@@ -8,6 +8,7 @@ use App\Models\InventoryBatch;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class InventoryController extends Controller
 {
@@ -16,15 +17,23 @@ class InventoryController extends Controller
         $this->authorize('manage_inventory', InventoryItem::class);
 
         $filter = $request->get('filter', 'all');
+        $today = now()->startOfDay();
+        $nearExpiryDate = $today->copy()->addMonthsNoOverflow(2);
 
-        $query = InventoryItem::with(['batches' => function ($q) {
-            $q->where('quantity_remaining', '>', 0);
-        }]);
+        $query = InventoryItem::with('batches');
+
+        $search = $request->get('search');
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
 
         switch ($filter) {
             case 'available':
-                $query->whereHas('batches', function ($q) {
-                    $q->where('status', 'available')->where('quantity_remaining', '>', 0);
+                $query->whereHas('batches', function ($q) use ($today) {
+                    $q->where('status', 'available')
+                      ->where('quantity_remaining', '>', 0)
+                      ->whereNotNull('expiry_date')
+                      ->whereDate('expiry_date', '>=', $today->toDateString());
                 });
                 break;
             case 'expired':
@@ -41,11 +50,11 @@ class InventoryController extends Controller
                 $query->where('usage_route', 'external');
                 break;
             case 'near_expiry':
-                $query->whereHas('batches', function ($q) {
+                $query->whereHas('batches', function ($q) use ($today, $nearExpiryDate) {
                     $q->where('status', 'available')
                       ->where('quantity_remaining', '>', 0)
                       ->whereNotNull('expiry_date')
-                      ->whereBetween('expiry_date', [now()->toDateString(), now()->addDays(30)->toDateString()]);
+                      ->whereBetween('expiry_date', [$today->toDateString(), $nearExpiryDate->toDateString()]);
                 });
                 break;
         }
@@ -62,22 +71,22 @@ class InventoryController extends Controller
             foreach ($item->batches as $batch) {
                 if ($batch->quantity_remaining <= 0) continue;
 
-                if ($batch->status === 'available' || $batch->status === 'near_expiry') {
-                    // Check near expiry dynamically
-                    if ($batch->expiry_date && $batch->expiry_date->diffInDays(now()) <= 30 && $batch->expiry_date >= now()->startOfDay()) {
+                if (($batch->status === 'available' || $batch->status === 'near_expiry') && $batch->expiry_date) {
+                    $expiryDate = $batch->expiry_date->copy()->startOfDay();
+                    if ($expiryDate->betweenIncluded($today, $nearExpiryDate)) {
                         $hasNearExpiry = true;
                     }
                     $total += $batch->quantity_remaining;
                 }
                 
-                if ($batch->status === 'expired' || ($batch->expiry_date && $batch->expiry_date < now()->startOfDay())) {
+                if ($batch->status === 'expired' || ($batch->expiry_date && $batch->expiry_date < $today)) {
                     $hasExpired = true;
                 }
-                if ($batch->status === 'unknown_expiry') {
+                if ($batch->status === 'unknown_expiry' || !$batch->expiry_date) {
                     $hasUnknown = true;
                 }
             }
-            $item->total_quantity = $total;
+            $item->total_quantity = $item->total_available_quantity;
             
             if ($hasExpired) {
                 $item->computed_status = 'expired';
@@ -103,6 +112,66 @@ class InventoryController extends Controller
         }])->findOrFail($id);
 
         return view('admin.inventory.show', compact('item'));
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $this->authorize('manage_inventory', InventoryItem::class);
+
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:inventory_items,id',
+        ], [
+            'ids.required' => 'Vui lòng chọn ít nhất một mặt hàng để xóa.',
+            'ids.min' => 'Vui lòng chọn ít nhất một mặt hàng để xóa.',
+        ]);
+
+        $items = InventoryItem::with('batches.stockMovements')
+            ->whereIn('id', $validated['ids'])
+            ->get();
+
+        $usedPrescriptionItemIds = collect();
+        if (Schema::hasTable('prescription_items') && Schema::hasColumn('prescription_items', 'inventory_item_id')) {
+            $usedPrescriptionItemIds = DB::table('prescription_items')
+                ->whereIn('inventory_item_id', $items->pluck('id'))
+                ->whereNotNull('inventory_item_id')
+                ->pluck('inventory_item_id')
+                ->unique();
+        }
+
+        $deletedCount = 0;
+        $skippedNames = [];
+
+        DB::transaction(function () use ($items, $usedPrescriptionItemIds, &$deletedCount, &$skippedNames) {
+            foreach ($items as $item) {
+                $hasStockMovements = $item->batches->contains(function ($batch) {
+                    return $batch->stockMovements->isNotEmpty();
+                });
+                $isUsedInPrescription = $usedPrescriptionItemIds->contains($item->id);
+
+                if ($hasStockMovements || $isUsedInPrescription) {
+                    $skippedNames[] = $item->name;
+                    continue;
+                }
+
+                $item->delete();
+                $deletedCount++;
+            }
+        });
+
+        if ($deletedCount === 0) {
+            return back()->with('error', 'Không thể xóa các mặt hàng đã có lịch sử lô, giao dịch kho hoặc đã dùng trong đơn điều trị.');
+        }
+
+        $message = "Đã xóa {$deletedCount} mặt hàng khỏi kho.";
+        if (!empty($skippedNames)) {
+            $message .= ' Không xóa các mục đã có lịch sử: ' . implode(', ', array_slice($skippedNames, 0, 5));
+            if (count($skippedNames) > 5) {
+                $message .= '...';
+            }
+        }
+
+        return back()->with('success', $message);
     }
 
     public function updateBatch(Request $request, $id)

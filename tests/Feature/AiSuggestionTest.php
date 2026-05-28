@@ -4,6 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\MedicinalHerb;
 use App\Models\User;
+use App\Models\Patient;
+use App\Models\MedicalRecord;
+use App\Models\InventoryItem;
+use App\Models\InventoryBatch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -12,14 +16,57 @@ class AiSuggestionTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\RoleAndPermissionSeeder::class);
+    }
+
+    private function createAdmin()
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+        $user->assignRole('admin');
+        return $user;
+    }
+
+    private function createStaff()
+    {
+        $user = User::factory()->create(['role' => 'staff']);
+        $user->assignRole('staff');
+        return $user;
+    }
+
+    private function createPatient()
+    {
+        return Patient::create([
+            'patient_code' => 'PT-TEST-' . rand(1000, 9999),
+            'full_name' => 'Nguyễn Văn Test',
+            'phone' => '098765' . rand(1000, 9999),
+            'gender' => 'male',
+            'date_of_birth' => '1990-01-01',
+        ]);
+    }
+
+    private function createMedicalRecord($patientId, $staffId, array $extra = [])
+    {
+        return MedicalRecord::create(array_merge([
+            'patient_id' => $patientId,
+            'staff_id' => $staffId,
+            'visit_date' => now()->format('Y-m-d'),
+            'case_type' => 'normal',
+            'symptoms' => 'Triệu chứng test',
+            'diagnosis' => 'Chẩn đoán test',
+            'treatment_direction' => 'oral_only',
+        ], $extra));
+    }
+
     /**
      * Test unauthenticated access is blocked.
      */
     public function test_guest_cannot_access_ai_suggestions(): void
     {
         $response = $this->postJson(route('admin.ai.suggest'), [
-            'symptoms' => 'Đau nhức thắt lưng lan xuống chân',
-            'diagnosis' => 'Thoái hóa cột sống thắt lưng L4-L5',
+            'medical_record_id' => 999999,
         ]);
 
         $response->assertStatus(401);
@@ -30,17 +77,16 @@ class AiSuggestionTest extends TestCase
      */
     public function test_staff_without_permission_cannot_access_ai_suggestions(): void
     {
-        $staff = User::factory()->create([
-            'role' => 'staff',
-            'permissions' => []
-        ]);
+        $staff = $this->createStaff();
+        // Remove the permission check by ensuring they don't have Spatie permission (which standard staff doesn't have)
+        
+        $patient = $this->createPatient();
+        $record = $this->createMedicalRecord($patient->id, $staff->id);
 
         $response = $this->actingAs($staff)->postJson(route('admin.ai.suggest'), [
-            'symptoms' => 'Đau nhức thắt lưng lan xuống chân',
-            'diagnosis' => 'Thoái hóa cột sống thắt lưng L4-L5',
+            'medical_record_id' => $record->id,
         ]);
 
-        // Laravel permission middleware might throw 403 Forbidden or custom handling
         $response->assertStatus(403);
     }
 
@@ -49,21 +95,23 @@ class AiSuggestionTest extends TestCase
      */
     public function test_ai_suggestions_validation_failures(): void
     {
-        $admin = User::factory()->create([
-            'role' => 'admin',
-        ]);
+        $admin = $this->createAdmin();
 
-        // Empty symptoms and diagnosis
+        // Empty medical_record_id
         $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
-            'symptoms' => '',
-            'diagnosis' => '',
+            'medical_record_id' => '',
         ]);
         $response->assertStatus(422);
 
-        // Symptoms too short
+        // Invalid medical_record_id
         $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
-            'symptoms' => 'Đau',
-            'diagnosis' => 'Đau thắt lưng',
+            'medical_record_id' => 'abc',
+        ]);
+        $response->assertStatus(422);
+
+        // Non-existent medical_record_id
+        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+            'medical_record_id' => 999999,
         ]);
         $response->assertStatus(422);
     }
@@ -106,23 +154,27 @@ class AiSuggestionTest extends TestCase
             ], 200)
         ]);
 
-        $admin = User::factory()->create([
-            'role' => 'admin',
-        ]);
-        $this->seedAvailableHerbs(['Quế Chi', 'Bạch Thược', 'Cam Thảo']);
+        $admin = $this->createAdmin();
+        $this->seedAvailableHerbs(['Quế Chi', 'Bạch Thược', 'Cam Thảo'], 'oral');
 
-        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+        $patient = $this->createPatient();
+        $record = $this->createMedicalRecord($patient->id, $admin->id, [
             'symptoms' => 'Ho nhiều, sốt cao, sợ gió sợ lạnh',
             'diagnosis' => 'Cảm mạo phong hàn',
+            'treatment_direction' => 'oral_only',
+        ]);
+
+        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+            'medical_record_id' => $record->id,
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'success');
         
-        $data = $response->json('data');
-        $this->assertNotEmpty($data['oral_herbs']);
-        $this->assertEmpty($data['external_herbs']);
-        $this->assertEmpty($data['therapy_services']);
+        $suggestions = $response->json('suggestions');
+        $this->assertNotEmpty($suggestions['oral_herbs']);
+        $this->assertEmpty($suggestions['external_herbs']);
+        $this->assertEmpty($suggestions['therapy_services']);
     }
 
     /**
@@ -186,26 +238,33 @@ class AiSuggestionTest extends TestCase
             ], 200)
         ]);
 
-        $admin = User::factory()->create([
-            'role' => 'admin',
-        ]);
-        $this->seedAvailableHerbs(['Đương Quy', 'Xuyên Khung', 'Bạch Thược', 'Cam Thảo']);
+        $admin = $this->createAdmin();
+        
+        // Seed both oral herbs and external herbs/packaged products
+        $this->seedAvailableHerbs(['Đương Quy', 'Xuyên Khung', 'Bạch Thược', 'Cam Thảo'], 'oral');
+        $this->seedAvailableHerbs(['Bó thuốc nam', 'Lọ rượu thuốc xoa bóp'], 'external');
 
-        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+        $patient = $this->createPatient();
+        $record = $this->createMedicalRecord($patient->id, $admin->id, [
             'symptoms' => 'Té ngã sưng bầm cổ chân, đau buốt',
             'diagnosis' => 'Bong gân cổ chân',
+            'treatment_direction' => 'combined',
+        ]);
+
+        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+            'medical_record_id' => $record->id,
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'success');
         
-        $data = $response->json('data');
-        $this->assertNotEmpty($data['oral_herbs']);
-        $this->assertNotEmpty($data['external_herbs']);
-        $this->assertNotEmpty($data['therapy_services']);
+        $suggestions = $response->json('suggestions');
+        $this->assertNotEmpty($suggestions['oral_herbs']);
+        $this->assertNotEmpty($suggestions['external_herbs']);
+        $this->assertNotEmpty($suggestions['therapy_services']);
         
         // Assert Bó thuốc nam is present
-        $externalNames = array_column($data['external_herbs'], 'custom_name');
+        $externalNames = array_column($suggestions['external_herbs'], 'custom_name');
         $this->assertTrue(in_array('Bó thuốc nam', $externalNames));
         $this->assertTrue(in_array('Lọ rượu thuốc xoa bóp', $externalNames));
     }
@@ -266,26 +325,29 @@ class AiSuggestionTest extends TestCase
             ], 200)
         ]);
 
-        $admin = User::factory()->create([
-            'role' => 'admin',
-        ]);
+        $admin = $this->createAdmin();
+        $this->seedAvailableHerbs(['Bó thuốc nam', 'Lọ rượu thuốc xoa bóp'], 'external');
 
-        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+        $patient = $this->createPatient();
+        $record = $this->createMedicalRecord($patient->id, $admin->id, [
             'symptoms' => 'Té ngã sưng bầm cổ chân, đau buốt',
             'diagnosis' => 'Bong gân cổ chân',
             'case_type' => 'musculoskeletal',
             'injury_location' => 'vùng cổ chân',
+            'treatment_direction' => 'external_only',
+        ]);
+
+        $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
+            'medical_record_id' => $record->id,
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'success');
 
-        $data = $response->json('data');
-        $this->assertEmpty($data['oral_herbs']);
-        $this->assertNotEmpty($data['external_herbs']);
-        $this->assertNotEmpty($data['therapy_services']);
-        $this->assertNull($data['suggested_formula_name']);
-        $this->assertStringContainsString('không bốc thuốc sắc', $data['internal_notes']);
+        $suggestions = $response->json('suggestions');
+        $this->assertEmpty($suggestions['oral_herbs']);
+        $this->assertNotEmpty($suggestions['external_herbs']);
+        $this->assertNotEmpty($suggestions['therapy_services']);
     }
 
     /**
@@ -335,40 +397,61 @@ class AiSuggestionTest extends TestCase
             ], 200)
         ]);
 
-        $admin = User::factory()->create([
-            'role' => 'admin',
+        $admin = $this->createAdmin();
+
+        $patient = $this->createPatient();
+        $record = $this->createMedicalRecord($patient->id, $admin->id, [
+            'symptoms' => 'Khòm khom người, đi đứng mỏi cơ thắt lưng và vai, có gù lưng',
+            'diagnosis' => 'Gù lưng / Lệch cột sống',
+            'treatment_direction' => 'combined',
         ]);
 
         $response = $this->actingAs($admin)->postJson(route('admin.ai.suggest'), [
-            'symptoms' => 'Khòm khom người, đi đứng mỏi cơ thắt lưng và vai, có gù lưng',
-            'diagnosis' => 'Gù lưng / Lệch cột sống',
+            'medical_record_id' => $record->id,
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonPath('status', 'success');
         
-        $data = $response->json('data');
-        $this->assertEmpty($data['oral_herbs']);
-        $this->assertEmpty($data['external_herbs']);
-        $this->assertNotEmpty($data['therapy_services']);
+        $suggestions = $response->json('suggestions');
+        $this->assertEmpty($suggestions['oral_herbs']);
+        $this->assertEmpty($suggestions['external_herbs']);
+        $this->assertNotEmpty($suggestions['therapy_services']);
         
         // Assert that the suggested therapy services are mapped correctly
-        $therapyNames = array_column($data['therapy_services'], 'custom_name');
+        $therapyNames = array_column($suggestions['therapy_services'], 'custom_name');
         $this->assertTrue(in_array('Nắn chỉnh khớp xương', $therapyNames));
         $this->assertTrue(in_array('Theo dõi phục hồi vận động', $therapyNames));
     }
 
-    private function seedAvailableHerbs(array $names): void
+    private function seedAvailableHerbs(array $names, string $usageRoute = 'oral'): void
     {
         foreach ($names as $name) {
             MedicinalHerb::create([
                 'name' => $name,
                 'category' => 'Dược liệu bốc thuốc',
-                'usage_type' => 'Sắc uống',
+                'usage_type' => $usageRoute === 'oral' ? 'Sắc uống' : 'Dùng ngoài',
                 'unit' => 'g',
                 'stock_quantity' => 1000,
                 'expiry_date' => now()->addYear()->toDateString(),
                 'status' => 'active',
+            ]);
+
+            // Seed new inventory item and batch
+            $item = InventoryItem::create([
+                'name' => $name,
+                'item_type' => 'herb',
+                'usage_route' => $usageRoute,
+                'unit' => 'g',
+                'is_active' => true,
+            ]);
+
+            InventoryBatch::create([
+                'inventory_item_id' => $item->id,
+                'batch_number' => 'BATCH-' . strtoupper(\Illuminate\Support\Str::random(5)),
+                'expiry_date' => now()->addYear()->toDateString(),
+                'quantity_remaining' => 1000,
+                'status' => 'available',
             ]);
         }
     }

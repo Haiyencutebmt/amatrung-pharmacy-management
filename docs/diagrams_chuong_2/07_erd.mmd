@@ -1,0 +1,44 @@
+erDiagram
+    users ||--o{ patients : links
+    users ||--o{ medical_records : creates
+    users ||--o{ prescriptions : writes
+    users ||--o{ articles : authors
+    users ||--o{ comments : writes
+    users ||--o{ article_likes : likes
+    users ||--o{ herb_dictionary_favorites : saves
+    users ||--o{ ai_suggestion_logs : requests
+    users ||--o{ stock_movements : performs
+
+    patients ||--o{ medical_records : has
+    patients ||--o{ appointments : has
+    patients ||--o{ patient_user_links : linked_to
+
+    medical_records ||--o{ prescriptions : has
+    medical_records ||--o{ medical_record_attachments : has
+    medical_records ||--o{ ai_suggestion_logs : logs
+
+    prescriptions ||--o{ prescription_items : contains
+    inventory_items ||--o{ prescription_items : used_by
+    medicinal_herbs ||--o{ prescription_items : legacy_used_by
+    packaged_products ||--o{ prescription_items : legacy_used_by
+
+    inventory_items ||--o{ inventory_batches : has
+    inventory_batches ||--o{ stock_movements : has
+    prescription_items ||--o{ stock_movements : causes
+
+    articles ||--o{ comments : has
+    articles ||--o{ article_likes : has
+
+    herb_dictionary_entries ||--o{ herb_dictionary_images : has
+    herb_dictionary_entries ||--o{ herb_dictionary_favorites : has
+
+    sample_prescriptions ||--o{ sample_prescription_items : contains
+    medicinal_herbs ||--o{ sample_prescription_items : ingredient
+
+    retail_orders ||--o{ retail_order_items : has
+    packaged_products ||--o{ retail_order_items : item
+
+    roles ||--o{ role_has_permissions : grants
+    permissions ||--o{ role_has_permissions : belongs
+    users ||--o{ model_has_roles : assigned
+    users ||--o{ model_has_permissions : assigned

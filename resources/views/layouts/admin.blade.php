@@ -30,85 +30,87 @@
                 <span class="nav-icon" style="color: var(--color-primary-600);">📊</span> Dashboard
             </a>
 
-            <div style="padding: 1.5rem 1.5rem 0.5rem; font-size: 0.75rem; text-transform: uppercase; color: #cbd5e1; letter-spacing: 0.1em; font-weight: 800;">
-                Clinical Care
+            <div class="sidebar-section-header" onclick="toggleSidebarSection('clinical-care')">
+                <span class="section-title" style="font-size: 0.75rem; text-transform: uppercase; color: #cbd5e1; letter-spacing: 0.1em; font-weight: 800; transition: color 0.15s;">Clinical Care</span>
+                <span class="section-arrow" id="arrow-clinical-care" style="font-size: 0.7rem; color: #cbd5e1; transition: transform 0.2s, color 0.15s; transform: rotate(0deg); line-height: 1;">▲</span>
             </div>
 
-            @if(auth()->user()->hasPermission('patients.view'))
-            <a href="{{ url('/admin/patients') }}"
-               class="nav-link {{ request()->is('admin/patients*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">👤</span> Bệnh nhân
-            </a>
-            @endif
-            @if(auth()->user()->hasPermission('medical_records.view'))
-            <a href="{{ url('/admin/medical-records') }}"
-               class="nav-link {{ request()->is('admin/medical-records*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">📋</span> Bệnh án
-            </a>
-            @endif
-            @if(auth()->user()->hasPermission('prescriptions.view'))
-            <a href="{{ url('/admin/prescriptions') }}"
-               class="nav-link {{ request()->is('admin/prescriptions*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">💊</span> Đơn điều trị
-            </a>
-            <a href="{{ route('admin.treatment-templates.index') }}"
-               class="nav-link {{ request()->is('admin/treatment-templates*') || request()->is('admin/sample-prescriptions*') || request()->is('admin/therapy-services*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">🩺</span> Danh mục điều trị
-            </a>
-            @endif
+            <div id="section-clinical-care" style="display: block;">
+                @if(auth()->user()->hasPermission('patients.view'))
+                <a href="{{ url('/admin/patients') }}"
+                   class="nav-link {{ request()->is('admin/patients*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">👤</span> Bệnh nhân
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('medical_records.view'))
+                <a href="{{ url('/admin/medical-records') }}"
+                   class="nav-link {{ request()->is('admin/medical-records*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">📋</span> Bệnh án
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('prescriptions.view'))
+                <a href="{{ url('/admin/prescriptions') }}"
+                   class="nav-link {{ request()->is('admin/prescriptions*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">💊</span> Đơn điều trị
+                </a>
+                <a href="{{ route('admin.treatment-templates.index') }}"
+                   class="nav-link {{ request()->is('admin/treatment-templates*') || request()->is('admin/sample-prescriptions*') || request()->is('admin/therapy-services*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">🩺</span> Dịch vụ trị liệu
+                </a>
+                @endif
 
-            @if(auth()->user()->isStaff())
-            <a href="{{ route('admin.appointments.index') }}"
-               class="nav-link {{ request()->is('admin/appointments*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">📅</span> Lịch hẹn
-            </a>
-            @endif
-            @if(auth()->user()->hasPermission('medicinal_herbs.view'))
-            <a href="{{ route('admin.warehouse.index') }}"
-               class="nav-link {{ request()->is('admin/warehouse*') || request()->is('admin/medicinal-herbs*') || request()->is('admin/packaged-products*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">🏪</span> Quản lý kho
-            </a>
-            <a href="{{ url('/admin/retail-orders') }}"
-               class="nav-link {{ request()->is('admin/retail-orders*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">🧾</span> Phiếu xuất kho
-            </a>
-            @endif
-
-            <div style="padding: 1.5rem 1.5rem 0.5rem; font-size: 0.75rem; text-transform: uppercase; color: #cbd5e1; letter-spacing: 0.1em; font-weight: 800;">
-                Systems
+                @if(auth()->user()->isStaff())
+                <a href="{{ route('admin.appointments.index') }}"
+                   class="nav-link {{ request()->is('admin/appointments*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">📅</span> Lịch hẹn
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('manage_inventory') || auth()->user()->hasPermission('medicinal_herbs.view'))
+                <a href="{{ route('admin.inventory.index') }}"
+                   class="nav-link {{ request()->is('admin/inventory*') || request()->is('admin/warehouse*') || request()->is('admin/medicinal-herbs*') || request()->is('admin/packaged-products*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">🏪</span> Quản lý kho
+                </a>
+                @endif
             </div>
 
-            @if(auth()->user()->hasPermission('articles.manage'))
-            <a href="{{ url('/admin/articles') }}"
-               class="nav-link {{ request()->is('admin/articles*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">📰</span> Bài viết
-            </a>
-            @endif
-            @if(auth()->user()->hasPermission('herb_dictionary.manage'))
-            <a href="{{ route('admin.herb-dictionary.index') }}"
-               class="nav-link {{ request()->is('admin/herb-dictionary*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">🌱</span> Từ điển thuốc nam
-            </a>
-            @endif
-            @if(auth()->user()->hasPermission('comments.manage'))
-            <a href="{{ url('/admin/comments') }}"
-               class="nav-link {{ request()->is('admin/comments*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">💬</span> Bình luận
-            </a>
-            @endif
-            @if(auth()->user()->hasPermission('contact_messages.manage'))
-            <a href="{{ url('/admin/contact-messages') }}"
-               class="nav-link {{ request()->is('admin/contact-messages*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">📧</span> Yêu cầu hỗ trợ
-            </a>
-            @endif
+            <div class="sidebar-section-header" onclick="toggleSidebarSection('systems')">
+                <span class="section-title" style="font-size: 0.75rem; text-transform: uppercase; color: #cbd5e1; letter-spacing: 0.1em; font-weight: 800; transition: color 0.15s;">Systems</span>
+                <span class="section-arrow" id="arrow-systems" style="font-size: 0.7rem; color: #cbd5e1; transition: transform 0.2s, color 0.15s; transform: rotate(0deg); line-height: 1;">▲</span>
+            </div>
 
-            @if(auth()->user()->isAdmin())
-            <a href="{{ url('/admin/users') }}"
-               class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
-                <span class="nav-icon" style="color: var(--color-primary-600);">👥</span> Tài khoản
-            </a>
-            @endif
+            <div id="section-systems" style="display: block;">
+                @if(auth()->user()->hasPermission('articles.manage'))
+                <a href="{{ url('/admin/articles') }}"
+                   class="nav-link {{ request()->is('admin/articles*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">📰</span> Bài viết
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('herb_dictionary.manage'))
+                <a href="{{ route('admin.herb-dictionary.index') }}"
+                   class="nav-link {{ request()->is('admin/herb-dictionary*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">🌱</span> Từ điển thuốc nam
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('comments.manage'))
+                <a href="{{ url('/admin/comments') }}"
+                   class="nav-link {{ request()->is('admin/comments*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">💬</span> Bình luận
+                </a>
+                @endif
+                @if(auth()->user()->hasPermission('contact_messages.manage'))
+                <a href="{{ url('/admin/contact-messages') }}"
+                   class="nav-link {{ request()->is('admin/contact-messages*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">📧</span> Yêu cầu hỗ trợ
+                </a>
+                @endif
+
+                @if(auth()->user()->isAdmin())
+                <a href="{{ url('/admin/users') }}"
+                   class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}">
+                    <span class="nav-icon" style="color: var(--color-primary-600);">👥</span> Tài khoản
+                </a>
+                @endif
+            </div>
         </nav>
 
         {{-- User info --}}
@@ -158,9 +160,6 @@
                         🏠 <span>Về trang chủ</span>
                     </a>
                 @endif
-                <div style="width: 44px; height: 44px; border-radius: 12px; background: #fff; border: 1px solid #f0f3ff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">
-                    🔔
-                </div>
             </div>
         </div>
 
@@ -241,57 +240,52 @@
         }
     }
 
+    window.showToastMessage = function(message, type = 'success') {
+        const toast = document.getElementById('globalToast');
+        const toastIcon = document.getElementById('toastIcon');
+        const toastMessage = document.getElementById('toastMessage');
+
+        if (!toast) return;
+
+        toastMessage.textContent = message;
+        if (type === 'success') {
+            toastIcon.style.background = '#d1fae5';
+            toastIcon.style.color = '#10b981';
+            toastIcon.innerHTML = '✓';
+        } else if (type === 'error') {
+            toastIcon.style.background = '#fee2e2';
+            toastIcon.style.color = '#ef4444';
+            toastIcon.innerHTML = '✕';
+        } else if (type === 'warning') {
+            toastIcon.style.background = '#fef3c7';
+            toastIcon.style.color = '#f59e0b';
+            toastIcon.innerHTML = '⚠';
+        }
+        
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+        }, 100);
+
+        setTimeout(() => {
+            closeToast();
+        }, 5000);
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
         const flashMessages = document.getElementById('flash-messages');
         if (flashMessages) {
             flashMessages.style.display = 'none'; // Hide default flash messages
         }
 
-        const toast = document.getElementById('globalToast');
-        const toastIcon = document.getElementById('toastIcon');
-        const toastMessage = document.getElementById('toastMessage');
-
-        let showToast = false;
-        let message = '';
-        let isSuccess = true;
-
         @if(session('success'))
-            showToast = true;
-            message = "{{ session('success') }}";
-            isSuccess = true;
+            window.showToastMessage({!! json_encode(session('success')) !!}, 'success');
         @elseif(session('status'))
-            showToast = true;
-            message = "{{ session('status') }}";
-            isSuccess = true;
+            window.showToastMessage({!! json_encode(session('status')) !!}, 'success');
         @elseif(session('error'))
-            showToast = true;
-            message = "{{ session('error') }}";
-            isSuccess = false;
+            window.showToastMessage({!! json_encode(session('error')) !!}, 'error');
         @endif
-
-        if (showToast && toast) {
-            toastMessage.textContent = message;
-            if (isSuccess) {
-                toastIcon.style.background = '#d1fae5';
-                toastIcon.style.color = '#10b981';
-                toastIcon.innerHTML = '✓';
-            } else {
-                toastIcon.style.background = '#fee2e2';
-                toastIcon.style.color = '#ef4444';
-                toastIcon.innerHTML = '✕';
-            }
-            
-            toast.style.display = 'flex';
-            setTimeout(() => {
-                toast.style.transform = 'translateY(0)';
-                toast.style.opacity = '1';
-            }, 100);
-
-            // Auto-close after 8 seconds (between 5-10s)
-            setTimeout(() => {
-                closeToast();
-            }, 8000);
-        }
     });
     </script>
 
@@ -389,15 +383,36 @@
                 margin: 5mm;
             }
         }
+        
+        .sidebar-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 1.5rem 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .sidebar-section-header:hover span.section-title {
+            color: #94a3b8 !important;
+        }
+        .sidebar-section-header:hover span.section-arrow {
+            color: #64748b !important;
+        }
     </style>
 
     <script>
+        let activePrescriptionPrintId = null;
+        let activePrescriptionPrintType = 'patient';
+
         function openPrescriptionModal(prescriptionId, printType = 'patient', autoPrint = false, titleLabel = null) {
             const modal = document.getElementById('prescriptionDetailModal');
             const spinner = document.getElementById('prescriptionModalSpinner');
             const contentArea = document.getElementById('modalPaperDoc');
             const titleText = document.getElementById('prescriptionModalTitle');
             const normalizedType = printType === 'internal' ? 'internal' : 'patient';
+
+            activePrescriptionPrintId = prescriptionId;
+            activePrescriptionPrintType = normalizedType;
             
             titleText.textContent = normalizedType === 'internal'
                 ? 'Phiếu ' + (titleLabel || 'nội bộ') + ' #' + prescriptionId
@@ -464,14 +479,16 @@
         }
         
         function printModalPrescription() {
-            setModalPaperDefaults();
-            document.body.classList.add('printing-modal');
-            window.print();
-            
-            // Remove class after print dialog is closed
-            setTimeout(() => {
-                document.body.classList.remove('printing-modal');
-            }, 500);
+            if (!activePrescriptionPrintId) {
+                return;
+            }
+
+            const params = new URLSearchParams({
+                type: activePrescriptionPrintType === 'internal' ? 'internal' : 'patient',
+                auto_print: '1'
+            });
+
+            window.open(`/admin/prescriptions/${activePrescriptionPrintId}/print?${params.toString()}`, '_blank', 'noopener');
         }
         
         // Global Event Listener to capture clicking on prescription show links
@@ -493,6 +510,41 @@
                 }
                 element = element.parentElement;
             }
+        });
+
+        function toggleSidebarSection(sectionId) {
+            const section = document.getElementById('section-' + sectionId);
+            const arrow = document.getElementById('arrow-' + sectionId);
+            if (!section || !arrow) return;
+
+            const isCollapsed = section.style.display === 'none';
+            if (isCollapsed) {
+                section.style.display = 'block';
+                arrow.style.transform = 'rotate(0deg)';
+                localStorage.setItem('sidebar_section_' + sectionId, 'expanded');
+            } else {
+                section.style.display = 'none';
+                arrow.style.transform = 'rotate(180deg)';
+                localStorage.setItem('sidebar_section_' + sectionId, 'collapsed');
+            }
+        }
+
+        // Initialize collapse state on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            ['clinical-care', 'systems'].forEach(function(sectionId) {
+                const section = document.getElementById('section-' + sectionId);
+                const arrow = document.getElementById('arrow-' + sectionId);
+                if (!section || !arrow) return;
+
+                const savedState = localStorage.getItem('sidebar_section_' + sectionId);
+                if (savedState === 'collapsed') {
+                    section.style.display = 'none';
+                    arrow.style.transform = 'rotate(180deg)';
+                } else {
+                    section.style.display = 'block';
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            });
         });
     </script>
 </body>

@@ -1,138 +1,106 @@
 {{--
     ai_panel.blade.php
-    Panel "Gợi ý AI hỗ trợ thầy thuốc" – nhúng vào records/show.blade.php và prescriptions/create.blade.php
-
-    Biến cần truyền:
-      $medicalRecord  – Model MedicalRecord (có id và treatment_direction)
-
-    Điều kiện hiển thị: Blade @can('use_ai_suggestion') ở trang nhúng.
-    Panel này KHÔNG tự kê đơn, KHÔNG tự lưu đơn, KHÔNG tự trừ kho.
+    Panel "Gợi ý AI hỗ trợ thầy thuốc" – nhúng vào prescriptions/create.blade.php
 --}}
-<div id="ai-suggestion-panel" class="card border-0 shadow-sm mt-4" style="border-radius:12px; overflow:hidden;">
-    <div class="card-header d-flex align-items-center justify-content-between py-3"
-         style="background: linear-gradient(135deg,#1a5276,#2e86c1); border:none;">
-        <div class="d-flex align-items-center gap-2">
-            <span style="font-size:1.3rem;">🤖</span>
-            <div>
-                <h6 class="mb-0 text-white fw-semibold" style="font-size:.95rem;">
-                    Gợi ý AI hỗ trợ thầy thuốc
-                </h6>
-                <small class="text-white-50" style="font-size:.72rem;">
-                    Chỉ mang tính tham khảo – Mọi quyết định thuộc thẩm quyền thầy thuốc
-                </small>
+<div id="ai-suggestion-panel" style="background: #fff; border: 1px solid #e0e7ff; border-radius: 0.5rem; margin-bottom: 1.5rem; overflow: hidden;">
+    
+    {{-- Header --}}
+    <div style="padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e7ff;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="color: #3b82f6; font-size: 1.1rem; display: flex; align-items: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
             </div>
+            <h3 style="margin: 0; font-size: 0.9rem; font-weight: 800; color: #1e3a8a; text-transform: uppercase;">
+                Gợi ý AI hỗ trợ thầy thuốc
+            </h3>
+            <span style="color: #94a3b8; font-size: 0.8rem; margin-left: 0.5rem;">Tham khảo, không thay thế quyết định chuyên môn</span>
         </div>
+
         @if($medicalRecord->treatment_direction === 'referral')
-            <span class="badge bg-warning text-dark" style="font-size:.72rem;">Chuyển viện – không gợi ý</span>
+            <span style="background: #fef3c7; color: #92400e; padding: 0.3rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 700;">
+                Chuyển viện – không gợi ý
+            </span>
         @else
             <button id="btn-ai-suggest"
-                    class="btn btn-sm btn-light fw-semibold"
-                    style="font-size:.8rem; border-radius:8px;"
-                    data-record-id="{{ $medicalRecord->id }}">
-                ✨ Lấy gợi ý
+                    type="button"
+                    data-record-id="{{ $medicalRecord->id }}"
+                    style="background: #2563eb; color: #fff; border: none; padding: 0.4rem 1rem; border-radius: 0.25rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: background 0.2s;"
+                    onmouseover="this.style.background='#1d4ed8'"
+                    onmouseout="this.style.background='#2563eb'">
+                ✨ Lấy gợi ý mới
             </button>
         @endif
     </div>
 
-    {{-- Disclaimer cố định --}}
-    <div class="px-3 py-2" style="background:#eaf4fb; border-bottom:1px solid #d6eaf8;">
-        <small class="text-muted" style="font-size:.72rem;">
-            ⚠️ <strong>Lưu ý:</strong> Đây là <strong>gợi ý tham khảo</strong> của AI hỗ trợ thầy thuốc.
-            AI không thay thế chẩn đoán lâm sàng. Thầy thuốc chịu trách nhiệm mọi quyết định điều trị.
-        </small>
-    </div>
+    {{-- Body --}}
+    <div style="padding: 1rem 1.25rem; background: #f8fafc;">
 
-    <div class="card-body p-3">
-        {{-- Trạng thái --}}
-        <div id="ai-status-box" class="text-center text-muted py-3" style="font-size:.85rem;">
+        {{-- Status box (hiện mặc định) --}}
+        <div id="ai-status-box" style="text-align: center; padding: 1rem; color: #64748b; font-size: 0.88rem;">
             @if($medicalRecord->treatment_direction === 'referral')
-                <span class="text-warning">🔁 Bệnh nhân được chỉ định chuyển viện. Không áp dụng gợi ý thuốc.</span>
+                <span>🔁 Bệnh nhân được chỉ định chuyển viện. Không áp dụng gợi ý thuốc.</span>
             @else
-                <span class="text-muted">Nhấn <strong>"Lấy gợi ý"</strong> để AI phân tích bệnh án.</span>
+                <span>Nhấn <strong>"✨ Lấy gợi ý mới"</strong> để AI phân tích bệnh án và đề xuất.</span>
             @endif
         </div>
 
-        {{-- Loading --}}
-        <div id="ai-loading" class="text-center py-3 d-none">
-            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-            <span class="text-muted" style="font-size:.85rem;">Đang phân tích bệnh án…</span>
-        </div>
-
-        {{-- Kết quả --}}
-        <div id="ai-result-box" class="d-none">
-            {{-- Reasoning --}}
-            <div id="ai-reasoning-section" class="mb-3 d-none">
-                <p class="fw-semibold text-secondary mb-1" style="font-size:.82rem;">💡 Nhận xét lâm sàng tham khảo:</p>
-                <div id="ai-reasoning-text"
-                     class="p-2 rounded text-dark"
-                     style="background:#f8f9fa; font-size:.83rem; border-left:3px solid #2e86c1; white-space:pre-wrap;"></div>
-            </div>
-
-            {{-- Oral Herbs --}}
-            <div id="ai-oral-section" class="mb-3 d-none">
-                <p class="fw-semibold text-secondary mb-1" style="font-size:.82rem;">🌿 Dược liệu uống tham khảo (có trong kho):</p>
-                <div class="alert alert-warning py-1 px-2 mb-2" style="font-size:.72rem; border-radius:6px;">
-                    ⚠️ Gợi ý dược liệu bên dưới <strong>chưa có liều lượng</strong>.
-                    Thầy thuốc cần xác định liều phù hợp khi lập đơn chính thức.
-                </div>
-                <div id="ai-oral-list"></div>
-            </div>
-
-            {{-- External Herbs --}}
-            <div id="ai-external-section" class="mb-3 d-none">
-                <p class="fw-semibold text-secondary mb-1" style="font-size:.82rem;">🧴 Sản phẩm dùng ngoài tham khảo:</p>
-                <div id="ai-external-list"></div>
-            </div>
-
-            {{-- Therapy Services --}}
-            <div id="ai-therapy-section" class="mb-3 d-none">
-                <p class="fw-semibold text-secondary mb-1" style="font-size:.82rem;">🏥 Dịch vụ trị liệu tham khảo:</p>
-                <div id="ai-therapy-list"></div>
-            </div>
-
-            {{-- Safety Note --}}
-            <div id="ai-safety-section" class="mb-3 d-none">
-                <div id="ai-safety-text"
-                     class="alert alert-danger py-2 px-2 mb-0"
-                     style="font-size:.78rem; border-radius:6px;"></div>
-            </div>
-
-            {{-- Follow up --}}
-            <div id="ai-followup-section" class="mb-3 d-none">
-                <p class="fw-semibold text-secondary mb-1" style="font-size:.82rem;">🔄 Gợi ý theo dõi:</p>
-                <div id="ai-followup-text"
-                     class="p-2 rounded text-dark"
-                     style="background:#f0fff4; font-size:.83rem; border-left:3px solid #27ae60;"></div>
-            </div>
-
-            {{-- Interaction status buttons (chỉ để ghi log, không tự apply) --}}
-            <div id="ai-interaction-bar" class="d-none pt-2 border-top mt-2">
-                <p class="text-muted mb-2" style="font-size:.75rem;">
-                    Sau khi xem xét gợi ý, thầy thuốc vui lòng ghi nhận để cải thiện AI:
-                </p>
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-sm btn-outline-success btn-ai-interact"
-                            data-status="accepted"
-                            style="font-size:.78rem; border-radius:6px;">
-                        ✅ Tham khảo và tự lập đơn
-                    </button>
-                    <button class="btn btn-sm btn-outline-warning btn-ai-interact"
-                            data-status="edited"
-                            style="font-size:.78rem; border-radius:6px;">
-                        ✏️ Có tham khảo một phần
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary btn-ai-interact"
-                            data-status="ignored"
-                            style="font-size:.78rem; border-radius:6px;">
-                        🚫 Không dùng gợi ý này
-                    </button>
-                </div>
-                <div id="ai-interact-feedback" class="mt-2 d-none" style="font-size:.75rem;"></div>
+        {{-- Loading (ẩn mặc định) --}}
+        <div id="ai-loading" style="display: none; text-align: center; padding: 1.5rem;">
+            <div style="display: inline-flex; align-items: center; gap: 0.75rem;">
+                <svg style="animation: ai-spin 1s linear infinite; width: 1.25rem; height: 1.25rem; color: #2563eb;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span style="color: #475569; font-weight: 600; font-size: 0.88rem;">Đang phân tích bệnh án…</span>
             </div>
         </div>
 
         {{-- Error box --}}
-        <div id="ai-error-box" class="d-none alert alert-warning py-2 mb-0" style="font-size:.83rem; border-radius:8px;">
+        <div id="ai-error-box" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.25rem; padding: 0.75rem 1rem; font-size: 0.85rem; color: #991b1b; font-weight: 600;"></div>
+
+        {{-- Kết quả (3 cột grid) --}}
+        <div id="ai-result-box" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            
+            {{-- Cột 1: Nhận xét lâm sàng --}}
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="background: #eff6ff; color: #3b82f6; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Nhận xét lâm sàng</span>
+                </div>
+                <div id="ai-reasoning-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+            </div>
+
+            {{-- Cột 2: Gợi ý dược liệu --}}
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="background: #f0fdf4; color: #22c55e; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                    </div>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý dược liệu / Dịch vụ</span>
+                </div>
+                <div id="ai-herbs-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+            </div>
+
+            {{-- Cột 3: Gợi ý theo dõi --}}
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="background: #faf5ff; color: #a855f7; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý theo dõi</span>
+                </div>
+                <div id="ai-followup-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<style>
+@keyframes ai-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>

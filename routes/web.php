@@ -51,6 +51,10 @@ Route::get('/chinh-sach-bao-mat', function () {
     return view('privacy-policy');
 })->name('privacy-policy');
 
+Route::get('/dieu-khoan', function () {
+    return view('terms');
+})->name('terms');
+
 Route::get('/ve-thay-thuoc-amatrung', function () {
     return view('about.doctor');
 })->name('about.doctor');
@@ -59,7 +63,9 @@ Route::post('/lien-he', [\App\Http\Controllers\ContactMessageController::class, 
 
 // ── AI Chatbot ──────────────────────────────────────────────────
 
-Route::post('/api/chatbot/chat', [ChatbotController::class, 'chat'])->name('chatbot.chat');
+Route::post('/api/chatbot/chat', [ChatbotController::class, 'chat'])
+    ->middleware('throttle:20,1')
+    ->name('chatbot.chat');
 
 
 // ── Auth: Guest only (chưa đăng nhập) ─────────────────────────
@@ -99,6 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::get('/yeu-thich', [ProfileController::class, 'favorites'])->name('profile.favorites');
 
     // Bình luận bài viết
     Route::post('/bai-viet/{article_id}/comments', [CommentController::class, 'store'])->name('comments.store');
@@ -144,6 +151,7 @@ Route::prefix('admin')
 
         // Quản lý kho mới (Phase 3)
         Route::get('inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
+        Route::delete('inventory/bulk-destroy', [\App\Http\Controllers\Admin\InventoryController::class, 'bulkDestroy'])->name('inventory.bulk-destroy');
         Route::get('inventory/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'show'])->name('inventory.show');
         Route::put('inventory/batch/{id}', [\App\Http\Controllers\Admin\InventoryController::class, 'updateBatch'])->name('inventory.batch.update');
         Route::post('inventory/{item_id}/batch', [\App\Http\Controllers\Admin\InventoryController::class, 'storeBatch'])->name('inventory.batch.store');
@@ -158,10 +166,6 @@ Route::prefix('admin')
         Route::get('medicinal-herbs/print-list', [\App\Http\Controllers\Admin\MedicinalHerbController::class, 'printList'])->name('medicinal-herbs.print-list');
         Route::get('medicinal-herbs/{medicinal_herb}/stock-logs', [\App\Http\Controllers\Admin\MedicinalHerbController::class, 'stockLogs'])->name('medicinal-herbs.stock-logs');
         Route::resource('medicinal-herbs', \App\Http\Controllers\Admin\MedicinalHerbController::class);
-
-        // Phiếu xuất kho & Sản phẩm hỗ trợ/Trà thảo mộc
-        Route::resource('retail-orders', \App\Http\Controllers\Admin\RetailOrderController::class)->except(['edit', 'update']);
-        Route::post('retail-orders/herb-info', [\App\Http\Controllers\Admin\RetailOrderController::class, 'herbInfo'])->name('retail-orders.herb-info');
 
         // Sản phẩm hỗ trợ/Trà thảo mộc
         Route::resource('packaged-products', \App\Http\Controllers\Admin\PackagedProductController::class);
@@ -186,7 +190,7 @@ Route::prefix('admin')
         Route::get('prescriptions/{prescription}/print', [\App\Http\Controllers\Admin\PrescriptionController::class, 'print'])->name('prescriptions.print');
         Route::post('prescriptions/{prescription}/dispense', [\App\Http\Controllers\Admin\PrescriptionController::class, 'dispense'])->name('prescriptions.dispense');
 
-        // Quản lý Danh mục điều trị (Gộp Bài thuốc mẫu & Dịch vụ trị liệu)
+        // Quản lý Dịch vụ trị liệu
         Route::get('treatment-templates', [\App\Http\Controllers\Admin\TreatmentTemplateController::class, 'index'])->name('treatment-templates.index');
 
         // Quản lý Bài thuốc mẫu
@@ -198,6 +202,7 @@ Route::prefix('admin')
 
 
         // Giai đoạn 4.3: Quản lý Bài viết và Bình luận
+        Route::delete('articles/bulk-destroy', [\App\Http\Controllers\Admin\ArticleController::class, 'bulkDestroy'])->name('articles.bulk-destroy');
         Route::resource('articles', \App\Http\Controllers\Admin\ArticleController::class);
         Route::get('herb-dictionary/download-template', [\App\Http\Controllers\Admin\HerbDictionaryController::class, 'downloadTemplate'])->name('herb-dictionary.download-template');
         Route::post('herb-dictionary/import', [\App\Http\Controllers\Admin\HerbDictionaryController::class, 'import'])->name('herb-dictionary.import');
@@ -228,6 +233,7 @@ Route::prefix('admin')
 
         // Quản lý người dùng & Phân quyền
         Route::middleware('admin')->group(function () {
+            Route::delete('users/bulk-destroy', [\App\Http\Controllers\Admin\UserController::class, 'bulkDestroy'])->name('users.bulk-destroy');
             Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
             Route::patch('users/{user}/toggle-status', [\App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
             Route::patch('users/{user}/reset-password', [\App\Http\Controllers\Admin\UserController::class, 'resetPassword'])->name('users.reset-password');

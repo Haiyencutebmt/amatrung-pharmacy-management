@@ -1,0 +1,46 @@
+flowchart LR
+    Guest[Khach / User]
+    Staff[Staff / Admin]
+    Gemini[Google Gemini]
+
+    subgraph PublicAI[Chatbot public]
+      P51((Chuan hoa cau hoi))
+      P52((Tim context website))
+      P53((Kiem tra an toan public))
+      P54((Goi Gemini tra loi))
+    end
+
+    subgraph ClinicalAI[AI ho tro thay thuoc]
+      P55((Nhan medical_record_id))
+      P56((Kiem tra quyen truy cap benh an))
+      P57((Dung payload lam sang an danh))
+      P58((Goi Gemini lay goi y))
+      P59((Post-verify va ghi log))
+    end
+
+    Articles[(articles)]
+    Herbs[(medicinal_herbs, herb_dictionary_entries)]
+    Records[(medical_records, patients)]
+    Inventory[(inventory_items, inventory_batches)]
+    Logs[(ai_suggestion_logs)]
+
+    Guest --> P51
+    P51 --> P52
+    P52 --> Articles
+    P52 --> Herbs
+    P52 --> P53
+    P53 --> P54
+    P54 <--> Gemini
+    P54 --> Guest
+
+    Staff --> P55
+    P55 --> P56
+    P56 --> Records
+    P56 --> P57
+    P57 --> Records
+    P57 --> Inventory
+    P57 --> P58
+    P58 <--> Gemini
+    P58 --> P59
+    P59 --> Logs
+    P59 --> Staff

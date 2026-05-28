@@ -3,10 +3,10 @@
     $isInternal = $printType === 'internal';
     $patient = $prescription->medicalRecord->patient;
     $record = $prescription->medicalRecord;
-    $herbs = $prescription->items->where('item_type', 'formula_herb');
-    $externalHerbs = $prescription->items->where('item_type', 'external_product');
-    $services = $prescription->items->where('item_type', 'therapy_service');
-    $numDoses = $prescription->num_of_doses ?? 1;
+    $herbs = $prescription->items->whereIn('item_type', ['formula_herb', 'herb', 'oral_herb']);
+    $externalHerbs = $prescription->items->whereIn('item_type', ['external_product', 'packaged_product', 'external_herb']);
+    $services = $prescription->items->whereIn('item_type', ['therapy_service', 'service']);
+    $numDoses = $prescription->num_of_doses ?: ($herbs->max('number_of_doses') ?: 1);
     $formulaName = $prescription->note ?: 'Bài thuốc sắc gia giảm';
     $isDispensingSheet = $prescription->isDispensingPrescription();
     $showDispensingColumns = $isInternal && $isDispensingSheet;
@@ -19,6 +19,46 @@
     $fmt = function ($value) {
         return rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.');
     };
+
+    $bmi = null;
+    $bmiText = '';
+    $bmiColor = '#111';
+    $bmiBg = '#fafafa';
+    $bmiBorder = '#ccc';
+    $bmiAdvice = '';
+
+    if ($record->weight && $record->height) {
+        $heightInMeters = (float) $record->height / 100;
+        if ($heightInMeters > 0) {
+            $bmi = round((float) $record->weight / ($heightInMeters * $heightInMeters), 1);
+
+            if ($bmi < 18.5) {
+                $bmiText = 'Thiếu cân';
+                $bmiColor = '#1e40af';
+                $bmiBg = '#eff6ff';
+                $bmiBorder = '#bfdbfe';
+                $bmiAdvice = 'Chỉ số BMI cho thấy người bệnh đang thiếu cân. Cần chú ý bồi bổ cơ thể, tăng cường dinh dưỡng và theo dõi khả năng tiêu hóa, hấp thu.';
+            } elseif ($bmi < 23) {
+                $bmiText = 'Bình thường';
+                $bmiColor = '#166534';
+                $bmiBg = '#f0fdf4';
+                $bmiBorder = '#bbf7d0';
+                $bmiAdvice = 'Chỉ số BMI ở mức cân đối. Nên tiếp tục duy trì chế độ dinh dưỡng lành mạnh, uống đủ nước và vận động đều đặn.';
+            } elseif ($bmi < 25) {
+                $bmiText = 'Thừa cân';
+                $bmiColor = '#9a3412';
+                $bmiBg = '#fff7ed';
+                $bmiBorder = '#fed7aa';
+                $bmiAdvice = 'Người bệnh đang ở trạng thái thừa cân nhẹ. Nên hạn chế bớt tinh bột, đường và mỡ động vật, đồng thời tăng cường hoạt động thể chất phù hợp.';
+            } else {
+                $bmiText = 'Béo phì';
+                $bmiColor = '#991b1b';
+                $bmiBg = '#fef2f2';
+                $bmiBorder = '#fecaca';
+                $bmiAdvice = 'Chỉ số BMI ở mức béo phì. Nên kiểm soát nghiêm ngặt cân nặng để giảm áp lực lên cột sống, khớp gối và tim mạch. Hãy giảm tinh bột, chất béo, đồ ngọt.';
+            }
+        }
+    }
 @endphp
 
 {{-- Header --}}
@@ -60,6 +100,17 @@
             <td colspan="2" style="padding: 5px; vertical-align: top;">Địa chỉ: {{ $patient->address ?? '...' }}</td>
             <td style="padding: 5px; vertical-align: top;">Điện thoại: {{ $patient->phone ?? '...' }}</td>
         </tr>
+        @if($bmi)
+            <tr style="border-top: 1px dashed #ccc;">
+                <td colspan="3" style="padding: 7px 5px; vertical-align: top;">
+                    Chỉ số đo đạc:
+                    <strong>{{ $fmt($record->weight) }} kg / {{ $fmt($record->height) }} cm</strong>
+                    &nbsp;|&nbsp;
+                    BMI: <strong>{{ $bmi }}</strong>
+                    <strong style="color: {{ $bmiColor }};">- {{ $bmiText }}</strong>
+                </td>
+            </tr>
+        @endif
         <tr style="border-top: 1px dashed #ccc;">
             <td colspan="3" style="padding: 8px 5px 5px 5px; vertical-align: top;">
                 Chẩn đoán chính: <strong style="color: #b91c1c; text-transform: uppercase;">{{ $record->diagnosis }}</strong>
@@ -70,6 +121,13 @@
         </tr>
     </table>
 </div>
+
+@if($bmi)
+    <div class="usage-instruction-box" style="margin: -6px 0 15px 0; padding: 9px 12px; border: 1px solid {{ $bmiBorder }}; font-size: 10.5pt; border-radius: 4px; background-color: {{ $bmiBg }}; color: {{ $bmiColor }};">
+        <strong>Khuyến nghị y khoa (Chỉ số BMI: {{ $bmi }} - Thể trạng: {{ $bmiText }}):</strong>
+        {{ $bmiAdvice }}
+    </div>
+@endif
 
 {{-- Items Table --}}
 <table class="prescription-table" style="width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 10.5pt;">
@@ -100,10 +158,14 @@
                     </td>
                 </tr>
                 @foreach($herbs as $item)
-                    @php $totalQty = (float) $item->quantity * (int) $numDoses; @endphp
+                    @php
+                        $doseCount = (int) ($item->number_of_doses ?: $numDoses ?: 1);
+                        $perDoseQty = (float) ($item->quantity_per_dose ?: ($doseCount > 0 ? ((float) $item->quantity / $doseCount) : $item->quantity));
+                        $totalQty = (float) ($item->quantity ?: ($perDoseQty * $doseCount));
+                    @endphp
                     <tr>
                         <td style="border: 1px solid #000; padding: 6px 8px; font-weight: bold; padding-left: 15px;">{{ $item->display_name }}</td>
-                        <td style="border: 1px solid #000; padding: 6px 8px; text-align: center; font-weight: bold;">{{ $fmt($item->quantity) }} {{ $item->unit }}</td>
+                        <td style="border: 1px solid #000; padding: 6px 8px; text-align: center; font-weight: bold;">{{ $fmt($perDoseQty) }} {{ $item->unit }}</td>
                         <td style="border: 1px solid #000; padding: 6px 8px; text-align: center; font-weight: bold;">{{ $fmt($totalQty) }} {{ $item->unit }}</td>
                         <td style="border: 1px solid #000; padding: 6px 8px;">{{ $item->dosage }} {{ $item->note ? '('.$item->note.')' : '' }}</td>
                     </tr>
@@ -146,7 +208,7 @@
                     @if($showDispensingColumns)
                         <td style="border: 1px solid #000; padding: 6px 8px; text-align: center;">-</td>
                     @endif
-                    <td style="border: 1px solid #000; padding: 6px 8px; text-align: center; font-weight: bold;">{{ $item->sessions ? $item->sessions . ' buổi' : '1 lần' }}</td>
+                    <td style="border: 1px solid #000; padding: 6px 8px; text-align: center; font-weight: bold;">{{ $item->sessions ? $item->sessions . ' lần' : '1 lần' }}</td>
                     <td style="border: 1px solid #000; padding: 6px 8px;">
                         @if($item->usage_area) <strong>Vùng:</strong> {{ $item->usage_area }}<br> @endif
                         {{ $item->usage_instruction ?? $item->note }}

@@ -1,0 +1,56 @@
+flowchart TB
+    Guest[Khach / User]
+    Staff[Staff / Admin]
+    Gemini[Google Gemini]
+    Mail[SMTP]
+
+    P1((1. Tai khoan va phan quyen))
+    P2((2. Noi dung cong khai))
+    P3((3. Benh nhan va benh an))
+    P4((4. Don dieu tri va kho))
+    P5((5. AI tra cuu va ho tro))
+    P6((6. Dashboard va bao cao))
+
+    D1[(users, roles, permissions)]
+    D2[(articles, comments, article_likes)]
+    D3[(herb_dictionary_entries, images, favorites)]
+    D4[(patients, medical_records, attachments)]
+    D5[(prescriptions, prescription_items, appointments)]
+    D6[(inventory_items, inventory_batches, stock_movements)]
+    D7[(medicinal_herbs, packaged_products, therapy_services)]
+    D8[(ai_suggestion_logs, contact_messages)]
+
+    Guest --> P1
+    P1 <--> D1
+    P1 --> Mail
+
+    Guest --> P2
+    User[User da dang nhap] --> P2
+    Staff --> P2
+    P2 <--> D2
+    P2 <--> D3
+    P2 <--> D8
+
+    Staff --> P3
+    P3 <--> D4
+    P3 <--> D5
+
+    Staff --> P4
+    P4 <--> D5
+    P4 <--> D6
+    P4 <--> D7
+
+    Guest --> P5
+    Staff --> P5
+    P5 <--> D2
+    P5 <--> D3
+    P5 <--> D4
+    P5 <--> D6
+    P5 <--> D8
+    P5 <--> Gemini
+
+    Staff --> P6
+    P6 --> D4
+    P6 --> D5
+    P6 --> D6
+    P6 --> D7

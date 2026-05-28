@@ -7,6 +7,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Tài khoản — AmaTrung')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .goog-te-banner-frame,
+        .goog-te-banner-frame.skiptranslate,
+        iframe.skiptranslate,
+        .skiptranslate iframe,
+        .goog-te-gadget,
+        #google_translate_element {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -97,18 +111,115 @@
     <!-- Google Translate Script -->
     <div id="google_translate_element" class="hidden"></div>
     <script type="text/javascript">
+        const AmaTrungLanguage = {
+            defaultLanguage: 'vi',
+            supportedLanguages: ['vi', 'en', 'zh-CN'],
+            storageKey: 'amatrung-language',
+
+            cookieValue(langCode) {
+                return `/vi/${langCode}`;
+            },
+
+            canUseDomainCookie() {
+                return window.location.hostname
+                    && window.location.hostname !== 'localhost'
+                    && !/^\d{1,3}(\.\d{1,3}){3}$/.test(window.location.hostname);
+            },
+
+            setCookie(langCode) {
+                const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+                const value = this.cookieValue(langCode);
+
+                document.cookie = `googtrans=${value}; expires=${expires}; path=/`;
+
+                if (this.canUseDomainCookie()) {
+                    document.cookie = `googtrans=${value}; expires=${expires}; domain=.${window.location.hostname}; path=/`;
+                }
+            },
+
+            clearCookie() {
+                document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+
+                if (this.canUseDomainCookie()) {
+                    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=.${window.location.hostname}; path=/`;
+                }
+            },
+
+            getStoredLanguage() {
+                const stored = localStorage.getItem(this.storageKey);
+                return this.supportedLanguages.includes(stored) ? stored : this.defaultLanguage;
+            },
+
+            remember(langCode) {
+                if (langCode === this.defaultLanguage) {
+                    localStorage.removeItem(this.storageKey);
+                    this.clearCookie();
+                    return;
+                }
+
+                localStorage.setItem(this.storageKey, langCode);
+                this.setCookie(langCode);
+            },
+
+            apply(langCode, retry = 0) {
+                if (langCode === this.defaultLanguage) {
+                    return;
+                }
+
+                const selectField = document.querySelector('.goog-te-combo');
+
+                if (selectField) {
+                    selectField.value = langCode;
+                    selectField.dispatchEvent(new Event('change', { bubbles: true }));
+                    return;
+                }
+
+                if (retry < 10) {
+                    window.setTimeout(() => this.apply(langCode, retry + 1), 300);
+                }
+            },
+
+            change(langCode) {
+                if (!this.supportedLanguages.includes(langCode)) {
+                    return;
+                }
+
+                this.remember(langCode);
+
+                if (langCode === this.defaultLanguage) {
+                    window.location.reload();
+                    return;
+                }
+
+                const selectField = document.querySelector('.goog-te-combo');
+                if (selectField) {
+                    selectField.value = langCode;
+                    selectField.dispatchEvent(new Event('change', { bubbles: true }));
+                    return;
+                }
+
+                window.setTimeout(() => window.location.reload(), 150);
+            },
+        };
+
         function googleTranslateElementInit() {
-            new google.translate.TranslateElement({pageLanguage: 'vi', includedLanguages: 'en,vi,zh-CN', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+            new google.translate.TranslateElement({
+                pageLanguage: 'vi',
+                includedLanguages: 'en,vi,zh-CN',
+                autoDisplay: false,
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+
+            window.setTimeout(() => {
+                AmaTrungLanguage.apply(AmaTrungLanguage.getStoredLanguage());
+            }, 500);
         }
+
         function changeLanguage(langCode) {
-            var selectField = document.querySelector(".goog-te-combo");
-            if (selectField) {
-                selectField.value = langCode;
-                selectField.dispatchEvent(new Event('change'));
-            }
+            AmaTrungLanguage.change(langCode);
         }
     </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <!-- Dark Mode Script -->
     <script>

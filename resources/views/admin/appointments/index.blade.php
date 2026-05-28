@@ -105,17 +105,7 @@
                 @if($isCurrentMonth && $dayAppointments->count() > 0)
                     <div class="appointment-indicator">
                         <div class="cat-icon-wrapper">
-                            <svg class="cat-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <path id="hl-{{ $i }}"
-                                          d="M20,21 C20,18 12,15 12,11 C12,7 16,5 20,10 C24,5 28,7 28,11 C28,15 20,18 20,21 Z"/>
-                                </defs>
-                                <use href="#hl-{{ $i }}" fill="#b4f0a8" stroke="#88d878" stroke-width="0.5"/>
-                                <use href="#hl-{{ $i }}" fill="#a8e8a0" stroke="#88d878" stroke-width="0.5" transform="rotate(90,20,20)"/>
-                                <use href="#hl-{{ $i }}" fill="#b4f0a8" stroke="#88d878" stroke-width="0.5" transform="rotate(180,20,20)"/>
-                                <use href="#hl-{{ $i }}" fill="#a8e8a0" stroke="#88d878" stroke-width="0.5" transform="rotate(270,20,20)"/>
-                                <circle cx="20" cy="20" r="2.8" fill="#6dcf5e"/>
-                            </svg>
+                            <img src="{{ asset('images/Thủy.png') }}" alt="Thủy" style="width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.4));">
                             <span class="cat-count-badge">{{ $dayAppointments->count() }}</span>
                         </div>
                         <span class="appt-circle-label">lịch hẹn</span>
@@ -196,10 +186,12 @@
 <style>
 .calendar-container {
     background: #fff;
-    border-radius: 0.375rem;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
 }
 
 .calendar-header {
@@ -361,7 +353,7 @@
         position: absolute;
         top: -5px;
         right: -7px;
-        background: #16a34a;
+        background: #3b82f6;
         color: #fff;
         font-size: 0.62rem;
         font-weight: 800;
@@ -373,7 +365,7 @@
         justify-content: center;
         padding: 0 2px;
         border: 2px solid #fff;
-        box-shadow: 0 2px 6px rgba(22, 163, 74, 0.4);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
         line-height: 1;
     }
 

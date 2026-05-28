@@ -14,25 +14,7 @@ class TreatmentTemplateController extends Controller
 {
     public function index(Request $request)
     {
-        // Tự động chèn bài thuốc mẫu ban đầu nếu CSDL trống và chưa từng seed
-        $seededFile = storage_path('app/sample_prescriptions_seeded.txt');
-        if (SamplePrescription::count() === 0 && !file_exists($seededFile)) {
-            $this->seedInitialSamplePrescriptions();
-            @file_put_contents($seededFile, 'seeded');
-        }
-
-        // 1. Xử lý Tab Bài thuốc mẫu
-        $prescriptionQuery = SamplePrescription::query()->with('items.medicinalHerb');
-        if ($request->filled('search_prescription')) {
-            $searchPrescription = $request->search_prescription;
-            $prescriptionQuery->where(function ($q) use ($searchPrescription) {
-                $q->where('name', 'like', "%{$searchPrescription}%")
-                  ->orWhere('suggested_condition', 'like', "%{$searchPrescription}%");
-            });
-        }
-        $samples = $prescriptionQuery->latest()->paginate(15, ['*'], 'page_prescriptions');
-
-        // 2. Xử lý Tab Dịch vụ trị liệu
+        // Xử lý Dịch vụ trị liệu
         $serviceQuery = TherapyService::query();
         if ($request->filled('search_service')) {
             $searchService = $request->search_service;
@@ -41,15 +23,9 @@ class TreatmentTemplateController extends Controller
                   ->orWhere('default_instruction', 'like', "%{$searchService}%");
             });
         }
-        $services = $serviceQuery->orderBy('name')->paginate(15, ['*'], 'page_services');
+        $services = $serviceQuery->orderBy('name')->paginate(4);
 
-        // 3. Lấy danh sách dược liệu cho form thêm/sửa bài thuốc
-        $herbs = MedicinalHerb::orderBy('name')->get();
-
-        // Xác định tab hoạt động mặc định
-        $activeTab = $request->get('tab', 'prescriptions');
-
-        return view('admin.treatment_templates.index', compact('samples', 'services', 'herbs', 'activeTab'));
+        return view('admin.treatment_templates.index', compact('services'));
     }
 
     private function seedInitialSamplePrescriptions()

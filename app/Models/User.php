@@ -18,6 +18,7 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
+        'avatar',
         'role',
         'is_active',
         'legacy_permissions_json',
@@ -79,7 +80,7 @@ class User extends Authenticatable
         if ($this->role === 'staff') {
             $sensitivePerms = [
                 'manage_inventory', 'dispense_prescriptions', 'create_medical_records',
-                'create_prescriptions', 'view_medical_record_attachments', 'manage_users'
+                'create_prescriptions', 'view_medical_record_attachments', 'use_ai_suggestion', 'manage_users'
             ];
             if (in_array($permission, $sensitivePerms)) {
                 return false; // MUST use Spatie for sensitive perms
@@ -90,6 +91,12 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function setPermissionsAttribute($value)
+    {
+        $this->attributes['legacy_permissions_json'] = is_array($value) ? json_encode($value) : $value;
+        unset($this->attributes['permissions']);
     }
 
     // ── Relationships ──────────────────────────────────────────
@@ -128,6 +135,12 @@ class User extends Authenticatable
     public function herbDictionaryFavorites()
     {
         return $this->belongsToMany(HerbDictionaryEntry::class, 'herb_dictionary_favorites', 'user_id', 'entry_id')->withTimestamps();
+    }
+
+    /** Các bài viết đã thích */
+    public function likedArticles()
+    {
+        return $this->belongsToMany(Article::class, 'article_likes', 'user_id', 'article_id')->withTimestamps();
     }
 
 

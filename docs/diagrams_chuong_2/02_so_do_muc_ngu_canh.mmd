@@ -1,0 +1,18 @@
+flowchart LR
+    Guest[Khach truy cap]
+    User[Nguoi dung da dang nhap]
+    Staff[Staff / Thay thuoc]
+    Admin[Admin]
+    Gemini[Google Gemini API]
+    Mail[SMTP Email]
+
+    System((Website quan ly nha thuoc YHCT AmaTrung))
+
+    Guest -->|Xem trang chu, bai viet, tu dien, hoi chatbot, lien he| System
+    User -->|Dang nhap, binh luan, yeu thich, quan ly ho so ca nhan| System
+    Staff -->|Quan ly benh nhan, benh an, don dieu tri, kho, lich hen| System
+    Admin -->|Quan tri tai khoan, phan quyen, noi dung, kho, dashboard| System
+    System -->|Prompt va context public / noi bo| Gemini
+    Gemini -->|Cau tra loi hoac goi y tham khao| System
+    System -->|Gui OTP quen mat khau| Mail
+    Mail -->|Ma OTP den email nguoi dung| Guest

@@ -65,7 +65,7 @@ class PrescriptionService
                     if (!$inventoryItem) throw new Exception('Mặt hàng không tồn tại.');
                     
                     // Validate treatment direction
-                    if ($direction === 'oral_only' && $inventoryItem->usage_route === 'external') {
+                    if ($direction === 'oral_only' && $inventoryItem->usage_route === 'external' && !in_array($inventoryItem->item_type, ['packaged_product', 'external_product'], true)) {
                         throw new Exception("Hồ sơ chỉ định 'oral_only' nhưng mặt hàng '{$inventoryItem->name}' dùng ngoài.");
                     }
                     if ($direction === 'external_only' && $inventoryItem->usage_route === 'oral') {
@@ -116,32 +116,93 @@ class PrescriptionService
 
     public function dispensePrescription(Prescription $prescription, int $userId): bool
     {
-        if ($prescription->status !== 'confirmed') {
-            throw new Exception("Chỉ có thể xuất thuốc cho đơn đã xác nhận.");
-        }
+        return DB::transaction(function () use ($prescription, $userId) {
+            // Lock prescription row to prevent race conditions
+            $lockedPrescription = Prescription::where('id', $prescription->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        DB::transaction(function () use ($prescription, $userId) {
-            foreach ($prescription->items as $item) {
+            if ($lockedPrescription->status !== 'confirmed') {
+                throw new Exception("Chỉ có thể xuất thuốc cho đơn đã xác nhận.");
+            }
+
+            foreach ($lockedPrescription->items as $item) {
                 if ($item->affects_stock && $item->inventory_item_id && $item->quantity > 0) {
                     $this->inventoryService->deductStockFefo($item->inventory_item_id, $item->quantity, $item->id, $userId);
                 }
             }
 
-            $prescription->update(['status' => 'dispensed']);
+            $lockedPrescription->update(['status' => 'dispensed']);
+            return true;
         });
-
-        return true;
     }
 
     public function cancelPrescription(Prescription $prescription): bool
     {
-        if ($prescription->status === 'dispensed') {
-            // Không tự động nhập lại kho, phải làm thủ công hoặc qua process trả thuốc
-            $prescription->update(['status' => 'cancelled']);
-            return true;
+        // 1. Check return window
+        if (!$prescription->canBeReturnedOrDeleted()) {
+            throw new Exception("Đơn thuốc đã vượt quá thời hạn 24 giờ, không thể hủy hoặc hoàn trả.");
         }
 
-        $prescription->update(['status' => 'cancelled']);
+        DB::transaction(function () use ($prescription) {
+            $lockedPrescription = Prescription::where('id', $prescription->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedPrescription->status === 'cancelled') {
+                return;
+            }
+
+            // 2. Refund stock if it has been dispensed or active (for legacy compatibility)
+            $isDispensedOrActive = in_array($lockedPrescription->status, ['dispensed', 'active'], true);
+
+            foreach ($lockedPrescription->items as $item) {
+                if ($item->affects_stock) {
+                    // Refund new inventory
+                    if ($item->inventory_item_id && $isDispensedOrActive) {
+                        $movements = StockMovement::where('prescription_item_id', $item->id)
+                            ->where('movement_type', 'dispense')
+                            ->get();
+
+                        foreach ($movements as $movement) {
+                            $batch = $movement->batch;
+                            if ($batch) {
+                                $batch->increment('quantity_remaining', abs($movement->quantity));
+                                
+                                StockMovement::create([
+                                    'inventory_batch_id' => $batch->id,
+                                    'prescription_item_id' => $item->id,
+                                    'performed_by' => auth()->id(),
+                                    'movement_type' => 'reverse',
+                                    'quantity' => abs($movement->quantity),
+                                    'note' => 'Hoàn kho do hủy đơn thuốc #' . $lockedPrescription->id,
+                                ]);
+                            }
+                        }
+                    }
+
+                    // Refund legacy inventory (for compatibility/tests)
+                    if ($item->medicinal_herb_id) {
+                        $herb = \App\Models\MedicinalHerb::find($item->medicinal_herb_id);
+                        if ($herb) {
+                            $herb->stockLogType = 'prescription_return';
+                            $herb->stockLogNote = 'Hoàn kho do hủy đơn thuốc #' . $lockedPrescription->id;
+                            $herb->increment('stock_quantity', $item->quantity);
+                        }
+                    }
+
+                    if ($item->packaged_product_id) {
+                        $prod = \App\Models\PackagedProduct::find($item->packaged_product_id);
+                        if ($prod) {
+                            $prod->increment('stock_quantity', $item->quantity);
+                        }
+                    }
+                }
+            }
+
+            $lockedPrescription->update(['status' => 'cancelled']);
+        });
+
         return true;
     }
 }

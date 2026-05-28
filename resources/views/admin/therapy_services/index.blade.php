@@ -61,7 +61,7 @@
                     <thead>
                         <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                             <th style="padding: 1rem; width: 35%;">TÊN DỊCH VỤ</th>
-                            <th style="padding: 1rem; width: 15%; text-align: center;">SỐ BUỔI</th>
+                            <th style="padding: 1rem; width: 15%; text-align: center;">SỐ LẦN</th>
                             <th style="padding: 1rem; width: 30%;">HƯỚNG DẪN MẶC ĐỊNH</th>
                             <th style="padding: 1rem; width: 10%; text-align: center;">TRẠNG THÁI</th>
                             <th style="padding: 1rem; width: 10%; text-align: right;">HÀNH ĐỘNG</th>
@@ -74,7 +74,7 @@
                                     {{ $service->name }}
                                 </td>
                                 <td style="padding: 1rem; text-align: center; font-weight: 700; color: #1e293b;">
-                                    {{ $service->default_sessions }} buổi
+                                    {{ $service->default_sessions }} lần
                                 </td>
                                 <td style="padding: 1rem; color: #475569; font-size: 0.85rem; line-height: 1.45;">
                                     {{ $service->default_instruction ?: '—' }}
@@ -135,8 +135,8 @@
                 </div>
 
                 <div style="margin-bottom: 1.25rem;">
-                    <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 0.4rem;">Số buổi mặc định *</label>
-                    <input type="number" name="default_sessions" id="service-sessions" required min="1" placeholder="VD: 3" value="{{ old('default_sessions', 3) }}" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 0.75rem; border: 1.5px solid #cbd5e1; font-size: 0.9rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--color-primary-500)'" onblur="this.style.borderColor='#cbd5e1'">
+                    <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 0.4rem;">Số lần mặc định *</label>
+                    <input type="number" name="default_sessions" id="service-sessions" required min="1" placeholder="VD: 1" value="{{ old('default_sessions', 1) }}" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 0.75rem; border: 1.5px solid #cbd5e1; font-size: 0.9rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='var(--color-primary-500)'" onblur="this.style.borderColor='#cbd5e1'">
                 </div>
 
                 <div style="margin-bottom: 1.25rem;">
@@ -207,7 +207,7 @@
         
         // Clear inputs
         document.getElementById('service-name').value = '';
-        document.getElementById('service-sessions').value = 3;
+        document.getElementById('service-sessions').value = 1;
         document.getElementById('service-instruction').value = '';
         document.getElementById('service-status').value = 'active';
         

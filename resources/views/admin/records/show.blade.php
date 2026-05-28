@@ -624,6 +624,7 @@
                         @endif
                     </div>
                 </div>
+            </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
                 <div>
@@ -641,10 +642,7 @@
             </div>
         </div>
 
-        {{-- ── PANEL: GỢI Ý AI HỖ TRỢ THẦY THUỐC (Giai đoạn 4) ── --}}
-        @can('use_ai_suggestion')
-        @include('admin.records.partials.ai_panel', ['medicalRecord' => $medicalRecord])
-        @endcan
+        {{-- AI Panel đã chuyển sang trang Kê đơn (prescriptions/create) để tránh trùng lặp --}}
 
         {{-- DANH SÁCH ĐƠN ĐIỀU TRỊ / PHÁC ĐỒ ĐÃ KÊ --}}
         @php
@@ -753,7 +751,7 @@
                             @foreach($pServices as $item)
                             <tr style="border-bottom: 1px dashed #f1f5f9;">
                                 <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: #0369a1; padding-left: 1.25rem;">{{ $item->display_name }}</td>
-                                <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 700; color: #2563eb;">{{ $item->sessions ? $item->sessions . ' buổi' : '1 lần' }}</td>
+                                <td style="padding: 0.5rem 0.75rem; text-align: right; font-weight: 700; color: #2563eb;">{{ $item->sessions ? $item->sessions . ' lần' : '1 lần' }}</td>
                                 <td style="padding: 0.5rem 0.75rem; color: #64748b;">
                                     @if($item->usage_area) <strong>Vùng:</strong> {{ $item->usage_area }}<br>@endif
                                     {{ $item->usage_instruction ?? $item->note }}
@@ -842,7 +840,7 @@
                         <div style="line-height: 1.5;">
                             <strong style="color: #475569;">👐 Vật lý trị liệu / Trị liệu:</strong>
                             @foreach($cServices as $item)
-                                {{ $item->display_name }} ({{ $item->sessions ? $item->sessions . ' buổi' : '1 lần' }}){{ !$loop->last ? ', ' : '' }}
+                                {{ $item->display_name }} ({{ $item->sessions ? $item->sessions . ' lần' : '1 lần' }}){{ !$loop->last ? ', ' : '' }}
                             @endforeach
                         </div>
                         @endif
@@ -991,117 +989,7 @@
                     </table>
                 </div>
 
-                {{-- Prescription table --}}
-                @php
-                    $activePrescriptions = $medicalRecord->prescriptions->where('status', '!=', 'cancelled');
-                @endphp
-                @if($activePrescriptions->count() > 0)
-                <div class="doc-section" style="font-family: 'Times New Roman', Times, serif; color: #111; margin-bottom: 15px;">
-                    <div style="font-weight: bold; font-size: 11.5pt; border-bottom: 1.5px solid #111; padding-bottom: 3px; margin-bottom: 8px; color: #111; text-transform: uppercase;">
-                        II. PHÁC ĐỒ ĐIỀU TRỊ & CHỈ ĐỊNH DÙNG THUỐC
-                    </div>
-                    
-                    @foreach($activePrescriptions as $prescription)
-                    <table style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 10px;">
-                        <thead>
-                            <tr style="border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; background: #fafafa;">
-                                <th style="padding: 5px; text-align: left; width: 6%; font-weight: bold;">STT</th>
-                                <th style="padding: 5px; text-align: left; width: 44%; font-weight: bold;">Tên Vị thuốc / Phương pháp</th>
-                                <th style="padding: 5px; text-align: right; width: 18%; font-weight: bold;">Số lượng</th>
-                                <th style="padding: 5px; text-align: left; width: 32%; font-weight: bold;">Hướng dẫn chi tiết</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $stt = 1;
-                                $pHerbs = $prescription->items->whereIn('item_type', ['formula_herb', 'herb']);
-                                $pExtHerbs = $prescription->items->whereIn('item_type', ['external_product', 'packaged_product']);
-                                $pServices = $prescription->items->whereIn('item_type', ['service', 'therapy_service']);
-                            @endphp
 
-                            {{-- Group A --}}
-                            @if($pHerbs->count() > 0)
-                                <tr style="background: #f5f5f5; border-bottom: 1px solid #111;">
-                                    <td colspan="4" style="padding: 4px; font-weight: bold; font-size: 9.5pt; text-transform: uppercase;">🌱 A. BÀI THUỐC THANG (Sắc/Xông/Ngâm) (Tổng kê: {{ $prescription->num_of_doses ?? 1 }} thang)</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #111;">
-                                    <td style="padding: 6px 5px; text-align: center; font-weight: bold; vertical-align: top;">{{ $stt++ }}</td>
-                                    <td colspan="3" style="padding: 6px 5px; font-size: 10pt; line-height: 1.5; vertical-align: top;">
-                                        <div style="font-weight: bold; font-size: 10.5pt; margin-bottom: 3px; color: #000;">
-                                            Phương thang: {{ $prescription->note ?: 'Bài thuốc sắc gia giảm' }}
-                                        </div>
-                                        @if($prescription->usage_instruction)
-                                        <div style="font-size: 9.5pt; color: #333; font-style: italic;">
-                                            <strong>Cách dùng:</strong> {{ $prescription->usage_instruction }}
-                                        </div>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endif
-
-                            {{-- Group B --}}
-                            @if($pExtHerbs->count() > 0)
-                                <tr style="background: #f5f5f5; border-top: 1px solid #111; border-bottom: 1px solid #111;">
-                                    <td colspan="4" style="padding: 4px; font-weight: bold; font-size: 9.5pt; text-transform: uppercase;">🩹 B. THUỐC BÓ / THUỐC DÙNG NGOÀI DA</td>
-                                </tr>
-                                @foreach($pExtHerbs as $item)
-                                <tr style="border-bottom: 1px dashed #ddd;">
-                                    <td style="padding: 4px 5px;">{{ $stt++ }}</td>
-                                    <td style="padding: 4px 5px; font-weight: bold;">
-                                        {{ $item->display_name }}
-                                    </td>
-                                    <td style="padding: 4px 5px; text-align: right; font-weight: bold;">{{ floatval($item->quantity) }} {{ $item->unit }}</td>
-                                    <td style="padding: 4px 5px; font-size: 9.5pt; color: #333;">
-                                        @if($item->usage_area) <strong>Vùng đắp:</strong> {{ $item->usage_area }}<br>@endif
-                                        {{ $item->usage_instruction ?? $item->dosage }}
-                                    </td>
-                                </tr>
-                                @endforeach
-                            @endif
-
-                            {{-- Group C --}}
-                            @if($pServices->count() > 0)
-                                <tr style="background: #f5f5f5; border-top: 1px solid #111; border-bottom: 1px solid #111;">
-                                    <td colspan="4" style="padding: 4px; font-weight: bold; font-size: 9.5pt; text-transform: uppercase;">👐 C. VẬT LÝ TRỊ LIỆU / DỊCH VỤ TÁC ĐỘNG NGOÀI</td>
-                                </tr>
-                                @foreach($pServices as $item)
-                                <tr style="border-bottom: 1px dashed #ddd;">
-                                    <td style="padding: 4px 5px;">{{ $stt++ }}</td>
-                                    <td style="padding: 4px 5px; font-weight: bold; color: #111;">{{ $item->display_name }}</td>
-                                    <td style="padding: 4px 5px; text-align: right; font-weight: bold;">{{ $item->sessions ? $item->sessions . ' buổi' : '1 lần' }}</td>
-                                    <td style="padding: 4px 5px; font-size: 9.5pt; color: #333;">
-                                        @if($item->usage_area) <strong>Vùng:</strong> {{ $item->usage_area }}<br>@endif
-                                        {{ $item->usage_instruction ?? $item->note }}
-                                    </td>
-                                </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-
-                    @if($prescription->public_instruction)
-                    <div style="padding: 6px; font-size: 9.5pt; color: #222; font-style: italic; background: #fafafa; border: 1px dashed #111; margin-bottom: 8px; line-height: 1.4;">
-                        <strong>Hướng dẫn đặc biệt của thầy thuốc:</strong> {{ $prescription->public_instruction }}
-                    </div>
-                    @endif
-
-                    <div style="font-size: 10pt; color: #111; background: #fafafa; border: 1px solid #111; padding: 6px 10px; display: flex; gap: 20px; flex-wrap: wrap;">
-                        @if($pHerbs->count() > 0)
-                            <span><strong>Tổng số thang thuốc sắc:</strong> {{ $prescription->num_of_doses ?? 1 }} thang</span>
-                        @endif
-                        @if($prescription->course_days)
-                            <span><strong>Thời gian liệu trình:</strong> {{ $prescription->course_days }} ngày</span>
-                        @endif
-                        @if($prescription->usage_instruction)
-                            <span><strong>Cách dùng chung:</strong> {{ $prescription->usage_instruction }}</span>
-                        @endif
-                        @if($prescription->follow_up_date)
-                            <span style="color: #000; font-weight: bold;">📅 Hẹn ngày tái khám: {{ $prescription->follow_up_date->format('d/m/Y') }}</span>
-                        @endif
-                    </div>
-                    @endforeach
-                </div>
-                @endif
 
                 @if($medicalRecord->is_legacy_data)
                 <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; font-size: 8.5pt; color: #92400e;">
@@ -1491,7 +1379,7 @@ function switchView(viewName) {
     const tabPrint = document.getElementById('tabPrint');
 
     if (viewName === 'screen') {
-       
+        screenView.style.display = 'block';
         printView.style.display = 'none';
         tabScreen.classList.add('active');
         tabPrint.classList.remove('active');
@@ -1653,7 +1541,7 @@ function displayAiResults() {
                         <strong style="flex: 1; font-size: 0.85rem; color: #0c4a6e;">${escapeHtml(s.custom_name)}</strong>
                         <div style="display: flex; align-items: center; gap: 0.25rem;">
                             <input type="number" class="ai-therapy-service-sessions" data-index="${idx}" value="${s.sessions}" style="width: 50px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.25rem; text-align: center; font-weight: 700; color: #0369a1; font-size: 0.8rem; background: #ffffff;">
-                            <span style="font-size: 0.8rem; color: #475569; font-weight: 600;">buổi</span>
+                            <span style="font-size: 0.8rem; color: #475569; font-weight: 600;">lần</span>
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.35rem;">
@@ -2237,7 +2125,7 @@ function addItem(itemType, fromFormula = false, presetItem = null) {
         item.sessions = parseInt(document.getElementById('service_sessions')?.value) || 1;
         item.usage_area = '';
         item.usage_instruction = document.getElementById('service_instruction')?.value || '';
-        item.unit = 'buổi';
+        item.unit = 'lần';
     }
 
     const isGroupedFormula = itemType === 'formula_herb' && item.formula_group_id;
@@ -2310,7 +2198,7 @@ function addItem(itemType, fromFormula = false, presetItem = null) {
             qtyInputHtml = `
                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem;">
                     <input type="number" min="1" value="${item.sessions}" oninput="updateItemField(${idx}, 'sessions', this.value)" style="width: 70px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.25rem; text-align: center; font-weight: 700; color: #0f766e; background: #fff;">
-                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">buổi</span>
+                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 600;">lần</span>
                 </div>
             `;
             guidanceInputHtml = `
@@ -3348,9 +3236,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-{{-- ── JS: Gợi ý AI hỗ trợ thầy thuốc (Giai đoạn 4) ── --}}
-@can('use_ai_suggestion')
-@include('admin.records.partials.ai_js')
-@endcan
+{{-- AI JS đã chuyển sang trang Kê đơn (prescriptions/create) --}}
 
 @endsection

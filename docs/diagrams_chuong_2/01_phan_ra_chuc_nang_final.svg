@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1700" viewBox="0 0 2400 1700">
+  <rect width="2400" height="1700" fill="#ffffff"/>
+  <style>
+    .root { fill: #1e3a8a; stroke: #1e3a8a; stroke-width: 3; }
+    .area { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+    .group { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.6; }
+    .feature { fill: #f8fafc; stroke: #64748b; stroke-width: 1.4; }
+    .line { stroke: #64748b; stroke-width: 2; fill: none; }
+    .title { font: 700 34px Arial, sans-serif; fill: #ffffff; }
+    .areaText { font: 700 26px Arial, sans-serif; fill: #0f172a; }
+    .featureText { font: 700 21px Arial, sans-serif; fill: #0f172a; }
+    .leafText { font: 400 20px Arial, sans-serif; fill: #0f172a; }
+  </style>
+
+  <rect class="root" x="640" y="35" width="1120" height="86" rx="18"/>
+  <text class="title" x="1200" y="88" text-anchor="middle">Website quản lý nhà thuốc YHCT AmaTrung</text>
+
+  <line class="line" x1="1200" y1="121" x2="1200" y2="170"/>
+  <line class="line" x1="650" y1="170" x2="1750" y2="170"/>
+  <line class="line" x1="650" y1="170" x2="650" y2="205"/>
+  <line class="line" x1="1750" y1="170" x2="1750" y2="205"/>
+
+  <rect class="area" x="120" y="205" width="1060" height="62" rx="14"/>
+  <text class="areaText" x="650" y="245" text-anchor="middle">1. Khu vực người dùng</text>
+  <rect class="area" x="1220" y="205" width="1060" height="62" rx="14"/>
+  <text class="areaText" x="1750" y="245" text-anchor="middle">2. Khu vực quản trị</text>
+
+  <line class="line" x1="650" y1="267" x2="650" y2="300"/>
+  <line class="line" x1="1750" y1="267" x2="1750" y2="300"/>
+
+  <!-- User area -->
+  <g>
+    <rect class="group" x="120" y="300" width="1060" height="120" rx="12"/>
+    <rect class="feature" x="145" y="324" width="330" height="72" rx="10"/>
+    <text class="featureText" x="310" y="353" text-anchor="middle">
+      <tspan x="310" dy="0">Quản lý tài khoản</tspan>
+      <tspan x="310" dy="27">cá nhân</tspan>
+    </text>
+    <text class="leafText" x="520" y="332">
+      <tspan x="520" dy="0">- Đăng ký</tspan>
+      <tspan x="520" dy="26">- Đăng nhập</tspan>
+      <tspan x="520" dy="26">- Quên mật khẩu</tspan>
+      <tspan x="520" dy="26">- Cập nhật hồ sơ</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="120" y="450" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="145" y="472" width="330" height="68" rx="10"/>
+    <text class="featureText" x="310" y="512" text-anchor="middle">Xem bài viết</text>
+    <text class="leafText" x="520" y="480">
+      <tspan x="520" dy="0">- Danh sách bài viết</tspan>
+      <tspan x="520" dy="26">- Chi tiết bài viết</tspan>
+      <tspan x="520" dy="26">- Bình luận</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="120" y="592" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="145" y="614" width="330" height="68" rx="10"/>
+    <text class="featureText" x="310" y="642" text-anchor="middle">
+      <tspan x="310" dy="0">Tra cứu từ điển</tspan>
+      <tspan x="310" dy="26">dược liệu</tspan>
+    </text>
+    <text class="leafText" x="520" y="622">
+      <tspan x="520" dy="0">- Danh sách dược liệu</tspan>
+      <tspan x="520" dy="26">- Chi tiết dược liệu</tspan>
+      <tspan x="520" dy="26">- Yêu thích dược liệu</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="120" y="734" width="1060" height="98" rx="12"/>
+    <rect class="feature" x="145" y="752" width="330" height="62" rx="10"/>
+    <text class="featureText" x="310" y="790" text-anchor="middle">Gửi liên hệ</text>
+    <text class="leafText" x="520" y="762">
+      <tspan x="520" dy="0">- Nhập thông tin liên hệ</tspan>
+      <tspan x="520" dy="26">- Gửi yêu cầu hỗ trợ</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="120" y="862" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="145" y="884" width="330" height="68" rx="10"/>
+    <text class="featureText" x="310" y="912" text-anchor="middle">
+      <tspan x="310" dy="0">Chatbot AI</tspan>
+      <tspan x="310" dy="26">hỗ trợ tra cứu</tspan>
+    </text>
+    <text class="leafText" x="520" y="892">
+      <tspan x="520" dy="0">- Tra cứu bài viết</tspan>
+      <tspan x="520" dy="26">- Tra cứu dược liệu</tspan>
+      <tspan x="520" dy="26">- Trả lời tham khảo an toàn</tspan>
+    </text>
+  </g>
+
+  <!-- Admin area -->
+  <g>
+    <rect class="group" x="1220" y="300" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="322" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="350" text-anchor="middle">
+      <tspan x="1415" dy="0">Quản lý tài khoản</tspan>
+      <tspan x="1415" dy="26">và phân quyền</tspan>
+    </text>
+    <text class="leafText" x="1630" y="330">
+      <tspan x="1630" dy="0">- Quản lý tài khoản</tspan>
+      <tspan x="1630" dy="26">- Vai trò Admin, Staff, User</tspan>
+      <tspan x="1630" dy="26">- Cấp quyền chi tiết</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="438" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="460" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="500" text-anchor="middle">Quản lý bệnh nhân</text>
+    <text class="leafText" x="1630" y="468">
+      <tspan x="1630" dy="0">- Danh sách, tìm kiếm</tspan>
+      <tspan x="1630" dy="26">- Thêm, sửa, xóa</tspan>
+      <tspan x="1630" dy="26">- Import và xuất danh sách</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="576" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="598" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="626" text-anchor="middle">
+      <tspan x="1415" dy="0">Quản lý hồ sơ</tspan>
+      <tspan x="1415" dy="26">bệnh án</tspan>
+    </text>
+    <text class="leafText" x="1630" y="606">
+      <tspan x="1630" dy="0">- Tạo bệnh án</tspan>
+      <tspan x="1630" dy="26">- Sửa, xem, in bệnh án</tspan>
+      <tspan x="1630" dy="26">- Theo dõi triệu chứng và chẩn đoán</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="714" width="1060" height="126" rx="12"/>
+    <rect class="feature" x="1245" y="744" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="772" text-anchor="middle">
+      <tspan x="1415" dy="0">Quản lý đơn</tspan>
+      <tspan x="1415" dy="26">điều trị</tspan>
+    </text>
+    <text class="leafText" x="1630" y="736">
+      <tspan x="1630" dy="0">- Thuốc uống dạng thang</tspan>
+      <tspan x="1630" dy="26">- Thuốc, chế phẩm dùng ngoài</tspan>
+      <tspan x="1630" dy="26">- Dịch vụ trị liệu</tspan>
+      <tspan x="1630" dy="26">- In đơn điều trị</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="866" width="1060" height="126" rx="12"/>
+    <rect class="feature" x="1245" y="896" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="924" text-anchor="middle">
+      <tspan x="1415" dy="0">Quản lý kho</tspan>
+      <tspan x="1415" dy="26">dược liệu</tspan>
+    </text>
+    <text class="leafText" x="1630" y="888">
+      <tspan x="1630" dy="0">- Mặt hàng kho</tspan>
+      <tspan x="1630" dy="26">- Lô và hạn dùng</tspan>
+      <tspan x="1630" dy="26">- Cấp thuốc theo đơn</tspan>
+      <tspan x="1630" dy="26">- Cảnh báo kho</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="1018" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="1040" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="1080" text-anchor="middle">Quản lý lịch hẹn</text>
+    <text class="leafText" x="1630" y="1048">
+      <tspan x="1630" dy="0">- Danh sách lịch hẹn</tspan>
+      <tspan x="1630" dy="26">- Tạo và cập nhật lịch hẹn</tspan>
+      <tspan x="1630" dy="26">- Theo dõi tái khám</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="1156" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="1178" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="1206" text-anchor="middle">
+      <tspan x="1415" dy="0">Quản lý nội dung</tspan>
+      <tspan x="1415" dy="26">website</tspan>
+    </text>
+    <text class="leafText" x="1630" y="1186">
+      <tspan x="1630" dy="0">- Bài viết</tspan>
+      <tspan x="1630" dy="26">- Bình luận</tspan>
+      <tspan x="1630" dy="26">- Từ điển dược liệu</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="1294" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="1316" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="1344" text-anchor="middle">
+      <tspan x="1415" dy="0">Dashboard</tspan>
+      <tspan x="1415" dy="26">và thống kê</tspan>
+    </text>
+    <text class="leafText" x="1630" y="1324">
+      <tspan x="1630" dy="0">- Thống kê tổng quan</tspan>
+      <tspan x="1630" dy="26">- Biểu đồ lượt khám và bệnh nhân mới</tspan>
+      <tspan x="1630" dy="26">- Hoạt động gần đây</tspan>
+    </text>
+  </g>
+  <g>
+    <rect class="group" x="1220" y="1432" width="1060" height="112" rx="12"/>
+    <rect class="feature" x="1245" y="1454" width="340" height="68" rx="10"/>
+    <text class="featureText" x="1415" y="1482" text-anchor="middle">
+      <tspan x="1415" dy="0">AI hỗ trợ</tspan>
+      <tspan x="1415" dy="26">thầy thuốc</tspan>
+    </text>
+    <text class="leafText" x="1630" y="1462">
+      <tspan x="1630" dy="0">- Nhận xét lâm sàng</tspan>
+      <tspan x="1630" dy="26">- Gợi ý dược liệu và dịch vụ</tspan>
+      <tspan x="1630" dy="26">- Gợi ý theo dõi</tspan>
+    </text>
+  </g>
+</svg>

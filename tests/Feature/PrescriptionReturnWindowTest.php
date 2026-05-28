@@ -8,6 +8,9 @@ use App\Models\Patient;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 use App\Models\User;
+use App\Models\InventoryItem;
+use App\Models\InventoryBatch;
+use App\Models\StockMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,10 +18,15 @@ class PrescriptionReturnWindowTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_saving_prescription_deducts_stock(): void
+    public function test_dispensing_prescription_deducts_stock(): void
     {
         [$admin, $record, $herb] = $this->makeBaseData();
 
+        $item = InventoryItem::where('legacy_source_table', 'medicinal_herbs')
+            ->where('legacy_source_id', $herb->id)
+            ->first();
+
+        // 1. Post to store (creates confirmed prescription, no stock deducted)
         $this->actingAs($admin)->post(route('admin.prescriptions.store'), [
             'medical_record_id' => $record->id,
             'treatment_type' => 'herbal_only',
@@ -26,22 +34,44 @@ class PrescriptionReturnWindowTest extends TestCase
             'num_of_doses' => 3,
             'items' => [
                 [
-                    'item_type' => 'formula_herb',
-                    'herb_id' => $herb->id,
-                    'quantity' => 10,
+                    'item_type' => 'herb',
+                    'inventory_item_id' => $item->id,
+                    'quantity_per_dose' => 10,
                     'unit' => 'g',
                     'dosage' => 'Sắc cùng thang',
                 ],
             ],
         ])->assertRedirect();
 
-        $this->assertSame(70.0, (float) $herb->fresh()->stock_quantity);
+        // Retrieve created prescription
+        $prescription = Prescription::latest()->first();
+        $this->assertEquals('confirmed', $prescription->status);
+        $this->assertSame(100.0, (float) $herb->fresh()->stock_quantity); // Legacy untouched
+        
+        $batch = InventoryBatch::where('inventory_item_id', $item->id)->first();
+        $this->assertEquals(100.0, (float) $batch->quantity_remaining); // New untouched
+
+        // 2. Dispense prescription (deducts stock)
+        $this->actingAs($admin)->post(route('admin.prescriptions.dispense', $prescription))
+            ->assertRedirect();
+
+        $this->assertEquals('dispensed', $prescription->fresh()->status);
+        $this->assertEquals(70.0, (float) $batch->fresh()->quantity_remaining);
     }
 
     public function test_prescription_can_be_deleted_and_stock_refunded_within_24_hours(): void
     {
         [$admin, $record, $herb] = $this->makeBaseData();
         $prescription = $this->makeDeductedPrescription($record, $admin, $herb, now()->subHours(23));
+
+        $item = InventoryItem::where('legacy_source_table', 'medicinal_herbs')
+            ->where('legacy_source_id', $herb->id)
+            ->first();
+        $batch = InventoryBatch::where('inventory_item_id', $item->id)->first();
+
+        // Verify pre-conditions
+        $this->assertSame(70.0, (float) $herb->fresh()->stock_quantity);
+        $this->assertSame(70.0, (float) $batch->fresh()->quantity_remaining);
 
         $this->actingAs($admin)
             ->from(route('admin.medical-records.show', $record))
@@ -53,12 +83,18 @@ class PrescriptionReturnWindowTest extends TestCase
             'status' => 'cancelled',
         ]);
         $this->assertSame(100.0, (float) $herb->fresh()->stock_quantity);
+        $this->assertSame(100.0, (float) $batch->fresh()->quantity_remaining);
     }
 
     public function test_prescription_cannot_be_deleted_or_refunded_after_24_hours(): void
     {
         [$admin, $record, $herb] = $this->makeBaseData();
         $prescription = $this->makeDeductedPrescription($record, $admin, $herb, now()->subHours(25));
+
+        $item = InventoryItem::where('legacy_source_table', 'medicinal_herbs')
+            ->where('legacy_source_id', $herb->id)
+            ->first();
+        $batch = InventoryBatch::where('inventory_item_id', $item->id)->first();
 
         $this->actingAs($admin)
             ->from(route('admin.medical-records.show', $record))
@@ -68,9 +104,10 @@ class PrescriptionReturnWindowTest extends TestCase
 
         $this->assertDatabaseHas('prescriptions', [
             'id' => $prescription->id,
-            'status' => 'active',
+            'status' => 'dispensed',
         ]);
         $this->assertSame(70.0, (float) $herb->fresh()->stock_quantity);
+        $this->assertSame(70.0, (float) $batch->fresh()->quantity_remaining);
     }
 
     public function test_internal_print_label_depends_on_case_type_and_items(): void
@@ -89,7 +126,7 @@ class PrescriptionReturnWindowTest extends TestCase
             'treatment_type' => 'service_only',
             'note' => null,
             'num_of_doses' => 0,
-            'status' => 'active',
+            'status' => 'confirmed',
             'affect_stock' => true,
         ]);
 
@@ -153,6 +190,25 @@ class PrescriptionReturnWindowTest extends TestCase
             'status' => 'active',
         ]);
 
+        // Seed new inventory tables
+        $item = InventoryItem::create([
+            'name' => 'Sa',
+            'item_type' => 'herb',
+            'usage_route' => 'oral',
+            'unit' => 'g',
+            'is_active' => true,
+            'legacy_source_table' => 'medicinal_herbs',
+            'legacy_source_id' => $herb->id,
+        ]);
+
+        InventoryBatch::create([
+            'inventory_item_id' => $item->id,
+            'batch_number' => 'LEGACY-H-' . date('Ymd') . '-' . $herb->id,
+            'expiry_date' => now()->addYear()->toDateString(),
+            'quantity_remaining' => 100.0,
+            'status' => 'available',
+        ]);
+
         return [$admin, $record, $herb];
     }
 
@@ -164,7 +220,7 @@ class PrescriptionReturnWindowTest extends TestCase
             'treatment_type' => 'herbal_only',
             'note' => 'Thuoc xong cam',
             'num_of_doses' => 3,
-            'status' => 'active',
+            'status' => 'dispensed',
             'affect_stock' => true,
         ]);
 
@@ -173,11 +229,18 @@ class PrescriptionReturnWindowTest extends TestCase
             'updated_at' => $createdAt,
         ])->save();
 
-        PrescriptionItem::create([
+        $item = InventoryItem::where('legacy_source_table', 'medicinal_herbs')
+            ->where('legacy_source_id', $herb->id)
+            ->first();
+
+        $pItem = PrescriptionItem::create([
             'prescription_id' => $prescription->id,
+            'inventory_item_id' => $item?->id,
             'medicinal_herb_id' => $herb->id,
             'item_type' => 'formula_herb',
-            'quantity' => 10,
+            'quantity' => 30,
+            'quantity_per_dose' => 10,
+            'number_of_doses' => 3,
             'unit' => 'g',
             'dosage' => 'Sac uong',
             'affects_stock' => true,
@@ -186,6 +249,21 @@ class PrescriptionReturnWindowTest extends TestCase
         $herb->stockLogType = 'prescription';
         $herb->stockLogNote = 'Kê đơn test';
         $herb->decrement('stock_quantity', 30);
+
+        if ($item) {
+            $batch = InventoryBatch::where('inventory_item_id', $item->id)->first();
+            if ($batch) {
+                $batch->decrement('quantity_remaining', 30);
+                StockMovement::create([
+                    'inventory_batch_id' => $batch->id,
+                    'prescription_item_id' => $pItem->id,
+                    'performed_by' => $admin->id,
+                    'movement_type' => 'dispense',
+                    'quantity' => -30,
+                    'note' => 'Xuất kho theo đơn thuốc (FEFO)',
+                ]);
+            }
+        }
 
         return $prescription->fresh();
     }

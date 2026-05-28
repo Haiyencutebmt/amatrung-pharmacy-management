@@ -68,9 +68,13 @@ class PrescriptionController extends Controller implements HasMiddleware
 
         $inventoryItems = InventoryItem::where('is_active', true)->orderBy('name')->get();
         $herbs = $inventoryItems->where('item_type', 'herb');
-        $externalProducts = $inventoryItems->where('item_type', 'packaged_product');
+        $externalProducts = $inventoryItems->filter(function ($item) {
+            return $item->usage_route === 'external'
+                || in_array($item->item_type, ['packaged_product', 'external_product'], true);
+        });
+        $therapyServices = \App\Models\TherapyService::where('status', 'active')->orderBy('name')->get();
 
-        return view('admin.prescriptions.create', compact('medicalRecord', 'herbs', 'externalProducts'));
+        return view('admin.prescriptions.create', compact('medicalRecord', 'herbs', 'externalProducts', 'therapyServices'));
     }
 
     public function store(Request $request)
@@ -84,7 +88,7 @@ class PrescriptionController extends Controller implements HasMiddleware
             'course_days'          => 'nullable|integer|min:1',
             'follow_up_date'       => 'nullable|date|after:today',
             'items'                => 'required|array|min:1',
-            'items.*.item_type'    => 'required|in:herb,packaged_product,therapy_service',
+            'items.*.item_type'    => 'required|in:herb,packaged_product,external_product,therapy_service',
             'items.*.inventory_item_id' => 'nullable|exists:inventory_items,id',
             'items.*.custom_name'  => 'nullable|string|max:255',
             'items.*.quantity_per_dose' => 'nullable|numeric|min:0',

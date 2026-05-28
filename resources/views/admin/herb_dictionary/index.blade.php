@@ -5,7 +5,7 @@
 
 @section('header-left')
 <div class="header-title" style="display:flex;align-items:center;gap:1rem;">
-    <div style="width:44px;height:44px;background:#ecfdf5;color:#0f766e;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;border:1px solid #bbf7d0;">🌿</div>
+    <div style="width:44px;height:44px;background:#eff6ff;color:#2563eb;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;border:1px solid #dbeafe;">🌿</div>
     <div>
         <h1 style="font-size:1.5rem;font-weight:850;color:#1e293b;margin:0;line-height:1.2;">Từ điển thuốc nam</h1>
         <p style="margin:0;color:#64748b;font-size:0.85rem;font-weight:500;">Quản lý cây thuốc, hình ảnh, tác dụng và lưu ý an toàn</p>
@@ -186,16 +186,16 @@
 .dict-filter-actions button, .dict-filter-actions a, .dict-add { border:0; border-radius:8px; padding:0.65rem 0.9rem; font-weight:850; text-decoration:none; white-space:nowrap; }
 .dict-filter-actions button { background:#f0f9ff; color:#2563eb; cursor:pointer; }
 .dict-filter-actions a { background:#f1f5f9; color:#64748b; }
-.dict-add { background:#16a34a; color:white; text-align:center; }
-.dict-import-panel { display:flex; justify-content:space-between; gap:1rem; align-items:center; background:#f8fffb; border:1px solid #bbf7d0; border-radius:10px; padding:0.95rem; margin-bottom:1rem; }
+.dict-add { background:#2563eb; color:white; text-align:center; }
+.dict-import-panel { display:flex; justify-content:space-between; gap:1rem; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:0.95rem; margin-bottom:1rem; }
 .dict-import-copy { display:flex; flex-direction:column; gap:0.25rem; min-width:220px; }
-.dict-import-copy strong { color:#065f46; font-size:0.95rem; }
+.dict-import-copy strong { color:#1e3a8a; font-size:0.95rem; }
 .dict-import-copy span { color:#64748b; font-size:0.84rem; line-height:1.45; }
 .dict-import-form { display:flex; align-items:center; justify-content:flex-end; gap:0.6rem; flex-wrap:wrap; }
 .dict-import-form input[type="file"] { max-width:280px; border:1px solid #cbd5e1; border-radius:8px; padding:0.55rem; background:white; color:#334155; }
 .dict-import-form a, .dict-import-form button { border:1px solid #99f6e4; border-radius:8px; padding:0.62rem 0.85rem; font-weight:850; text-decoration:none; white-space:nowrap; }
-.dict-import-form a { background:#f0fdfa; color:#0f766e; }
-.dict-import-form button { border-color:#16a34a; background:#16a34a; color:white; cursor:pointer; }
+.dict-import-form a { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
+.dict-import-form button { border-color:#2563eb; background:#2563eb; color:white; cursor:pointer; }
 .dict-import-errors { border:1px solid #fecaca; background:#fef2f2; color:#991b1b; border-radius:10px; padding:0.9rem 1rem; margin-bottom:1rem; font-size:0.9rem; }
 .dict-import-errors ul { margin:0.5rem 0 0; padding-left:1.1rem; }
 .dict-import-errors li { margin:0.25rem 0; }
@@ -214,13 +214,13 @@
 .dict-check { width:16px; height:16px; accent-color:#ef4444; cursor:pointer; }
 .dict-image-cell { width:88px; }
 .dict-thumb { width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0; }
-.dict-thumb.empty { display:flex; align-items:center; justify-content:center; color:#16a34a; background:#ecfdf5; font-size:1.5rem; font-weight:800; }
+.dict-thumb.empty { display:flex; align-items:center; justify-content:center; color:#2563eb; background:#eff6ff; font-size:1.5rem; font-weight:800; }
 .dict-inline-upload { margin:0; width:64px; height:64px; position:relative; }
 .dict-inline-input { display:none; }
 .dict-upload-button { padding:0; font-family:inherit; cursor:pointer; transition:background 0.2s, border-color 0.2s, transform 0.2s; }
-.dict-upload-button:hover { background:#dcfce7; border-color:#86efac; transform:translateY(-1px); }
+.dict-upload-button:hover { background:#eff6ff; border-color:#bfdbfe; transform:translateY(-1px); }
 .dict-inline-upload.is-uploading .dict-upload-button { color:transparent; pointer-events:none; }
-.dict-inline-upload.is-uploading .dict-upload-button::after { content:''; width:20px; height:20px; border:3px solid #bbf7d0; border-top-color:#16a34a; border-radius:50%; animation:dictSpin 0.75s linear infinite; }
+.dict-inline-upload.is-uploading .dict-upload-button::after { content:''; width:20px; height:20px; border:3px solid #bfdbfe; border-top-color:#2563eb; border-radius:50%; animation:dictSpin 0.75s linear infinite; }
 .dict-info { max-width:340px; color:#64748b; line-height:1.45; }
 .status { display:inline-flex; border-radius:999px; padding:0.25rem 0.55rem; font-weight:850; font-size:0.75rem; }
 .status.published { color:#166534; background:#dcfce7; border:1px solid #bbf7d0; }

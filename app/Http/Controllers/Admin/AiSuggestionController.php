@@ -90,7 +90,7 @@ class AiSuggestionController extends Controller
                 'medical_record_id' => $record->id,
                 'payload'           => $result['payload_sent'] ?? [],
                 'response'          => $result['suggestions'] ?? [],
-                'status'            => 'pending',
+                'status'            => ($result['status'] === 'success') ? 'generated' : 'failed',
                 'error_message'     => ($result['status'] === 'ai_unavailable')
                                          ? ($result['message'] ?? null)
                                          : null,
@@ -112,7 +112,7 @@ class AiSuggestionController extends Controller
 
     /**
      * POST /admin/api/ai-suggest/log-status
-     * Body: { log_id: int, interaction_status: 'accepted'|'edited'|'ignored' }
+     * Body: { log_id: int, interaction_status: 'referenced'|'not_used' }
      *
      * Cập nhật trạng thái tương tác của bác sĩ với gợi ý AI.
      * Không tự lưu đơn thuốc - chỉ cập nhật log.
@@ -123,12 +123,12 @@ class AiSuggestionController extends Controller
     {
         $validated = $request->validate([
             'log_id'             => 'required|integer|exists:ai_suggestion_logs,id',
-            'interaction_status' => 'required|in:accepted,edited,ignored',
+            'interaction_status' => 'required|in:referenced,not_used',
         ], [
             'log_id.required'             => 'Thiếu ID log.',
             'log_id.exists'               => 'Log không tồn tại.',
             'interaction_status.required' => 'Thiếu trạng thái tương tác.',
-            'interaction_status.in'       => 'Trạng thái không hợp lệ. Chấp nhận: accepted, edited, ignored.',
+            'interaction_status.in'       => 'Trạng thái không hợp lệ. Chấp nhận: referenced, not_used.',
         ]);
 
         $log = AiSuggestionLog::find($validated['log_id']);

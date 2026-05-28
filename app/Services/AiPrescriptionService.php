@@ -5,6 +5,10 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @deprecated This service is legacy and has been replaced by AiClinicalSuggestionService.
+ * It is kept for backward compatibility but should not be used in active flows.
+ */
 class AiPrescriptionService
 {
     private array $availableHerbs = [];

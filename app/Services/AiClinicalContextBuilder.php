@@ -66,7 +66,7 @@ class AiClinicalContextBuilder
         $age = null;
         if ($record->patient && $record->patient->date_of_birth) {
             try {
-                $age = now()->diffInYears($record->patient->date_of_birth);
+                $age = (int) $record->patient->age;
             } catch (\Exception $e) {
                 $age = null;
             }
@@ -100,19 +100,39 @@ class AiClinicalContextBuilder
             return [];
         }
 
-        // Dùng stock_quantity từ bảng medicinal_herbs
-        // (InventoryBatch liên kết qua InventoryItem chứ không trực tiếp đến MedicinalHerb,
-        //  nên truy vấn stock_quantity đã được đồng bộ là cách an toàn và chính xác nhất)
-        return MedicinalHerb::where('status', 'active')
-            ->where('stock_quantity', '>', 0)
-            ->orderBy('name')
-            ->get(['name', 'unit', 'stock_quantity'])
-            ->map(fn($h) => [
-                'name'          => $h->name,
-                'unit'          => $h->unit,
-                'available_qty' => (float) $h->stock_quantity,
-            ])
-            ->values()
-            ->toArray();
+        $today = now()->toDateString();
+        $query = DB::table('inventory_items')
+            ->join('inventory_batches', 'inventory_items.id', '=', 'inventory_batches.inventory_item_id')
+            ->where('inventory_items.is_active', true)
+            ->where('inventory_batches.quantity_remaining', '>', 0)
+            ->where('inventory_batches.status', 'available')
+            ->whereNotNull('inventory_batches.expiry_date')
+            ->where('inventory_batches.expiry_date', '>', $today);
+
+        // Áp dụng quy tắc dùng usage_route:
+        if ($treatmentDirection === 'oral_only') {
+            $query->where('inventory_items.usage_route', 'oral');
+        } elseif ($treatmentDirection === 'external_only') {
+            $query->where('inventory_items.usage_route', 'external');
+        } elseif ($treatmentDirection === 'combined') {
+            $query->whereIn('inventory_items.usage_route', ['oral', 'external']);
+        } else {
+            $query->whereIn('inventory_items.usage_route', ['oral', 'external']);
+        }
+
+        $items = $query->select(
+                'inventory_items.name',
+                'inventory_items.unit',
+                DB::raw('SUM(inventory_batches.quantity_remaining) as stock_quantity')
+            )
+            ->groupBy('inventory_items.id', 'inventory_items.name', 'inventory_items.unit')
+            ->orderBy('inventory_items.name')
+            ->get();
+
+        return $items->map(fn($item) => [
+            'name'          => $item->name,
+            'unit'          => $item->unit,
+            'available_qty' => (float) $item->stock_quantity,
+        ])->toArray();
     }
 }

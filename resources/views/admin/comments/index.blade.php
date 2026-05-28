@@ -5,7 +5,7 @@
 
 @section('header-left')
 <div class="header-title" style="display: flex; align-items: center; gap: 1rem;">
-    <div class="icon-bg" style="width: 44px; height: 44px; background: #eef9ee; color: #5eb542; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+    <div class="icon-bg" style="width: 44px; height: 44px; background: #eff6ff; color: #2563eb; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
         <span class="icon">💬</span>
     </div>
     <div>
@@ -106,7 +106,7 @@
                                     <form action="{{ route('admin.comments.update', $comment) }}" method="POST">
                                         @csrf @method('PUT')
                                         <input type="hidden" name="is_approved" value="1">
-                                        <button type="submit" class="btn-icon view" style="width: 100%; justify-content: center; border-color: #5eb542; color: #5eb542;" title="Duyệt">
+                                        <button type="submit" class="btn-icon view" style="width: 100%; justify-content: center; border-color: #2563eb; color: #2563eb;" title="Duyệt">
                                             ✅ Duyệt
                                         </button>
                                     </form>
@@ -145,7 +145,7 @@
 
 <style>
 .record-index-container {
-    --primary-green: #5eb542;
+    --primary-green: #2563eb;
     --text-dark: #1e293b;
     --text-muted: #64748b;
     --bg-light: #f8fafc;
@@ -161,8 +161,8 @@
 .header-title .icon-bg {
     width: 48px;
     height: 48px;
-    background: #eef9ee;
-    color: #5eb542;
+    background: #eff6ff;
+    color: #2563eb;
     border-radius: 1rem;
     display: flex;
     align-items: center;
@@ -259,7 +259,7 @@
 .btn-add {
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
-    background: #5eb542;
+    background: #2563eb;
     color: #fff;
     text-decoration: none;
     font-weight: 700;
@@ -380,9 +380,9 @@
 }
 
 .page-item.active .page-link {
-    background: #5eb542;
+    background: #2563eb;
     color: #fff;
-    border-color: #5eb542;
+    border-color: #2563eb;
 }
 </style>
 @endsection

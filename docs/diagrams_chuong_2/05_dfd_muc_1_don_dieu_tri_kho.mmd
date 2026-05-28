@@ -1,0 +1,46 @@
+flowchart TB
+    Staff[Staff / Admin]
+    Record[(medical_records)]
+    Prescription[(prescriptions)]
+    PrescriptionItem[(prescription_items)]
+    Item[(inventory_items)]
+    Batch[(inventory_batches)]
+    Movement[(stock_movements)]
+    Therapy[(therapy_services)]
+    Legacy[(medicinal_herbs / packaged_products legacy)]
+
+    P41((4.1 Mo trang ke don tu benh an))
+    P42((4.2 Chon thuoc thang uong))
+    P43((4.3 Chon thuoc / che pham dung ngoai))
+    P44((4.4 Chon dich vu tri lieu))
+    P45((4.5 Luu don dieu tri))
+    P46((4.6 Cap thuoc / dispense))
+    P47((4.7 Tru kho FEFO va ghi movement))
+    P48((4.8 In / huy don trong thoi han))
+
+    Staff --> P41
+    P41 --> Record
+    P41 --> Item
+    P41 --> Therapy
+    P41 -. Doc tuong thich / legacy .-> Legacy
+
+    P41 --> P42
+    P41 --> P43
+    P41 --> P44
+    P42 --> P45
+    P43 --> P45
+    P44 --> P45
+    P45 --> Prescription
+    P45 --> PrescriptionItem
+
+    Staff --> P46
+    P46 --> Prescription
+    P46 --> P47
+    P47 --> Batch
+    P47 --> Movement
+    P47 --> PrescriptionItem
+
+    Staff --> P48
+    P48 --> Prescription
+    P48 --> Batch
+    P48 --> Movement

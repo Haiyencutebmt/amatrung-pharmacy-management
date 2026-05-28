@@ -1,0 +1,88 @@
+%%{init: {"theme": "base", "themeVariables": {"background": "#ffffff", "primaryColor": "#ffffff", "primaryTextColor": "#0f172a", "primaryBorderColor": "#1e3a8a", "lineColor": "#64748b", "fontFamily": "Arial, sans-serif"}, "flowchart": {"htmlLabels": true, "curve": "basis"}}}%%
+flowchart TB
+    ROOT["Website quản lý nhà thuốc<br/>YHCT AmaTrung"]
+
+    ROOT --> USER["1. Khu vực người dùng"]
+    ROOT --> ADMIN["2. Khu vực quản trị"]
+
+    USER --> U_ACCOUNT["Quản lý tài khoản cá nhân"]
+    U_ACCOUNT --> U_ACCOUNT_1["Đăng ký"]
+    U_ACCOUNT --> U_ACCOUNT_2["Đăng nhập"]
+    U_ACCOUNT --> U_ACCOUNT_3["Quên mật khẩu"]
+    U_ACCOUNT --> U_ACCOUNT_4["Cập nhật hồ sơ"]
+
+    USER --> U_ARTICLE["Xem bài viết"]
+    U_ARTICLE --> U_ARTICLE_1["Danh sách bài viết"]
+    U_ARTICLE --> U_ARTICLE_2["Chi tiết bài viết"]
+    U_ARTICLE --> U_ARTICLE_3["Bình luận"]
+
+    USER --> U_DICT["Tra cứu từ điển dược liệu"]
+    U_DICT --> U_DICT_1["Danh sách dược liệu"]
+    U_DICT --> U_DICT_2["Chi tiết dược liệu"]
+    U_DICT --> U_DICT_3["Yêu thích dược liệu"]
+
+    USER --> U_CONTACT["Gửi liên hệ"]
+    U_CONTACT --> U_CONTACT_1["Nhập thông tin liên hệ"]
+    U_CONTACT --> U_CONTACT_2["Gửi yêu cầu hỗ trợ"]
+
+    USER --> U_CHATBOT["Chatbot AI hỗ trợ tra cứu"]
+    U_CHATBOT --> U_CHATBOT_1["Tra cứu bài viết"]
+    U_CHATBOT --> U_CHATBOT_2["Tra cứu dược liệu"]
+    U_CHATBOT --> U_CHATBOT_3["Trả lời tham khảo an toàn"]
+
+    ADMIN --> A_USER["Quản lý tài khoản<br/>và phân quyền"]
+    A_USER --> A_USER_1["Quản lý tài khoản"]
+    A_USER --> A_USER_2["Vai trò Admin, Staff, User"]
+    A_USER --> A_USER_3["Cấp quyền chi tiết"]
+
+    ADMIN --> A_PATIENT["Quản lý bệnh nhân"]
+    A_PATIENT --> A_PATIENT_1["Danh sách, tìm kiếm"]
+    A_PATIENT --> A_PATIENT_2["Thêm, sửa, xóa"]
+    A_PATIENT --> A_PATIENT_3["Import và xuất danh sách"]
+
+    ADMIN --> A_RECORD["Quản lý hồ sơ bệnh án"]
+    A_RECORD --> A_RECORD_1["Tạo bệnh án"]
+    A_RECORD --> A_RECORD_2["Sửa, xem, in bệnh án"]
+    A_RECORD --> A_RECORD_3["Theo dõi triệu chứng<br/>và chẩn đoán"]
+
+    ADMIN --> A_PRESCRIPTION["Quản lý đơn điều trị"]
+    A_PRESCRIPTION --> A_PRESCRIPTION_1["Thuốc uống dạng thang"]
+    A_PRESCRIPTION --> A_PRESCRIPTION_2["Thuốc, chế phẩm dùng ngoài"]
+    A_PRESCRIPTION --> A_PRESCRIPTION_3["Dịch vụ trị liệu"]
+    A_PRESCRIPTION --> A_PRESCRIPTION_4["In đơn điều trị"]
+
+    ADMIN --> A_INVENTORY["Quản lý kho dược liệu"]
+    A_INVENTORY --> A_INVENTORY_1["Mặt hàng kho"]
+    A_INVENTORY --> A_INVENTORY_2["Lô và hạn dùng"]
+    A_INVENTORY --> A_INVENTORY_3["Cấp thuốc theo đơn"]
+    A_INVENTORY --> A_INVENTORY_4["Cảnh báo kho"]
+
+    ADMIN --> A_APPOINTMENT["Quản lý lịch hẹn"]
+    A_APPOINTMENT --> A_APPOINTMENT_1["Danh sách lịch hẹn"]
+    A_APPOINTMENT --> A_APPOINTMENT_2["Tạo và cập nhật lịch hẹn"]
+    A_APPOINTMENT --> A_APPOINTMENT_3["Theo dõi tái khám"]
+
+    ADMIN --> A_CONTENT["Quản lý nội dung website"]
+    A_CONTENT --> A_CONTENT_1["Bài viết"]
+    A_CONTENT --> A_CONTENT_2["Bình luận"]
+    A_CONTENT --> A_CONTENT_3["Từ điển dược liệu"]
+
+    ADMIN --> A_DASHBOARD["Dashboard và thống kê"]
+    A_DASHBOARD --> A_DASHBOARD_1["Thống kê tổng quan"]
+    A_DASHBOARD --> A_DASHBOARD_2["Biểu đồ lượt khám<br/>và bệnh nhân mới"]
+    A_DASHBOARD --> A_DASHBOARD_3["Hoạt động gần đây"]
+
+    ADMIN --> A_AI["AI hỗ trợ thầy thuốc"]
+    A_AI --> A_AI_1["Nhận xét lâm sàng"]
+    A_AI --> A_AI_2["Gợi ý dược liệu<br/>và dịch vụ"]
+    A_AI --> A_AI_3["Gợi ý theo dõi"]
+
+    classDef root fill:#1e3a8a,stroke:#1e3a8a,color:#ffffff,stroke-width:2px,font-weight:bold;
+    classDef area fill:#dbeafe,stroke:#2563eb,color:#0f172a,stroke-width:1.5px,font-weight:bold;
+    classDef feature fill:#f8fafc,stroke:#64748b,color:#0f172a,stroke-width:1px,font-weight:bold;
+    classDef leaf fill:#ffffff,stroke:#cbd5e1,color:#0f172a,stroke-width:1px;
+
+    class ROOT root;
+    class USER,ADMIN area;
+    class U_ACCOUNT,U_ARTICLE,U_DICT,U_CONTACT,U_CHATBOT,A_USER,A_PATIENT,A_RECORD,A_PRESCRIPTION,A_INVENTORY,A_APPOINTMENT,A_CONTENT,A_DASHBOARD,A_AI feature;
+    class U_ACCOUNT_1,U_ACCOUNT_2,U_ACCOUNT_3,U_ACCOUNT_4,U_ARTICLE_1,U_ARTICLE_2,U_ARTICLE_3,U_DICT_1,U_DICT_2,U_DICT_3,U_CONTACT_1,U_CONTACT_2,U_CHATBOT_1,U_CHATBOT_2,U_CHATBOT_3,A_USER_1,A_USER_2,A_USER_3,A_PATIENT_1,A_PATIENT_2,A_PATIENT_3,A_RECORD_1,A_RECORD_2,A_RECORD_3,A_PRESCRIPTION_1,A_PRESCRIPTION_2,A_PRESCRIPTION_3,A_PRESCRIPTION_4,A_INVENTORY_1,A_INVENTORY_2,A_INVENTORY_3,A_INVENTORY_4,A_APPOINTMENT_1,A_APPOINTMENT_2,A_APPOINTMENT_3,A_CONTENT_1,A_CONTENT_2,A_CONTENT_3,A_DASHBOARD_1,A_DASHBOARD_2,A_DASHBOARD_3,A_AI_1,A_AI_2,A_AI_3 leaf;

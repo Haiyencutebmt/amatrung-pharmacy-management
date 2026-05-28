@@ -24,7 +24,7 @@ class HerbDictionaryTest extends TestCase
         $this->get(route('herb-dictionary.index'))
             ->assertOk()
             ->assertSee('Lá lốt')
-            ->assertSee('Đăng nhập để xem chi tiết');
+            ->assertSee('Đăng nhập để xem');
 
         $this->get(route('herb-dictionary.show', $entry))
             ->assertRedirect(route('login'));
@@ -39,7 +39,7 @@ class HerbDictionaryTest extends TestCase
             ->assertOk()
             ->assertSee('Gừng')
             ->assertSee('Lá lốt')
-            ->assertSee('Khách có thể xem danh sách');
+            ->assertSee('Khách chỉ có thể xem danh sách');
     }
 
     public function test_logged_in_user_can_search_view_detail_and_favorite(): void
@@ -289,7 +289,7 @@ class HerbDictionaryTest extends TestCase
         $csv = stream_get_contents($buffer);
         fclose($buffer);
 
-        $path = tempnam(sys_get_temp_dir(), 'herb_dictionary_import_');
+        $path = tempnam(storage_path(), 'herb_dictionary_import_');
         file_put_contents($path, "\xEF\xBB\xBF" . $csv);
 
         $file = new UploadedFile($path, 'tu-dien-thuoc-nam.csv', 'text/csv', null, true);
