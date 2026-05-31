@@ -3,6 +3,14 @@
 @section('title', 'Bảng điều khiển — AmaTrung')
 
 @section('content')
+@php
+    $linkFeatureAvailable = $linkFeatureAvailable ?? false;
+    $linkedPatients = $linkedPatients ?? collect();
+    $pendingPatientLinks = $pendingPatientLinks ?? collect();
+    $matchingPatients = $matchingPatients ?? collect();
+    $medicalRecords = $medicalRecords ?? collect();
+    $recentPrescriptions = $recentPrescriptions ?? collect();
+@endphp
 <div class="bg-[var(--color-surface-bg)] min-h-screen py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-[1400px] mx-auto space-y-8">
 
@@ -194,16 +202,22 @@
                     </div>
 
                     {{-- Card 3: Lịch sử khám bệnh --}}
-                    <div onclick="showUpgradeNotice('Lịch sử khám bệnh')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[150px] cursor-pointer">
+                    <div onclick="scrollToPatientSection('{{ $linkedPatients->isNotEmpty() ? 'medical-history-section' : 'patient-sync-section' }}')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[150px] cursor-pointer">
                         <div>
                             <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                             </div>
                             <h4 class="font-extrabold text-slate-800 mb-1.5 text-base">Lịch sử khám bệnh</h4>
-                            <p class="text-xs text-slate-500 leading-relaxed max-w-[90%]">Xem lại lịch sử khám, chẩn đoán và kết quả điều trị của bạn.</p>
+                            <p class="text-xs text-slate-500 leading-relaxed max-w-[90%]">
+                                @if($linkedPatients->isNotEmpty())
+                                    Đang liên kết {{ $linkedPatients->count() }} hồ sơ, có {{ $medicalRecords->count() }} lượt khám gần đây.
+                                @else
+                                    Đồng bộ bằng số điện thoại để xem lịch sử khám được phép hiển thị.
+                                @endif
+                            </p>
                         </div>
                         <span class="text-xs font-bold text-purple-600 flex items-center gap-1 hover:gap-2 transition-all mt-4 relative z-10">
-                            Xem lịch sử <span class="text-sm">→</span>
+                            {{ $linkedPatients->isNotEmpty() ? 'Xem lịch sử' : 'Đồng bộ hồ sơ' }} <span class="text-sm">→</span>
                         </span>
 
                         <!-- Traditional cloud motif at bottom-right -->
@@ -213,16 +227,22 @@
                     </div>
 
                     {{-- Card 4: Toa thuốc gần đây --}}
-                    <div onclick="showUpgradeNotice('Toa thuốc gần đây')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[150px] cursor-pointer">
+                    <div onclick="scrollToPatientSection('{{ $linkedPatients->isNotEmpty() ? 'recent-prescriptions-section' : 'patient-sync-section' }}')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[150px] cursor-pointer">
                         <div>
                             <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 9.172V5L8 4z"></path></svg>
                             </div>
                             <h4 class="font-extrabold text-slate-800 mb-1.5 text-base">Toa thuốc gần đây</h4>
-                            <p class="text-xs text-slate-500 leading-relaxed max-w-[90%]">Theo dõi các toa thuốc đã nhận và hướng dẫn sử dụng.</p>
+                            <p class="text-xs text-slate-500 leading-relaxed max-w-[90%]">
+                                @if($linkedPatients->isNotEmpty())
+                                    Hiển thị {{ $recentPrescriptions->count() }} toa đã xác nhận/cấp thuốc gần đây.
+                                @else
+                                    Sau khi xác minh hồ sơ, toa thuốc gần đây sẽ hiển thị tại đây.
+                                @endif
+                            </p>
                         </div>
                         <span class="text-xs font-bold text-orange-600 flex items-center gap-1 hover:gap-2 transition-all mt-4 relative z-10">
-                            Xem toa thuốc <span class="text-sm">→</span>
+                            {{ $linkedPatients->isNotEmpty() ? 'Xem toa thuốc' : 'Đồng bộ hồ sơ' }} <span class="text-sm">→</span>
                         </span>
 
                         <!-- Traditional cloud motif at bottom-right -->
@@ -231,6 +251,202 @@
                         </svg>
                     </div>
                 </div>
+
+                {{-- Patient Medical Data Sync --}}
+                @if($linkFeatureAvailable)
+                    <section id="patient-sync-section" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-7">
+                        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
+                            <div class="flex items-start gap-4">
+                                <span class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 shadow-sm">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </span>
+                                <div>
+                                    <h3 class="text-lg md:text-xl font-black text-slate-800">Đồng bộ hồ sơ khám bệnh</h3>
+                                    <p class="text-sm text-slate-500 leading-relaxed mt-1 max-w-2xl">
+                                        Hệ thống chỉ hiển thị lịch sử khám và toa thuốc khi hồ sơ bệnh nhân đã được liên kết an toàn với tài khoản của bạn.
+                                    </p>
+                                </div>
+                            </div>
+                            @if($linkedPatients->isNotEmpty())
+                                <span class="inline-flex items-center justify-center px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-700 text-xs font-extrabold border border-emerald-100">
+                                    {{ $linkedPatients->count() }} hồ sơ đã xác minh
+                                </span>
+                            @endif
+                        </div>
+
+                        @if(session('status'))
+                            <div class="mb-5 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                                {{ session('status') }}
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="mb-5 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
+                        @if(!auth()->user()->phone)
+                            <div class="rounded-3xl bg-slate-50 border border-dashed border-slate-200 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div>
+                                    <p class="font-extrabold text-slate-800">Bạn chưa cập nhật số điện thoại.</p>
+                                    <p class="text-sm text-slate-500 mt-1">Vui lòng cập nhật số điện thoại để hệ thống tìm hồ sơ bệnh nhân phù hợp.</p>
+                                </div>
+                                <button onclick="openModal('info')" class="px-5 py-3 rounded-2xl bg-blue-600 text-white text-sm font-bold shadow-md shadow-blue-500/10 hover:bg-blue-700 transition">
+                                    Cập nhật số điện thoại
+                                </button>
+                            </div>
+                        @else
+                            <div class="space-y-4">
+                                @if($linkedPatients->isNotEmpty())
+                                    <div class="rounded-3xl bg-emerald-50/70 border border-emerald-100 p-5">
+                                        <p class="text-sm font-extrabold text-emerald-800 mb-3">Hồ sơ đang được hiển thị</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($linkedPatients as $patient)
+                                                <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white border border-emerald-100 text-sm font-bold text-slate-700 shadow-sm">
+                                                    <span class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">{{ mb_substr($patient->full_name, 0, 1) }}</span>
+                                                    {{ $patient->full_name }}
+                                                    <span class="text-xs font-semibold text-slate-400">{{ $patient->patient_code }}</span>
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if($pendingPatientLinks->isNotEmpty())
+                                    <div class="rounded-3xl bg-amber-50 border border-amber-100 p-5">
+                                        <p class="text-sm font-extrabold text-amber-800 mb-3">Yêu cầu đang chờ xác minh</p>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            @foreach($pendingPatientLinks as $link)
+                                                @if($link->patient)
+                                                    <div class="rounded-2xl bg-white border border-amber-100 px-4 py-3">
+                                                        <p class="font-bold text-slate-800">{{ $link->patient->full_name }} <span class="text-xs text-slate-400">({{ $link->patient->patient_code }})</span></p>
+                                                        <p class="text-xs text-amber-700 mt-1">Nhà thuốc sẽ xác minh trước khi mở lịch sử khám.</p>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if($matchingPatients->isNotEmpty())
+                                    <div class="rounded-3xl bg-blue-50/60 border border-blue-100 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                                            <div>
+                                                <p class="text-sm font-extrabold text-blue-900">Tìm thấy hồ sơ có số điện thoại phù hợp</p>
+                                                <p class="text-xs text-blue-700/80 mt-1">Chọn đúng hồ sơ của bạn hoặc người thân để gửi yêu cầu liên kết.</p>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            @foreach($matchingPatients as $patient)
+                                                <form method="POST" action="{{ route('profile.patient-link') }}" class="rounded-2xl bg-white border border-blue-100 p-4 shadow-sm flex items-center justify-between gap-3">
+                                                    @csrf
+                                                    <input type="hidden" name="patient_id" value="{{ $patient->id }}">
+                                                    <div>
+                                                        <p class="font-extrabold text-slate-800">{{ $patient->masked_name }}</p>
+                                                        <p class="text-xs text-slate-500 mt-1">{{ $patient->patient_code }} · {{ $patient->matched_relation_label }}</p>
+                                                    </div>
+                                                    <button type="submit" class="shrink-0 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md shadow-blue-500/10 transition">
+                                                        Liên kết
+                                                    </button>
+                                                </form>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @elseif($linkedPatients->isEmpty() && $pendingPatientLinks->isEmpty())
+                                    <div class="rounded-3xl bg-slate-50 border border-dashed border-slate-200 p-5">
+                                        <p class="font-extrabold text-slate-800">Chưa tìm thấy hồ sơ phù hợp với số điện thoại hiện tại.</p>
+                                        <p class="text-sm text-slate-500 mt-1">Nếu bạn từng khám tại AmaTrung, hãy kiểm tra lại số điện thoại hoặc liên hệ nhà thuốc để được hỗ trợ liên kết hồ sơ.</p>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                    </section>
+                @endif
+
+                @if($linkedPatients->isNotEmpty())
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <section id="medical-history-section" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-7">
+                            <div class="flex items-center justify-between gap-4 mb-5">
+                                <div>
+                                    <h3 class="text-lg font-black text-slate-800">Lịch sử khám bệnh</h3>
+                                    <p class="text-sm text-slate-500 mt-1">Các lượt khám gần đây được phép hiển thị.</p>
+                                </div>
+                                <span class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                                    <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
+                                </span>
+                            </div>
+
+                            <div class="space-y-3">
+                                @forelse($medicalRecords as $record)
+                                    <div class="rounded-3xl border border-slate-100 bg-slate-50/60 p-4">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p class="font-extrabold text-slate-800">{{ $record->patient?->full_name }}</p>
+                                                <p class="text-xs text-slate-400 mt-1">{{ $record->record_code }} · {{ optional($record->visit_date)->format('d/m/Y') ?? optional($record->created_at)->format('d/m/Y') }}</p>
+                                            </div>
+                                            <span class="px-3 py-1 rounded-full bg-white border border-slate-100 text-[11px] font-bold text-slate-500">
+                                                {{ $record->staff?->name ?? 'AmaTrung' }}
+                                            </span>
+                                        </div>
+                                        <div class="mt-3 grid grid-cols-1 gap-2 text-sm">
+                                            <p class="text-slate-600"><span class="font-bold text-slate-800">Chẩn đoán:</span> {{ \Illuminate\Support\Str::limit($record->diagnosis ?: 'Chưa ghi nhận', 90) }}</p>
+                                            <p class="text-slate-600"><span class="font-bold text-slate-800">Triệu chứng:</span> {{ \Illuminate\Support\Str::limit($record->symptoms ?: 'Chưa ghi nhận', 110) }}</p>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center text-sm font-semibold text-slate-500">
+                                        Chưa có lượt khám nào được hiển thị.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </section>
+
+                        <section id="recent-prescriptions-section" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-6 md:p-7">
+                            <div class="flex items-center justify-between gap-4 mb-5">
+                                <div>
+                                    <h3 class="text-lg font-black text-slate-800">Toa thuốc gần đây</h3>
+                                    <p class="text-sm text-slate-500 mt-1">Chỉ hiển thị toa đã xác nhận hoặc đã cấp thuốc.</p>
+                                </div>
+                                <span class="w-11 h-11 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                                    <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 9.172V5L8 4z"></path></svg>
+                                </span>
+                            </div>
+
+                            <div class="space-y-3">
+                                @forelse($recentPrescriptions as $prescription)
+                                    @php
+                                        $statusLabel = $prescription->status === 'dispensed' ? 'Đã cấp thuốc' : 'Đã xác nhận';
+                                        $statusClass = $prescription->status === 'dispensed' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-blue-50 text-blue-700 border-blue-100';
+                                    @endphp
+                                    <div class="rounded-3xl border border-slate-100 bg-slate-50/60 p-4">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p class="font-extrabold text-slate-800">Đơn #{{ $prescription->id }}</p>
+                                                <p class="text-xs text-slate-400 mt-1">
+                                                    {{ $prescription->medicalRecord?->patient?->full_name }} · {{ optional($prescription->created_at)->format('d/m/Y') }}
+                                                </p>
+                                            </div>
+                                            <span class="px-3 py-1 rounded-full border text-[11px] font-extrabold {{ $statusClass }}">{{ $statusLabel }}</span>
+                                        </div>
+
+                                        <div class="mt-3 space-y-2 text-sm text-slate-600">
+                                            <p><span class="font-bold text-slate-800">Bài thuốc:</span> {{ \Illuminate\Support\Str::limit($prescription->note ?: 'Bài thuốc sắc gia giảm', 90) }}</p>
+                                            <p><span class="font-bold text-slate-800">Hướng dẫn:</span> {{ \Illuminate\Support\Str::limit($prescription->public_instruction ?: $prescription->usage_instruction ?: 'Dùng thuốc theo hướng dẫn của thầy thuốc.', 120) }}</p>
+                                            @if($prescription->follow_up_date)
+                                                <p><span class="font-bold text-slate-800">Tái khám:</span> {{ $prescription->follow_up_date->format('d/m/Y') }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-5 text-center text-sm font-semibold text-slate-500">
+                                        Chưa có toa thuốc nào được hiển thị.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </section>
+                    </div>
+                @endif
 
                 {{-- Bottom Banner: Trải nghiệm sức khỏe thông minh --}}
                 <div class="bg-gradient-to-r from-blue-50/70 via-sky-50/50 to-emerald-50/40 border border-slate-100 rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-sm">
@@ -476,6 +692,17 @@
         const modal = document.getElementById('upgrade-modal');
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+    }
+
+    function scrollToPatientSection(sectionId) {
+        const section = document.getElementById(sectionId);
+
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return;
+        }
+
+        showUpgradeNotice('đồng bộ hồ sơ khám bệnh');
     }
 
     // Automatically reopen modal if validation errors exist on load

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AiSuggestionLog;
 use App\Models\MedicalRecord;
 use App\Services\AiClinicalSuggestionService;
+use App\Services\AiPreliminaryAssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -24,10 +25,129 @@ use Illuminate\Support\Facades\Log;
 class AiSuggestionController extends Controller
 {
     protected AiClinicalSuggestionService $aiService;
+    protected AiPreliminaryAssessmentService $assessmentService;
 
-    public function __construct(AiClinicalSuggestionService $aiService)
+    public function __construct(
+        AiClinicalSuggestionService $aiService,
+        AiPreliminaryAssessmentService $assessmentService
+    )
     {
         $this->aiService = $aiService;
+        $this->assessmentService = $assessmentService;
+    }
+
+    public function preliminaryAssessment(Request $request)
+    {
+        $validated = $request->validate([
+            'medical_record_id' => 'required|integer|exists:medical_records,id',
+        ], [
+            'medical_record_id.required' => 'Thiếu ID bệnh án.',
+            'medical_record_id.integer'  => 'ID bệnh án không hợp lệ.',
+            'medical_record_id.exists'   => 'Bệnh án không tồn tại.',
+        ]);
+
+        $record = MedicalRecord::with('patient')->find($validated['medical_record_id']);
+
+        if (!$record) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bệnh án không tồn tại.',
+            ], 404);
+        }
+
+        $user = Auth::user();
+        if (!$this->canUseAiForRecord($record, $user)) {
+            Log::warning("[AiSuggestionController] User #{$user->id} cố gọi AI nhận định sơ bộ cho bệnh án #{$record->id} không được phân công.");
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền truy cập bệnh án này.',
+            ], 403);
+        }
+
+        try {
+            $result = $this->assessmentService->assessFromRecord($record);
+        } catch (\Exception $e) {
+            Log::error("[AiSuggestionController] Preliminary assessment exception: " . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Lỗi hệ thống khi xử lý nhận định sơ bộ.',
+            ], 500);
+        }
+
+        $logEntry = null;
+        try {
+            $logEntry = AiSuggestionLog::create([
+                'user_id'           => $user->id,
+                'medical_record_id' => $record->id,
+                'payload'           => $result['payload_sent'] ?? ['ai_flow' => 'preliminary_assessment'],
+                'response'          => $result['suggestions'] ?? [],
+                'status'            => ($result['status'] === 'success') ? 'generated' : 'failed',
+                'error_message'     => ($result['status'] === 'ai_unavailable')
+                                         ? ($result['message'] ?? null)
+                                         : null,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("[AiSuggestionController] Không thể ghi log preliminary assessment: " . $e->getMessage());
+        }
+
+        return response()->json([
+            'status'      => $result['status'],
+            'log_id'      => $logEntry?->id,
+            'suggestions' => $result['suggestions'] ?? [],
+            'disclaimer'  => $result['disclaimer'] ?? $this->assessmentService->getDisclaimer(),
+            'message'     => $result['message'] ?? null,
+        ]);
+    }
+
+    public function applyDiagnosis(Request $request)
+    {
+        $validated = $request->validate([
+            'medical_record_id' => 'required|integer|exists:medical_records,id',
+            'diagnosis'         => 'required|string|max:2000',
+            'log_id'            => 'nullable|integer|exists:ai_suggestion_logs,id',
+        ], [
+            'medical_record_id.required' => 'Thiếu ID bệnh án.',
+            'diagnosis.required'         => 'Thiếu nội dung chẩn đoán cần áp dụng.',
+        ]);
+
+        $record = MedicalRecord::with('patient')->find($validated['medical_record_id']);
+
+        if (!$record) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bệnh án không tồn tại.',
+            ], 404);
+        }
+
+        $user = Auth::user();
+        if (!$this->canUseAiForRecord($record, $user) || !$user->hasPermission('medical_records.edit')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền áp dụng chẩn đoán cho bệnh án này.',
+            ], 403);
+        }
+
+        $record->update([
+            'diagnosis' => trim($validated['diagnosis']),
+        ]);
+
+        if (!empty($validated['log_id'])) {
+            $log = AiSuggestionLog::where('id', $validated['log_id'])
+                ->where('medical_record_id', $record->id)
+                ->first();
+
+            if ($log && ($user->hasRole(['admin', 'owner']) || $log->user_id === $user->id)) {
+                $log->update(['status' => 'referenced']);
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã áp dụng chẩn đoán vào bệnh án.',
+            'diagnosis' => $record->diagnosis,
+        ]);
     }
 
     /**
@@ -60,10 +180,7 @@ class AiSuggestionController extends Controller
         // 3. Kiểm tra quyền: chỉ cho phép staff phụ trách hoặc admin xem bệnh án này
         // (Policy check - nếu staff_id tồn tại, chỉ staff đó hoặc admin mới gọi được)
         $user = Auth::user();
-        $isAdmin = $user->hasRole(['admin', 'owner']);
-        $isAssignedStaff = $record->staff_id && $record->staff_id === $user->id;
-
-        if (!$isAdmin && !$isAssignedStaff) {
+        if (!$this->canUseAiForRecord($record, $user)) {
             Log::warning("[AiSuggestionController] User #{$user->id} cố gọi AI cho bệnh án #{$record->id} không được phân công.");
             return response()->json([
                 'status'  => 'error',
@@ -88,7 +205,7 @@ class AiSuggestionController extends Controller
             $logEntry = AiSuggestionLog::create([
                 'user_id'           => $user->id,
                 'medical_record_id' => $record->id,
-                'payload'           => $result['payload_sent'] ?? [],
+                'payload'           => $result['payload_sent'] ?? ['ai_flow' => 'treatment_suggestion'],
                 'response'          => $result['suggestions'] ?? [],
                 'status'            => ($result['status'] === 'success') ? 'generated' : 'failed',
                 'error_message'     => ($result['status'] === 'ai_unavailable')
@@ -108,6 +225,14 @@ class AiSuggestionController extends Controller
             'disclaimer'  => $result['disclaimer'] ?? $this->aiService->getDisclaimer(),
             'message'     => $result['message'] ?? null,
         ]);
+    }
+
+    private function canUseAiForRecord(MedicalRecord $record, $user): bool
+    {
+        $isAdmin = $user->hasRole(['admin', 'owner']) || $user->isAdmin();
+        $isAssignedStaff = $record->staff_id && $record->staff_id === $user->id;
+
+        return $isAdmin || $isAssignedStaff;
     }
 
     /**

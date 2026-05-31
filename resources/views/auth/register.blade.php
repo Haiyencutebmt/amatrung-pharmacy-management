@@ -6,6 +6,15 @@
 <div class="min-h-[calc(100vh-100px)] bg-slate-50/50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     
     <div class="w-full max-w-6xl rounded-[2.5rem] shadow-2xl border border-sky-100/60 overflow-hidden flex flex-col md:flex-row relative min-h-[580px] bg-white bg-cover bg-left" style="background-image: url('{{ asset('images/login-imagecute.png') }}');">
+        <div class="hidden md:block absolute left-[10%] bottom-8 z-20 w-[240px] lg:w-[285px] xl:w-[310px]">
+            <div class="overflow-hidden rounded-[2rem] border-[5px] border-white bg-sky-100 shadow-[0_24px_55px_rgba(30,64,175,0.22)]">
+                <img src="{{ asset('images/doctor.JPG') }}" alt="Thầy thuốc Y Hiếu Niê" class="w-full aspect-[4/5] object-cover object-center">
+            </div>
+            <div class="mt-3 text-center">
+                <p class="text-white text-xl font-black drop-shadow-[0_2px_6px_rgba(30,64,175,0.35)]">Thầy thuốc Y Hiếu Niê</p>
+                <p class="text-white/95 text-lg font-extrabold drop-shadow-[0_2px_6px_rgba(30,64,175,0.35)]">(AmaTrung)</p>
+            </div>
+        </div>
         
         {{-- Left: Text & Doc character --}}
         <div class="hidden md:flex md:w-[55%] flex-col justify-between p-12 pr-6 z-10 text-left">

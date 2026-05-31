@@ -109,7 +109,7 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'weight'         => 'nullable|numeric|min:0|max:500',
             'height'         => 'nullable|numeric|min:0|max:300',
             'symptoms'       => 'required|string',
-            'diagnosis'      => 'required|string',
+            'diagnosis'      => 'nullable|string',
             'treatment_plan' => 'nullable|string',
             'doctor_note'    => 'nullable|string',
             // Khám xương khớp
@@ -131,9 +131,9 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'patient_id.required' => 'Vui lòng chọn bệnh nhân.',
             'visit_date.required' => 'Vui lòng chọn ngày khám.',
             'symptoms.required'   => 'Vui lòng nhập triệu chứng.',
-            'diagnosis.required'  => 'Vui lòng nhập chẩn đoán.',
         ]);
 
+        $validated['diagnosis'] = $this->normalizeDiagnosis($validated['diagnosis'] ?? null);
         $validated['staff_id'] = auth()->id();
         $validated['case_type'] = $this->normalizeCaseType($validated['case_type'] ?? null);
 
@@ -226,7 +226,7 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'weight'         => 'nullable|numeric|min:0|max:500',
             'height'         => 'nullable|numeric|min:0|max:300',
             'symptoms'       => 'required|string',
-            'diagnosis'      => 'required|string',
+            'diagnosis'      => 'nullable|string',
             'treatment_plan' => 'nullable|string',
             'doctor_note'    => 'nullable|string',
             // Khám xương khớp
@@ -246,6 +246,7 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'current_medications' => 'nullable|string',
         ]);
 
+        $validated['diagnosis'] = $this->normalizeDiagnosis($validated['diagnosis'] ?? null);
         $validated['case_type'] = $this->normalizeCaseType($validated['case_type'] ?? null);
 
         // Upload ảnh phim mới: xóa ảnh cũ nếu tồn tại
@@ -307,6 +308,13 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'both' => MedicalRecord::CASE_COMBINED,
             default => $caseType,
         };
+    }
+
+    private function normalizeDiagnosis(?string $diagnosis): string
+    {
+        $diagnosis = trim((string) $diagnosis);
+
+        return $diagnosis !== '' ? $diagnosis : MedicalRecord::PENDING_DIAGNOSIS;
     }
 
     private function mergeDefaultTreatmentDirection(Request $request): void

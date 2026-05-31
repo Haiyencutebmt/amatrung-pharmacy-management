@@ -38,26 +38,7 @@
 <div class="bg-[var(--color-surface-bg)] min-h-screen py-10 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
 
-        {{-- Hero Section (Shorter banner) --}}
-        <div class="relative overflow-hidden rounded-[2rem] border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-sky-50 shadow-[0_12px_35px_rgba(37,99,235,0.06)]">
-            <div class="grid items-center gap-8 px-7 py-8 md:px-12 lg:grid-cols-[1.1fr_0.9fr]">
-                <div class="relative z-10">
-                    <p class="text-xl font-black text-sky-500 md:text-2xl">Kiến thức</p>
-                    <h1 class="mt-1 text-2xl md:text-4xl font-black leading-tight text-blue-900 uppercase">
-                        Y Học Cổ Truyền
-                    </h1>
-                    <p class="mt-3 max-w-xl text-xs md:text-sm font-semibold leading-relaxed text-slate-600">
-                        Cập nhật những thông tin y khoa chuẩn xác, các bài thuốc dân gian và phương pháp điều trị hiệu quả từ đội ngũ bác sĩ chuyên môn.
-                    </p>
-                </div>
 
-                <div class="relative hidden h-full items-center justify-center lg:flex">
-                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}"
-                         alt="Kiến thức Y học cổ truyền"
-                         class="h-[160px] w-full object-contain object-center drop-shadow-sm">
-                </div>
-            </div>
-        </div>
 
         {{-- Search & Category Dropdown --}}
         <form action="{{ route('articles.index') }}" method="GET" class="flex flex-col md:flex-row gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 max-w-3xl mx-auto w-full">
@@ -97,29 +78,30 @@
 
         {{-- Content Area --}}
         <div class="pt-2">
-            @if($articles->count() > 0)
-                <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+            @if($articles->count() > 0 || (isset($featuredArticles) && $featuredArticles->count() > 0))
+                <div class="flex flex-col gap-10">
                     
-                    {{-- Main list --}}
+                    {{-- Featured Articles --}}
+                    @if(!$search && !$selectedCategory && isset($featuredArticles) && $featuredArticles->count() > 0)
                     <div>
                         <div class="mb-4 flex items-center justify-between">
                             <h2 class="flex items-center gap-3 text-lg font-black text-blue-950">
                                 <span class="h-6 w-1 rounded-full bg-blue-600"></span>
                                 Bài viết nổi bật
                             </h2>
-                            @if($selectedCategory || $search)
-                                <a href="{{ route('articles.index') }}" class="text-xs font-black text-blue-600 hover:text-blue-800">Xem tất cả</a>
-                            @endif
                         </div>
-
-                        <div class="grid gap-5 md:grid-cols-2">
-                            @foreach($articles as $article)
+                        <div class="grid gap-5 md:grid-cols-3">
+                            @foreach($featuredArticles as $index => $article)
                                 @php
                                     $isLiked = auth()->check()
                                         && $article->relationLoaded('likedByUsers')
                                         && $article->likedByUsers->contains('id', auth()->id());
                                 @endphp
-                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)]">
+                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)] relative">
+                                    {{-- Ranking Badge --}}
+                                    <div class="absolute top-0 left-0 z-20 w-10 h-10 flex items-center justify-center font-black text-sky-700 text-lg rounded-br-2xl shadow-md bg-sky-200">
+                                        {{ $loop->iteration }}
+                                    </div>
                                     <div class="relative">
                                         <a href="{{ route('articles.show', $article->slug) }}" class="block">
                                             <div class="relative aspect-[4/2.6] overflow-hidden bg-blue-50">
@@ -133,7 +115,7 @@
                                                     {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
                                                 </div>
 
-                                                <div class="absolute left-3 top-3 max-w-[74%] rounded-full bg-blue-600/95 px-2.5 py-1 text-[10px] font-black text-white shadow-sm truncate">
+                                                <div class="absolute left-3 top-3 ml-10 max-w-[50%] rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-black text-sky-600 shadow-sm truncate">
                                                     {{ $article->category_label }}
                                                 </div>
                                             </div>
@@ -177,42 +159,88 @@
                                 </article>
                             @endforeach
                         </div>
+                    </div>
+                    @endif
+
+                    {{-- Main list --}}
+                    <div>
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="flex items-center gap-3 text-lg font-black text-blue-950">
+                                <span class="h-6 w-1 rounded-full bg-blue-600"></span>
+                                Tất cả bài viết
+                            </h2>
+                        </div>
+
+                        <div class="flex flex-col gap-5">
+                            @foreach($articles as $article)
+                                @php
+                                    $isLiked = auth()->check()
+                                        && $article->relationLoaded('likedByUsers')
+                                        && $article->likedByUsers->contains('id', auth()->id());
+                                @endphp
+                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)] flex flex-col md:flex-row">
+                                    <div class="relative md:w-1/3 shrink-0">
+                                        <a href="{{ route('articles.show', $article->slug) }}" class="block h-full">
+                                            <div class="relative h-48 md:h-full overflow-hidden bg-blue-50">
+                                                @if($article->featured_image)
+                                                    <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
+                                                @else
+                                                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}" alt="{{ $article->title }}" class="h-full w-full object-cover object-center opacity-90 transition duration-700 group-hover:scale-105">
+                                                @endif
+
+                                                <div class="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-blue-600 shadow-sm">
+                                                    {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
+                                                </div>
+
+                                                <div class="absolute left-3 top-3 max-w-[74%] rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-black text-sky-600 shadow-sm truncate">
+                                                    {{ $article->category_label }}
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        <button type="button"
+                                                class="article-like-btn absolute right-3 top-3 z-10 flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border px-2 text-xs font-black shadow-md backdrop-blur transition {{ $isLiked ? 'border-rose-200 bg-rose-500 text-white' : 'border-white/70 bg-white/95 text-slate-500 hover:text-rose-500' }}"
+                                                data-like-url="{{ route('articles.like', $article->id) }}"
+                                                data-login-url="{{ route('login') }}"
+                                                data-liked="{{ $isLiked ? '1' : '0' }}"
+                                                data-authenticated="{{ auth()->check() ? '1' : '0' }}"
+                                                title="{{ $isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}">
+                                            <svg class="h-4.5 w-4.5 {{ $isLiked ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c-3.86-3.16-7.5-6.5-7.5-10.88A4.12 4.12 0 0 1 8.62 6c1.32 0 2.55.63 3.38 1.62A4.42 4.42 0 0 1 15.38 6a4.12 4.12 0 0 1 4.12 4.12C19.5 14.5 15.86 17.84 12 21Z"/>
+                                            </svg>
+                                            <span class="article-like-count text-[11px]">{{ $article->liked_by_users_count }}</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="flex-1 flex flex-col justify-center">
+                                        <a href="{{ route('articles.show', $article->slug) }}" class="block p-5 md:p-6 h-full flex flex-col">
+                                            <h3 class="text-lg md:text-xl font-black leading-snug text-blue-950 transition group-hover:text-blue-700 mb-3 line-clamp-2">
+                                                {{ $article->title }}
+                                            </h3>
+                                            <p class="text-sm font-semibold leading-relaxed text-slate-650 flex-1 line-clamp-3">
+                                                {{ $article->summary ?: $article->excerpt }}
+                                            </p>
+
+                                            <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-slate-500">
+                                                <span class="inline-flex items-center gap-1.5">
+                                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0 1 19.5 6.75v12A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5.25Z"/></svg>
+                                                    {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
+                                                </span>
+                                                <span class="inline-flex items-center gap-1.5 text-blue-600 group-hover:text-blue-800 transition">
+                                                    Xem chi tiết
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                                                </span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
 
                         <div class="mt-10">
                             {{ $articles->withQueryString()->links() }}
                         </div>
                     </div>
-
-                    {{-- Sidebar (Latest Articles) --}}
-                    <aside class="space-y-6">
-                        <section class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-                            <h3 class="mb-3 text-sm font-black text-blue-950">Bài viết mới nhất</h3>
-                            <div class="space-y-3">
-                                @foreach($latestArticles as $article)
-                                    <a href="{{ route('articles.show', $article->slug) }}" class="group flex gap-2.5">
-                                        <div class="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-blue-50">
-                                            @if($article->featured_image)
-                                                <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                                            @else
-                                                <img src="{{ asset('images/y-hoc-co-truyen.png') }}" alt="{{ $article->title }}" class="h-full w-full object-cover">
-                                            @endif
-                                        </div>
-                                        <div class="min-w-0">
-                                            <p class="line-clamp-2 text-xs font-black leading-4 text-blue-950 transition group-hover:text-blue-700">
-                                                {{ $article->title }}
-                                            </p>
-                                            <p class="mt-0.5 text-[10px] font-bold text-slate-400">
-                                                {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
-                                            </p>
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                            <a href="{{ route('articles.index') }}" class="mt-4 flex h-9 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-600 transition hover:bg-blue-600 hover:text-white">
-                                Xem tất cả bài viết mới
-                            </a>
-                        </section>
-                    </aside>
 
                 </div>
             @else

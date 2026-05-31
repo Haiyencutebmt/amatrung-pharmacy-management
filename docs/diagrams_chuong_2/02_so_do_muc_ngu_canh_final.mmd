@@ -1,0 +1,29 @@
+%%{init: {"theme": "base", "themeVariables": {"background": "#ffffff", "primaryColor": "#ffffff", "primaryTextColor": "#0f172a", "primaryBorderColor": "#1e3a8a", "lineColor": "#334155", "fontFamily": "Arial, sans-serif"}, "flowchart": {"htmlLabels": true, "curve": "basis"}}}%%
+flowchart LR
+    USER["NGƯỜI DÙNG"]
+    STAFF["STAFF/THẦY THUỐC"]
+    ADMIN["QUẢN TRỊ VIÊN"]
+    GEMINI["GOOGLE GEMINI API"]
+    EMAIL["DỊCH VỤ EMAIL"]
+
+    SYSTEM(["(0) WEBSITE QUẢN LÝ<br/>NHÀ THUỐC YHCT AMATRUNG"])
+
+    USER -- "Thông tin đăng ký/đăng nhập<br/>Yêu cầu tra cứu bài viết, dược liệu<br/>Bình luận, liên hệ<br/>Câu hỏi chatbot" --> SYSTEM
+    SYSTEM -- "Kết quả đăng nhập<br/>Bài viết, thông tin dược liệu<br/>Phản hồi chatbot<br/>Thông tin cá nhân được phép xem" --> USER
+
+    STAFF -- "Thông tin bệnh nhân<br/>Hồ sơ bệnh án<br/>Đơn điều trị<br/>Yêu cầu cấp thuốc<br/>Lịch hẹn<br/>Yêu cầu AI hỗ trợ" --> SYSTEM
+    SYSTEM -- "Lịch sử bệnh nhân<br/>Kết quả lưu bệnh án/đơn điều trị<br/>Cảnh báo kho<br/>Kết quả AI tham khảo" --> STAFF
+
+    ADMIN -- "Tài khoản nhân viên<br/>Quyền truy cập<br/>Bài viết, bình luận, từ điển dược liệu" --> SYSTEM
+    SYSTEM -- "Danh sách quản lý<br/>Dashboard/thống kê<br/>Kết quả phân quyền" --> ADMIN
+
+    SYSTEM -- "Câu hỏi chatbot<br/>Dữ liệu hồ sơ khám đã xử lý<br/>để yêu cầu gợi ý" --> GEMINI
+    GEMINI -- "Phản hồi chatbot<br/>Gợi ý AI hỗ trợ thầy thuốc" --> SYSTEM
+
+    SYSTEM -- "Yêu cầu gửi mã OTP<br/>khôi phục mật khẩu" --> EMAIL
+    EMAIL -- "Trạng thái gửi email" --> SYSTEM
+
+    classDef actor fill:#ffffff,stroke:#0f172a,stroke-width:2px,color:#0f172a,font-weight:bold;
+    classDef process fill:#e0f2fe,stroke:#1e3a8a,stroke-width:3px,color:#0f172a,font-weight:bold;
+    class USER,STAFF,ADMIN,GEMINI,EMAIL actor;
+    class SYSTEM process;

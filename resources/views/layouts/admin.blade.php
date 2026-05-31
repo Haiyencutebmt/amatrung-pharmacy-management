@@ -6,6 +6,7 @@
     <meta name="description" content="Quản trị — AmaTrung">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Quản trị — AmaTrung')</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/amatrung_logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body style="margin: 0; padding: 0;">

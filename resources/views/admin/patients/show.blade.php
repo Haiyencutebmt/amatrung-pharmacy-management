@@ -780,8 +780,8 @@
                         <textarea id="symptoms_modal_patient" name="symptoms" required rows="3" oninput="markTraditionalFieldManualPatient('symptoms')" placeholder="Ghi nhận lời khai và triệu chứng của bệnh nhân..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('symptoms') }}</textarea>
                     </div>
                     <div id="diagnosis_col_modal_patient">
-                        <label class="patient-bottom-field-label"><span>🎯</span> Chẩn đoán <strong>*</strong></label>
-                        <textarea id="diagnosis_modal_patient" name="diagnosis" required rows="3" oninput="markTraditionalFieldManualPatient('diagnosis')" placeholder="Kết luận chẩn đoán (theo YHCT hoặc YHHĐ)..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('diagnosis') }}</textarea>
+                        <label class="patient-bottom-field-label"><span>🎯</span> Chẩn đoán <small style="color:#94a3b8;">(có thể bổ sung sau)</small></label>
+                        <textarea id="diagnosis_modal_patient" name="diagnosis" rows="3" oninput="markTraditionalFieldManualPatient('diagnosis')" placeholder="Có thể để trống để AI hỗ trợ nhận định sơ bộ ở trang chi tiết..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('diagnosis') }}</textarea>
                     </div>
                 </div>
 
@@ -1288,7 +1288,6 @@ function updateRecordFieldsModalPatient() {
         if (injuryType === 'khac') {
             if (diagnosisCol) diagnosisCol.style.display = 'block';
             if (diagnosisInput) {
-                diagnosisInput.setAttribute('required', 'required');
                 if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value === '' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                     diagnosisInput.value = '';
                 }
@@ -1317,7 +1316,6 @@ function updateRecordFieldsModalPatient() {
 
         if (diagnosisCol) diagnosisCol.style.display = 'block';
         if (diagnosisInput) {
-            diagnosisInput.setAttribute('required', 'required');
             if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                 diagnosisInput.value = '';
             }

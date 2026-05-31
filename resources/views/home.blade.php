@@ -5,8 +5,8 @@
 <div class="relative bg-gradient-to-b from-sky-50 via-white to-sky-100 min-h-screen pb-20 overflow-hidden font-sans">
     
     <!-- Hero Section -->
-    <div class="max-w-[1400px] mx-auto px-4 mt-12 md:mt-16">
-        <div class="relative bg-cover bg-center bg-no-repeat rounded-[2.5rem] pt-16 sm:pt-20 md:pt-28 pb-12 md:pb-20 text-center shadow-lg border border-sky-100" style="background-image: url('{{ asset('images/home-imagecute.png') }}');">
+    <div class="max-w-[1400px] mx-auto px-4 mt-14 md:mt-16">
+        <div class="relative bg-cover bg-center bg-no-repeat rounded-[2.5rem] pt-10 sm:pt-12 md:pt-16 pb-24 sm:pb-28 md:pb-36 text-center shadow-lg border border-sky-100" style="background-image: url('{{ asset('images/home-imagecute.png') }}');">
             
             <!-- Logo -->
             <div class="absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 z-20">
@@ -17,10 +17,10 @@
 
             <!-- Golden Badge -->
             <div class="flex justify-center mb-4 md:mb-5">
-                <div class="inline-flex items-center gap-2.5 px-5 py-1.5 rounded-full border border-[#d4af37]/45 bg-[#fffdf9]/90 text-[#b58e3d] font-bold text-xs md:text-sm tracking-wider shadow-sm transition-transform hover:scale-105 duration-300">
-                    <span class="text-sm opacity-80">⚜️</span>
+                <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-[#d4af37]/45 bg-[#fffdf9]/90 text-[#b58e3d] font-bold text-[10px] md:text-xs tracking-wider shadow-sm transition-transform hover:scale-105 duration-300">
+                    <span class="text-xs opacity-80">⚜️</span>
                     <span>Tinh hoa thảo dược – Chăm sóc từ tâm</span>
-                    <span class="text-sm opacity-80">⚜️</span>
+                    <span class="text-xs opacity-80">⚜️</span>
                 </div>
             </div>
             
@@ -38,30 +38,50 @@
             </div>
 
             <!-- 5 Elements Characters (Overlapping bottom edge) -->
-            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-5xl px-2 md:px-4 flex justify-center items-end gap-1 sm:gap-4 md:gap-6 z-50 h-[100px] sm:h-[180px] md:h-[240px]">
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-5xl px-2 md:px-4 flex justify-center items-end gap-1 sm:gap-4 md:gap-6 z-50 h-[80px] sm:h-[140px] md:h-[200px]">
                 <!-- KIM -->
-                <a href="{{ url('/bai-viet/ngu-hanh-kim') }}" class="w-[16%] max-w-[180px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12">
+                <a href="{{ route('articles.index') }}" class="group w-[14%] max-w-[150px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12 flex flex-col items-center">
                     <img src="{{ asset('images/Kim.png') }}" alt="Kim" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-gray-50 via-[#f0e6d2] to-gray-200 border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#6a5b48] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Bài viết
+                    </div>
                 </a>
                 
                 <!-- MỘC -->
-                <a href="{{ url('/bai-viet/ngu-hanh-moc') }}" class="w-[19%] max-w-[220px] transform hover:-translate-y-4 transition-all duration-300 relative z-30 hover:z-50 mb-2 md:mb-6">
+                <a href="{{ route('herb-dictionary.index') }}" class="group w-[17%] max-w-[190px] transform hover:-translate-y-4 transition-all duration-300 relative z-30 hover:z-50 mb-2 md:mb-6 flex flex-col items-center">
                     <img src="{{ asset('images/Mộc.png') }}" alt="Mộc" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#eefade] via-[#d1eeb2] to-[#a4d673] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#3a6121] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="currentColor" viewBox="0 0 24 24"><path d="M17.75 2a8.75 8.75 0 0 0-7.39 13.43l-4.07 4.07a1 1 0 0 0 1.42 1.42l4.07-4.07A8.75 8.75 0 0 0 22 10.75V4a2 2 0 0 0-2-2h-2.25Zm-3 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"></path></svg>
+                        Từ điển dược liệu
+                    </div>
                 </a>
                 
                 <!-- THỦY (Center, Biggest) -->
-                <a href="{{ url('/bai-viet/ngu-hanh-thuy') }}" class="w-[26%] max-w-[280px] transform hover:-translate-y-4 transition-all duration-300 relative z-40 hover:z-50 mb-0">
+                <a href="{{ url('/') }}" class="group w-[24%] max-w-[240px] transform hover:-translate-y-4 transition-all duration-300 relative z-40 hover:z-50 mb-0 flex flex-col items-center">
                     <img src="{{ asset('images/Thủy.png') }}" alt="Thủy" class="w-full h-auto drop-shadow-[0_15px_20px_rgba(59,130,246,0.3)] hover:drop-shadow-[0_20px_25px_rgba(59,130,246,0.5)]">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-3 py-1 md:px-5 md:py-2 bg-gradient-to-br from-[#e6f2ff] via-[#badbff] to-[#7dbbfa] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#155096] font-bold text-[10px] sm:text-xs md:text-[15px] whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                        <svg class="w-3 h-3 md:w-5 md:h-5 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                        Trang chủ
+                    </div>
                 </a>
                 
                 <!-- HỎA -->
-                <a href="{{ url('/bai-viet/ngu-hanh-hoa') }}" class="w-[19%] max-w-[220px] transform hover:-translate-y-4 transition-all duration-300 relative z-30 hover:z-50 mb-2 md:mb-6">
+                <a href="{{ route('profile.favorites') }}" class="group w-[17%] max-w-[190px] transform hover:-translate-y-4 transition-all duration-300 relative z-30 hover:z-50 mb-2 md:mb-6 flex flex-col items-center">
                     <img src="{{ asset('images/Hỏa.png') }}" alt="Hỏa" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#fff1e6] via-[#ffd0a8] to-[#ff9e66] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#a34110] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+                        Góc yêu thích
+                    </div>
                 </a>
                 
                 <!-- THỔ -->
-                <a href="{{ url('/bai-viet/ngu-hanh-tho') }}" class="w-[16%] max-w-[180px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12">
+                <a href="{{ route('dashboard') }}" class="group w-[14%] max-w-[150px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12 flex flex-col items-center">
                     <img src="{{ asset('images/Thổ.png') }}" alt="Thổ" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#fcf4ea] via-[#e8cdb0] to-[#c9a073] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#6b4721] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                        <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                        Bảng điều khiển
+                    </div>
                 </a>
             </div>
         </div>
@@ -405,13 +425,13 @@
                         <input type="text" name="name" required placeholder="Tên đầy đủ" class="w-full px-5 py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl focus:outline-none text-slate-800 text-sm placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-[#1a5b8f] uppercase tracking-wider mb-2">Email *</label>
-                        <input type="email" name="email" required placeholder="Địa chỉ email" class="w-full px-5 py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl focus:outline-none text-slate-800 text-sm placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all">
+                        <label class="block text-xs font-bold text-[#1a5b8f] uppercase tracking-wider mb-2">Số điện thoại *</label>
+                        <input type="tel" name="phone" required placeholder="Số điện thoại của bạn" class="w-full px-5 py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl focus:outline-none text-slate-800 text-sm placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-[#1a5b8f] uppercase tracking-wider mb-2">Tin nhắn *</label>
-                    <textarea name="message" required rows="4" placeholder="Đừng ngại hỏi về đơn hàng của bạn" class="w-full px-5 py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl focus:outline-none text-slate-800 text-sm placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all resize-none"></textarea>
+                    <label class="block text-xs font-bold text-[#1a5b8f] uppercase tracking-wider mb-2">Tin nhắn</label>
+                    <textarea name="message" rows="4" placeholder="Đừng ngại hỏi về đơn hàng của bạn" class="w-full px-5 py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl focus:outline-none text-slate-800 text-sm placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-blue-100 transition-all resize-none"></textarea>
                 </div>
                 <div class="flex justify-center">
                     <button type="submit" class="px-12 py-3.5 bg-[#1a5b8f] hover:bg-blue-700 text-white font-extrabold rounded-full transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 text-sm uppercase tracking-wider">
@@ -430,7 +450,7 @@
             </div>
             <h3 class="text-2xl font-black text-slate-800 mb-3 uppercase">Gửi thành công!</h3>
             <p class="text-slate-600 text-sm mb-6 leading-relaxed">
-                Cảm ơn bạn đã liên hệ. Đội ngũ y tế AmaTrung sẽ sớm liên lạc lại với bạn qua Email để tư vấn và hỗ trợ.
+                Cảm ơn bạn đã liên hệ. Đội ngũ y tế AmaTrung sẽ sớm liên lạc lại với bạn qua số điện thoại để tư vấn và hỗ trợ.
             </p>
             <button type="button" onclick="document.getElementById('success-submit-modal').classList.add('hidden')" class="w-full py-3 bg-[#1a5b8f] hover:bg-blue-700 text-white font-extrabold rounded-full transition-colors text-sm uppercase tracking-wider shadow-md">
                 Đóng

@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1250" viewBox="0 0 2200 1250">
+  <rect width="2200" height="1250" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L12,7 L2,12 Z" fill="#1e3a8a"/>
+    </marker>
+  </defs>
+  <style>
+    .actor { fill: #ffffff; stroke: #0f172a; stroke-width: 2.5; }
+    .process { fill: #e0f2fe; stroke: #1e3a8a; stroke-width: 4; }
+    .arrow { stroke: #1e3a8a; stroke-width: 2.8; fill: none; marker-end: url(#arrow); }
+    .labelBox { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.2; rx: 12; }
+    .actorText { font: 700 28px Arial, sans-serif; fill: #0f172a; }
+    .processText { font: 800 28px Arial, sans-serif; fill: #0f172a; }
+    .flowText { font: 600 20px Arial, sans-serif; fill: #1e293b; }
+    .caption { font: 700 26px Arial, sans-serif; fill: #0f172a; }
+  </style>
+
+  <!-- External actors -->
+  <rect class="actor" x="95" y="475" width="275" height="86" rx="6"/>
+  <text class="actorText" x="232.5" y="529" text-anchor="middle">NGƯỜI DÙNG</text>
+
+  <rect class="actor" x="1760" y="335" width="330" height="86" rx="6"/>
+  <text class="actorText" x="1925" y="389" text-anchor="middle">STAFF/THẦY THUỐC</text>
+
+  <rect class="actor" x="1760" y="625" width="330" height="86" rx="6"/>
+  <text class="actorText" x="1925" y="679" text-anchor="middle">QUẢN TRỊ VIÊN</text>
+
+  <rect class="actor" x="765" y="85" width="410" height="86" rx="6"/>
+  <text class="actorText" x="970" y="139" text-anchor="middle">GOOGLE GEMINI API</text>
+
+  <rect class="actor" x="795" y="955" width="350" height="86" rx="6"/>
+  <text class="actorText" x="970" y="1009" text-anchor="middle">DỊCH VỤ EMAIL</text>
+
+  <!-- Central process -->
+  <ellipse class="process" cx="970" cy="520" rx="305" ry="128"/>
+  <text class="processText" x="970" y="490" text-anchor="middle">
+    <tspan x="970" dy="0">(0) WEBSITE QUẢN LÝ</tspan>
+    <tspan x="970" dy="36">NHÀ THUỐC YHCT</tspan>
+    <tspan x="970" dy="36">AMATRUNG</tspan>
+  </text>
+
+  <!-- User flows -->
+  <path class="arrow" d="M370 496 C500 442, 560 430, 671 462"/>
+  <rect class="labelBox" x="390" y="300" width="330" height="128" rx="12"/>
+  <text class="flowText" x="405" y="328">
+    <tspan x="405" dy="0">Thông tin đăng ký/đăng nhập</tspan>
+    <tspan x="405" dy="27">Yêu cầu tra cứu bài viết, dược liệu</tspan>
+    <tspan x="405" dy="27">Bình luận, liên hệ</tspan>
+    <tspan x="405" dy="27">Câu hỏi chatbot</tspan>
+  </text>
+
+  <path class="arrow" d="M672 570 C560 616, 500 612, 370 540"/>
+  <rect class="labelBox" x="390" y="620" width="350" height="128" rx="12"/>
+  <text class="flowText" x="405" y="648">
+    <tspan x="405" dy="0">Kết quả đăng nhập</tspan>
+    <tspan x="405" dy="27">Bài viết, thông tin dược liệu</tspan>
+    <tspan x="405" dy="27">Phản hồi chatbot</tspan>
+    <tspan x="405" dy="27">Thông tin cá nhân được phép xem</tspan>
+  </text>
+
+  <!-- Staff flows -->
+  <path class="arrow" d="M1760 378 C1560 372, 1435 405, 1254 468"/>
+  <rect class="labelBox" x="1355" y="165" width="355" height="182" rx="12"/>
+  <text class="flowText" x="1370" y="193">
+    <tspan x="1370" dy="0">Thông tin bệnh nhân</tspan>
+    <tspan x="1370" dy="27">Hồ sơ bệnh án</tspan>
+    <tspan x="1370" dy="27">Đơn điều trị</tspan>
+    <tspan x="1370" dy="27">Yêu cầu cấp thuốc</tspan>
+    <tspan x="1370" dy="27">Lịch hẹn</tspan>
+    <tspan x="1370" dy="27">Yêu cầu AI hỗ trợ</tspan>
+  </text>
+
+  <path class="arrow" d="M1255 518 C1435 490, 1565 450, 1760 409"/>
+  <rect class="labelBox" x="1355" y="430" width="365" height="128" rx="12"/>
+  <text class="flowText" x="1370" y="458">
+    <tspan x="1370" dy="0">Lịch sử bệnh nhân</tspan>
+    <tspan x="1370" dy="27">Kết quả lưu bệnh án/đơn điều trị</tspan>
+    <tspan x="1370" dy="27">Cảnh báo kho</tspan>
+    <tspan x="1370" dy="27">Kết quả AI tham khảo</tspan>
+  </text>
+
+  <!-- Admin flows -->
+  <path class="arrow" d="M1760 668 C1560 668, 1438 626, 1255 572"/>
+  <rect class="labelBox" x="1355" y="720" width="370" height="102" rx="12"/>
+  <text class="flowText" x="1370" y="748">
+    <tspan x="1370" dy="0">Tài khoản nhân viên</tspan>
+    <tspan x="1370" dy="27">Quyền truy cập</tspan>
+    <tspan x="1370" dy="27">Bài viết, bình luận, từ điển dược liệu</tspan>
+  </text>
+
+  <path class="arrow" d="M1256 610 C1438 685, 1560 705, 1760 692"/>
+  <rect class="labelBox" x="1370" y="850" width="330" height="102" rx="12"/>
+  <text class="flowText" x="1385" y="878">
+    <tspan x="1385" dy="0">Danh sách quản lý</tspan>
+    <tspan x="1385" dy="27">Dashboard/thống kê</tspan>
+    <tspan x="1385" dy="27">Kết quả phân quyền</tspan>
+  </text>
+
+  <!-- Gemini flows -->
+  <path class="arrow" d="M895 397 C858 320, 855 238, 895 171"/>
+  <rect class="labelBox" x="500" y="205" width="340" height="102" rx="12"/>
+  <text class="flowText" x="515" y="233">
+    <tspan x="515" dy="0">Câu hỏi chatbot</tspan>
+    <tspan x="515" dy="27">Dữ liệu hồ sơ khám đã xử lý</tspan>
+    <tspan x="515" dy="27">để yêu cầu gợi ý</tspan>
+  </text>
+
+  <path class="arrow" d="M1038 171 C1082 244, 1080 322, 1038 397"/>
+  <rect class="labelBox" x="1115" y="220" width="340" height="75" rx="12"/>
+  <text class="flowText" x="1130" y="248">
+    <tspan x="1130" dy="0">Phản hồi chatbot</tspan>
+    <tspan x="1130" dy="27">Gợi ý AI hỗ trợ thầy thuốc</tspan>
+  </text>
+
+  <!-- Email flows -->
+  <path class="arrow" d="M905 646 C858 735, 860 850, 905 955"/>
+  <rect class="labelBox" x="500" y="765" width="330" height="75" rx="12"/>
+  <text class="flowText" x="515" y="793">
+    <tspan x="515" dy="0">Yêu cầu gửi mã OTP</tspan>
+    <tspan x="515" dy="27">khôi phục mật khẩu</tspan>
+  </text>
+
+  <path class="arrow" d="M1034 955 C1080 850, 1082 735, 1034 646"/>
+  <rect class="labelBox" x="1115" y="778" width="270" height="48" rx="12"/>
+  <text class="flowText" x="1130" y="809">Trạng thái gửi email</text>
+
+  <text class="caption" x="1100" y="1165" text-anchor="middle">
+    Hình 2.3. Sơ đồ mức ngữ cảnh của website quản lý nhà thuốc y học cổ truyền AmaTrung
+  </text>
+</svg>

@@ -6,6 +6,7 @@
     <meta name="description" content="AmaTrung — Phòng khám Y Học Cổ Truyền">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'AmaTrung — Y Học Cổ Truyền')</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/amatrung_logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .goog-te-banner-frame,
@@ -98,15 +99,17 @@
                             <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <!-- User Dropdown Menu -->
-                        <div class="absolute right-0 mt-2.5 w-52 bg-white rounded-2xl shadow-xl py-2 z-50 hidden group-hover/user:block border border-slate-100 overflow-hidden">
-                            <a href="{{ url('/dashboard') }}" class="block px-5 py-3 text-base font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Bảng điều khiển</a>
-                            <div class="border-t border-slate-100 my-1"></div>
-                            <form action="{{ url('/logout') }}" method="POST" class="block w-full">
-                                @csrf
-                                <button type="submit" class="w-full text-left block px-5 py-3 text-base font-bold text-slate-700 hover:bg-red-50 hover:text-red-600 transition-colors focus:outline-none">
-                                    Đăng xuất
-                                </button>
-                            </form>
+                        <div class="absolute right-0 pt-2.5 w-52 z-50 hidden group-hover/user:block">
+                            <div class="bg-white rounded-2xl shadow-xl py-2 border border-slate-100 overflow-hidden">
+                                <a href="{{ url('/dashboard') }}" class="block px-5 py-3 text-base font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Bảng điều khiển</a>
+                                <div class="border-t border-slate-100 my-1"></div>
+                                <form action="{{ url('/logout') }}" method="POST" class="block w-full">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left block px-5 py-3 text-base font-bold text-slate-700 hover:bg-red-50 hover:text-red-600 transition-colors focus:outline-none">
+                                        Đăng xuất
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @else
@@ -137,18 +140,20 @@
                     <button class="w-11 h-11 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-500 border border-slate-100 transition-all focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </button>
-                    <div class="absolute right-0 mt-2.5 w-52 bg-white rounded-2xl shadow-xl py-3 z-50 hidden group-hover/settings:block border border-slate-100">
-                        <div class="px-5 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ngôn ngữ</div>
-                        <a href="#" onclick="changeLanguage('vi'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇻🇳 Tiếng Việt</a>
-                        <a href="#" onclick="changeLanguage('en'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇬🇧 Tiếng Anh</a>
-                        <a href="#" onclick="changeLanguage('zh-CN'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇨🇳 Tiếng Trung</a>
-                        <div class="border-t border-slate-100 my-2.5"></div>
-                        <div class="px-5 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Giao diện</div>
-                        <button id="theme-toggle" class="w-full text-left flex items-center px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500 focus:outline-none">
-                            <svg id="theme-toggle-light-icon" class="w-5.5 h-5.5 mr-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 2.366a1 1 0 011.415 0l.707.707a1 1 0 01-1.414 1.415l-.708-.707a1 1 0 010-1.415zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-2.574 4.22a1 1 0 010 1.415l-.707.707a1 1 0 01-1.415-1.414l.707-.707a1 1 0 011.415 0zM11 17a1 1 0 10-2 0v1a1 1 0 102 0v-1zm-4.22-2.366a1 1 0 01-1.415 0l-.707-.707a1 1 0 011.414-1.415l.708.707a1 1 0 010 1.415zM3 9a1 1 0 100 2h1a1 1 0 100-2H3zm2.574-4.22a1 1 0 010-1.415l.707-.707a1 1 0 011.415 1.414l-.707.707a1 1 0 01-1.415 0zM10 6a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd"></path></svg>
-                            <svg id="theme-toggle-dark-icon" class="w-5.5 h-5.5 mr-2.5 hidden text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                            <span class="theme-text">Đổi Sáng/Tối</span>
-                        </button>
+                    <div class="absolute right-0 pt-2.5 w-52 z-50 hidden group-hover/settings:block">
+                        <div class="bg-white rounded-2xl shadow-xl py-3 border border-slate-100">
+                            <div class="px-5 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ngôn ngữ</div>
+                            <a href="#" onclick="changeLanguage('vi'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇻🇳 Tiếng Việt</a>
+                            <a href="#" onclick="changeLanguage('en'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇬🇧 Tiếng Anh</a>
+                            <a href="#" onclick="changeLanguage('zh-CN'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇨🇳 Tiếng Trung</a>
+                            <div class="border-t border-slate-100 my-2.5"></div>
+                            <div class="px-5 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Giao diện</div>
+                            <button id="theme-toggle" class="w-full text-left flex items-center px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500 focus:outline-none">
+                                <svg id="theme-toggle-light-icon" class="w-5.5 h-5.5 mr-2.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 2.366a1 1 0 011.415 0l.707.707a1 1 0 01-1.414 1.415l-.708-.707a1 1 0 010-1.415zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-2.574 4.22a1 1 0 010 1.415l-.707.707a1 1 0 01-1.415-1.414l.707-.707a1 1 0 011.415 0zM11 17a1 1 0 10-2 0v1a1 1 0 102 0v-1zm-4.22-2.366a1 1 0 01-1.415 0l-.707-.707a1 1 0 011.414-1.415l.708.707a1 1 0 010 1.415zM3 9a1 1 0 100 2h1a1 1 0 100-2H3zm2.574-4.22a1 1 0 010-1.415l.707-.707a1 1 0 011.415 1.414l-.707.707a1 1 0 01-1.415 0zM10 6a4 4 0 100 8 4 4 0 000-8z" clip-rule="evenodd"></path></svg>
+                                <svg id="theme-toggle-dark-icon" class="w-5.5 h-5.5 mr-2.5 hidden text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                                <span class="theme-text">Đổi Sáng/Tối</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
         </header>

@@ -134,8 +134,8 @@
                 </div>
 
                 <div class="form-group" id="diagnosis_group">
-                    <label class="font-weight-bold">Chẩn đoán kết luận <span class="text-danger">*</span></label>
-                    <textarea name="diagnosis" id="diagnosis" class="form-control form-control-lg" rows="2" required placeholder="Kết luận chẩn đoán...">{{ old('diagnosis') }}</textarea>
+                    <label class="font-weight-bold">Chẩn đoán kết luận <span class="text-muted" style="font-size:0.85rem;">(có thể bổ sung sau)</span></label>
+                    <textarea name="diagnosis" id="diagnosis" class="form-control form-control-lg" rows="2" placeholder="Có thể để trống để AI hỗ trợ nhận định sơ bộ ở trang chi tiết...">{{ old('diagnosis') }}</textarea>
                 </div>
 
                 <div class="form-group">

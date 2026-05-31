@@ -41,6 +41,17 @@ class AiClinicalSuggestionService
     {
         // 1. Xây dựng payload lâm sàng an toàn
         $payload = $this->contextBuilder->build($record);
+        $payload['ai_flow'] = 'treatment_suggestion';
+
+        if (!$record->hasConfirmedDiagnosis()) {
+            return [
+                'status'       => 'diagnosis_required',
+                'payload_sent' => $payload,
+                'suggestions'  => [],
+                'disclaimer'   => $this->getDisclaimer(),
+                'message'      => 'Cần có chẩn đoán chính thức trước khi dùng AI gợi ý điều trị.',
+            ];
+        }
 
         // 2. Nếu referral → trả về gợi ý rỗng ngay
         if ($record->treatment_direction === 'referral') {
@@ -180,7 +191,7 @@ QUAN TRỌNG:
 
 THÔNG TIN LÂM SÀNG (Đã ẩn danh):
 - Triệu chứng: {$symptoms}
-- Chẩn đoán sơ bộ: {$diagnosis}
+- Chẩn đoán đã được thầy thuốc xác nhận: {$diagnosis}
 - Loại ca bệnh: {$caseType}
 - Hướng điều trị: {$direction}
 - Tuổi bệnh nhân: {$age}

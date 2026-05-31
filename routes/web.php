@@ -97,15 +97,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Dashboard user
-    Route::get('/dashboard', function () {
-        return view('user.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
 
     // Quản lý tài khoản cá nhân
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::get('/yeu-thich', [ProfileController::class, 'favorites'])->name('profile.favorites');
+    Route::post('/profile/patient-link', [ProfileController::class, 'requestPatientLink'])->name('profile.patient-link');
 
     // Bình luận bài viết
     Route::post('/bai-viet/{article_id}/comments', [CommentController::class, 'store'])->name('comments.store');
@@ -225,6 +224,11 @@ Route::prefix('admin')
 
         // Giai đoạn 4: AI gợi ý tham khảo (API nội bộ - an toàn)
         Route::middleware('permission:use_ai_suggestion')->group(function () {
+            Route::post('api/ai-preliminary-assessment', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'preliminaryAssessment'])
+                 ->name('ai.preliminary-assessment');
+            Route::post('api/ai-preliminary-assessment/apply-diagnosis', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'applyDiagnosis'])
+                 ->middleware('permission:medical_records.edit')
+                 ->name('ai.preliminary-assessment.apply-diagnosis');
             Route::post('api/ai-suggest', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'suggest'])
                  ->name('ai.suggest');
             Route::post('api/ai-suggest/log-status', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'updateLogStatus'])

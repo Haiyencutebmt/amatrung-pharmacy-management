@@ -159,6 +159,11 @@ window.aiSuggestionsData = null; // Biến toàn cục để chức năng "Áp d
                     return;
                 }
 
+                if (data.status === 'diagnosis_required') {
+                    showError(data.message || 'Cần có chẩn đoán chính thức trước khi lấy gợi ý điều trị.');
+                    return;
+                }
+
                 if (data.status === 'referral') {
                     hide('ai-loading');
                     show('ai-status-box');

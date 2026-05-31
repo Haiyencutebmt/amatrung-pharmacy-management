@@ -16,6 +16,7 @@ class MedicalRecord extends Model
     public const CASE_NORMAL = 'normal';
     public const CASE_MUSCULOSKELETAL = 'musculoskeletal';
     public const CASE_COMBINED = 'combined';
+    public const PENDING_DIAGNOSIS = 'Chưa chẩn đoán';
 
     public static function getCaseTypeLabels(): array
     {
@@ -26,6 +27,17 @@ class MedicalRecord extends Model
         ];
     }
 
+    public function hasConfirmedDiagnosis(): bool
+    {
+        $diagnosis = trim((string) $this->diagnosis);
+
+        return $diagnosis !== '' && $diagnosis !== self::PENDING_DIAGNOSIS;
+    }
+
+    public function displayDiagnosis(): string
+    {
+        return $this->hasConfirmedDiagnosis() ? (string) $this->diagnosis : self::PENDING_DIAGNOSIS;
+    }
 
     protected $fillable = [
         'patient_id',
@@ -137,4 +149,3 @@ class MedicalRecord extends Model
         return $this->hasMany(MedicalRecordAttachment::class);
     }
 }
-

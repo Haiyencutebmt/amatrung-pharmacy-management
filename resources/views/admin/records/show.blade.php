@@ -26,6 +26,7 @@
     $bmiTextColor = '#475569';
     $bmiIcon = '💡';
     $bmiAdvice = '';
+    $hasConfirmedDiagnosis = $medicalRecord->hasConfirmedDiagnosis();
     
     if ($medicalRecord->weight && $medicalRecord->height) {
         $heightInMeters = $medicalRecord->height / 100;
@@ -598,8 +599,13 @@
                 </div>
                 <div>
                     <strong style="color: #64748b; font-size: 0.78rem; text-transform: uppercase;">Chẩn đoán / Nhận định</strong>
-                    <div style="background: #f0fdf4; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.75rem 1rem; color: #166534; font-weight: 700; margin-top: 0.25rem; font-size: 0.88rem; line-height: 1.5; min-height: 60px;">
-                        {!! nl2br(e($medicalRecord->diagnosis)) !!}
+                    <div id="record-diagnosis-display" style="background: {{ $hasConfirmedDiagnosis ? '#f0fdf4' : '#fffbeb' }}; border: 1px solid {{ $hasConfirmedDiagnosis ? '#bbf7d0' : '#fde68a' }}; border-radius: 4px; padding: 0.75rem 1rem; color: {{ $hasConfirmedDiagnosis ? '#166534' : '#92400e' }}; font-weight: 700; margin-top: 0.25rem; font-size: 0.88rem; line-height: 1.5; min-height: 60px;">
+                        @if($hasConfirmedDiagnosis)
+                            {!! nl2br(e($medicalRecord->diagnosis)) !!}
+                        @else
+                            Chưa có chẩn đoán chính thức
+                            <div style="font-size:0.78rem; font-weight:600; margin-top:0.25rem; color:#a16207;">Có thể dùng AI nhận định sơ bộ để tham khảo, sau đó thầy thuốc tự áp dụng chẩn đoán.</div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -642,7 +648,12 @@
             </div>
         </div>
 
-        {{-- AI Panel đã chuyển sang trang Kê đơn (prescriptions/create) để tránh trùng lặp --}}
+        @can('use_ai_suggestion')
+            @include('admin.records.partials.ai_preliminary_panel', ['medicalRecord' => $medicalRecord])
+            @include('admin.records.partials.ai_panel', ['medicalRecord' => $medicalRecord])
+            @include('admin.records.partials.ai_preliminary_js')
+            @include('admin.records.partials.ai_js')
+        @endcan
 
         {{-- DANH SÁCH ĐƠN ĐIỀU TRỊ / PHÁC ĐỒ ĐÃ KÊ --}}
         @php
@@ -2971,7 +2982,6 @@ function updateRecordFieldsEditModal() {
         if (injuryType === 'khac') {
             if (diagnosisCol) diagnosisCol.style.display = 'block';
             if (diagnosisInput) {
-                diagnosisInput.setAttribute('required', 'required');
                 if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value === '' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                     diagnosisInput.value = '';
                 }
@@ -3000,7 +3010,6 @@ function updateRecordFieldsEditModal() {
 
         if (diagnosisCol) diagnosisCol.style.display = 'block';
         if (diagnosisInput) {
-            diagnosisInput.setAttribute('required', 'required');
             if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                 diagnosisInput.value = '';
             }
@@ -3222,8 +3231,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <textarea name="symptoms" id="symptoms_edit" required rows="3" placeholder="Ghi nhận lời khai và triệu chứng..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{!! old('symptoms', $medicalRecord->symptoms) !!}</textarea>
                 </div>
                 <div id="diagnosis_col_edit_modal">
-                    <label style="display:block; font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:0.4rem;">Chẩn đoán <span style="color:#ef4444;">*</span></label>
-                    <textarea name="diagnosis" id="diagnosis_edit" required rows="3" placeholder="Kết luận chẩn đoán (theo YHCT hoặc YHHĐ)..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{!! old('diagnosis', $medicalRecord->diagnosis) !!}</textarea>
+                    <label style="display:block; font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:0.4rem;">Chẩn đoán <span style="color:#94a3b8; font-size:0.75rem;">(có thể bổ sung sau)</span></label>
+                    <textarea name="diagnosis" id="diagnosis_edit" rows="3" placeholder="Có thể để trống để lưu trạng thái chưa chẩn đoán chính thức..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{!! old('diagnosis', $medicalRecord->hasConfirmedDiagnosis() ? $medicalRecord->diagnosis : '') !!}</textarea>
                 </div>
             </div>
 

@@ -48,9 +48,21 @@ class ArticleController extends Controller
 
         $articles = $articles
             ->latest('published_at')
-            ->paginate(12);
+            ->paginate(10);
 
-        return view('articles.index', compact('articles', 'articleCategories', 'selectedCategory', 'search'));
+        // Fetch top 3 featured articles
+        $featuredArticles = Article::with('author')
+            ->withCount(['likedByUsers', 'approvedComments'])
+            ->published()
+            ->get()
+            ->sortByDesc(function ($article) {
+                $wordCount = str_word_count(strip_tags($article->content ?? ''));
+                $readingTime = ceil($wordCount / 200);
+                return $readingTime + $article->liked_by_users_count + $article->approved_comments_count;
+            })
+            ->take(3);
+
+        return view('articles.index', compact('articles', 'featuredArticles', 'articleCategories', 'selectedCategory', 'search'));
     }
 
     public function show($slug)

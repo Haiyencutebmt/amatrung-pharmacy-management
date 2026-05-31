@@ -6,6 +6,7 @@
     <meta name="description" content="AmaTrung — Phòng khám Y Học Cổ Truyền">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Tài khoản — AmaTrung')</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/amatrung_logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .goog-te-banner-frame,

@@ -2,6 +2,9 @@
     ai_panel.blade.php
     Panel "Gợi ý AI hỗ trợ thầy thuốc" – nhúng vào prescriptions/create.blade.php
 --}}
+@php
+    $hasConfirmedDiagnosis = $medicalRecord->hasConfirmedDiagnosis();
+@endphp
 <div id="ai-suggestion-panel" style="background: #fff; border: 1px solid #e0e7ff; border-radius: 0.5rem; margin-bottom: 1.5rem; overflow: hidden;">
     
     {{-- Header --}}
@@ -16,7 +19,11 @@
             <span style="color: #94a3b8; font-size: 0.8rem; margin-left: 0.5rem;">Tham khảo, không thay thế quyết định chuyên môn</span>
         </div>
 
-        @if($medicalRecord->treatment_direction === 'referral')
+        @if(!$hasConfirmedDiagnosis)
+            <span style="background: #fef3c7; color: #92400e; padding: 0.3rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 700;">
+                Cần chẩn đoán chính thức
+            </span>
+        @elseif($medicalRecord->treatment_direction === 'referral')
             <span style="background: #fef3c7; color: #92400e; padding: 0.3rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 700;">
                 Chuyển viện – không gợi ý
             </span>
@@ -37,7 +44,9 @@
 
         {{-- Status box (hiện mặc định) --}}
         <div id="ai-status-box" style="text-align: center; padding: 1rem; color: #64748b; font-size: 0.88rem;">
-            @if($medicalRecord->treatment_direction === 'referral')
+            @if(!$hasConfirmedDiagnosis)
+                <span>⚠️ Bệnh án chưa có chẩn đoán chính thức. Hãy dùng AI nhận định sơ bộ hoặc cập nhật chẩn đoán trước khi lấy gợi ý điều trị.</span>
+            @elseif($medicalRecord->treatment_direction === 'referral')
                 <span>🔁 Bệnh nhân được chỉ định chuyển viện. Không áp dụng gợi ý thuốc.</span>
             @else
                 <span>Nhấn <strong>"✨ Lấy gợi ý mới"</strong> để AI phân tích bệnh án và đề xuất.</span>
