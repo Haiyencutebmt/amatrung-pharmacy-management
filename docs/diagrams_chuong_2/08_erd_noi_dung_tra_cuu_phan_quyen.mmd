@@ -1,0 +1,60 @@
+%% Hình 2.9. Mô hình quan hệ dữ liệu phần nội dung, tra cứu và phân quyền của website quản lý nhà thuốc y học cổ truyền AmaTrung
+%% Phạm vi: tài khoản/phân quyền, bài viết/bình luận, từ điển dược liệu, liên hệ.
+%% Không đưa bảng hệ thống Laravel, bảng legacy/cũ và các bảng nghiệp vụ điều trị của Hình 2.8.
+flowchart LR
+    classDef account fill:#eef2ff,stroke:#4f46e5,color:#111827,stroke-width:1.5px
+    classDef content fill:#fdf2f8,stroke:#db2777,color:#111827,stroke-width:1.5px
+    classDef dictionary fill:#f0fdfa,stroke:#0f766e,color:#111827,stroke-width:1.5px
+    classDef contact fill:#fff7ed,stroke:#ea580c,color:#111827,stroke-width:1.5px
+    classDef noteStyle fill:#ffffff,stroke:#94a3b8,color:#111827,stroke-dasharray:4 4
+
+    subgraph G1["Cụm 1: Tài khoản và phân quyền"]
+        users["users<br/>PK: id<br/>name, email, phone, role"]
+        roles["roles<br/>PK: id<br/>name, guard_name"]
+        permissions["permissions<br/>PK: id<br/>name, guard_name"]
+        model_has_roles["model_has_roles<br/>FK: role_id<br/>model_id, model_type"]
+        model_has_permissions["model_has_permissions<br/>FK: permission_id<br/>model_id, model_type"]
+        role_has_permissions["role_has_permissions<br/>FK: role_id, permission_id"]
+    end
+
+    subgraph G2["Cụm 2: Bài viết và bình luận"]
+        articles["articles<br/>PK: id<br/>FK: user_id<br/>title, slug, is_published"]
+        comments["comments<br/>PK: id<br/>FK: article_id, user_id<br/>content, rating, is_approved"]
+        article_likes["article_likes<br/>PK: id<br/>FK: article_id, user_id<br/>unique(article_id, user_id)"]
+    end
+
+    subgraph G3["Cụm 3: Từ điển dược liệu"]
+        herb_dictionary_entries["herb_dictionary_entries<br/>PK: id<br/>FK: created_by<br/>name, slug, status"]
+        herb_dictionary_images["herb_dictionary_images<br/>PK: id<br/>FK: entry_id<br/>image_path, sort_order"]
+        herb_dictionary_favorites["herb_dictionary_favorites<br/>PK: id<br/>FK: user_id, entry_id<br/>unique(user_id, entry_id)"]
+    end
+
+    subgraph G4["Cụm 4: Liên hệ/yêu cầu hỗ trợ"]
+        contact_messages["contact_messages<br/>PK: id<br/>name, phone, email<br/>message, status"]
+    end
+
+    note["Ghi chú:<br/>Admin/Thầy thuốc chính quản lý toàn bộ nội dung và phân quyền.<br/>Staff chỉ thao tác chức năng được Admin cấp quyền.<br/>User có thể xem bài viết, bình luận, lưu yêu thích dược liệu và gửi liên hệ.<br/>Các bảng này phục vụ nội dung, tra cứu và quản trị quyền, không phải luồng điều trị chính."]
+
+    users -->|"M-N qua model_has_roles"| model_has_roles
+    roles -->|"M-N qua model_has_roles"| model_has_roles
+    users -->|"M-N qua model_has_permissions"| model_has_permissions
+    permissions -->|"M-N qua model_has_permissions"| model_has_permissions
+    roles -->|"M-N qua role_has_permissions"| role_has_permissions
+    permissions -->|"M-N qua role_has_permissions"| role_has_permissions
+
+    users -->|"1-N"| articles
+    articles -->|"1-N"| comments
+    users -->|"1-N"| comments
+    articles -->|"1-N"| article_likes
+    users -->|"1-N"| article_likes
+
+    users -->|"1-N created_by"| herb_dictionary_entries
+    herb_dictionary_entries -->|"1-N"| herb_dictionary_images
+    herb_dictionary_entries -->|"1-N"| herb_dictionary_favorites
+    users -->|"1-N"| herb_dictionary_favorites
+
+    class users,roles,permissions,model_has_roles,model_has_permissions,role_has_permissions account
+    class articles,comments,article_likes content
+    class herb_dictionary_entries,herb_dictionary_images,herb_dictionary_favorites dictionary
+    class contact_messages contact
+    class note noteStyle

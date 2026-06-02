@@ -1,0 +1,65 @@
+%% Hình 2.8. Mô hình quan hệ dữ liệu nghiệp vụ chính của website quản lý nhà thuốc y học cổ truyền AmaTrung
+%% Phạm vi: bệnh nhân, bệnh án, đơn điều trị, kho dược liệu theo lô, lịch hẹn và AI log.
+%% Không đưa bảng hệ thống Laravel, bảng legacy/cũ, bài viết/bình luận, từ điển dược liệu và phân quyền chi tiết.
+flowchart LR
+    classDef userGroup fill:#eef2ff,stroke:#4f46e5,color:#111827,stroke-width:1.5px
+    classDef clinicalGroup fill:#ecfdf5,stroke:#059669,color:#111827,stroke-width:1.5px
+    classDef treatmentGroup fill:#fff7ed,stroke:#ea580c,color:#111827,stroke-width:1.5px
+    classDef inventoryGroup fill:#eff6ff,stroke:#2563eb,color:#111827,stroke-width:1.5px
+    classDef aiGroup fill:#f8fafc,stroke:#475569,color:#111827,stroke-width:1.5px
+    classDef noteStyle fill:#ffffff,stroke:#94a3b8,color:#111827,stroke-dasharray:4 4
+
+    subgraph LEFT["Bên trái: tài khoản và bệnh nhân"]
+        users["users<br/>PK: id<br/>name, role, is_active"]
+        patients["patients<br/>PK: id<br/>FK: user_id<br/>patient_code, full_name, phone"]
+        patient_user_links["patient_user_links<br/>FK: user_id, patient_id<br/>relationship_type, is_verified"]
+    end
+
+    subgraph MID["Giữa: bệnh án, lịch hẹn và AI"]
+        medical_records["medical_records<br/>PK: id<br/>FK: patient_id, staff_id<br/>record_code, symptoms, diagnosis, status"]
+        medical_record_attachments["medical_record_attachments<br/>PK: id<br/>FK: medical_record_id, uploaded_by<br/>file_name, file_path"]
+        appointments["appointments<br/>PK: id<br/>FK: patient_id<br/>appointment_date, appointment_time, status"]
+        ai_suggestion_logs["ai_suggestion_logs<br/>PK: id<br/>FK: user_id, medical_record_id<br/>payload, response, status"]
+    end
+
+    subgraph RIGHT["Bên phải: đơn điều trị và dịch vụ"]
+        prescriptions["prescriptions<br/>PK: id<br/>FK: medical_record_id, staff_id<br/>treatment_type, status, follow_up_date"]
+        prescription_items["prescription_items<br/>PK: id<br/>FK: prescription_id, inventory_item_id<br/>item_type, quantity, affects_stock"]
+        therapy_services["therapy_services<br/>PK: id<br/>name, default_sessions, status"]
+    end
+
+    subgraph FAR["Xa bên phải: kho dược liệu theo lô"]
+        inventory_items["inventory_items<br/>PK: id<br/>name, item_type, usage_route, unit"]
+        inventory_batches["inventory_batches<br/>PK: id<br/>FK: inventory_item_id<br/>batch_number, expiry_date, quantity_remaining"]
+        stock_movements["stock_movements<br/>PK: id<br/>FK: inventory_batch_id, prescription_item_id, performed_by<br/>movement_type, quantity"]
+    end
+
+    note["Ghi chú:<br/>Admin/Thầy thuốc chính quyết định chuyên môn.<br/>Staff là nhân viên được Admin cấp quyền.<br/>AI chỉ lưu nhật ký tham khảo, không tự tạo đơn và không tự trừ kho.<br/>Kho chính dùng inventory_items, inventory_batches, stock_movements."]
+
+    users -->|"1-N qua patients.user_id nếu có"| patients
+    users -->|"N-N qua bảng liên kết"| patient_user_links
+    patients -->|"N-N qua bảng liên kết"| patient_user_links
+
+    patients -->|"1-N"| medical_records
+    patients -->|"1-N"| appointments
+
+    medical_records -->|"1-N"| medical_record_attachments
+    medical_records -->|"1-N"| prescriptions
+    medical_records -->|"1-N"| ai_suggestion_logs
+    users -->|"1-N"| ai_suggestion_logs
+
+    prescriptions -->|"1-N"| prescription_items
+    therapy_services -.->|"danh mục dịch vụ / tham chiếu nghiệp vụ"| prescription_items
+
+    inventory_items -->|"1-N"| prescription_items
+    inventory_items -->|"1-N"| inventory_batches
+    inventory_batches -->|"1-N"| stock_movements
+    prescription_items -->|"0-N"| stock_movements
+    users -->|"1-N performed_by"| stock_movements
+
+    class users,patients,patient_user_links userGroup
+    class medical_records,medical_record_attachments,appointments clinicalGroup
+    class prescriptions,prescription_items,therapy_services treatmentGroup
+    class inventory_items,inventory_batches,stock_movements inventoryGroup
+    class ai_suggestion_logs aiGroup
+    class note noteStyle

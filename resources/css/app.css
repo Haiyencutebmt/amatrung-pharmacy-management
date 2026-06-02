@@ -638,3 +638,116 @@
 .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--color-earth-border); border-radius: 10px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--color-earth-accent); }
 
+/* ─── Mobile Responsive Utilities ─────────────────────────── */
+
+/* Horizontal scroll carousel for mobile */
+.mobile-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+.mobile-carousel > * {
+    scroll-snap-align: center;
+    flex-shrink: 0;
+}
+
+/* Hide scrollbar but keep scroll functionality */
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Touch water ripple effect */
+.touch-ripple {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 2px solid rgba(26, 91, 143, 0.6);
+    background: radial-gradient(circle, rgba(26, 91, 143, 0) 0%, rgba(26, 91, 143, 0.1) 50%, rgba(26, 91, 143, 0.35) 90%, rgba(26, 91, 143, 0.5) 100%);
+    width: 80px;
+    height: 80px;
+    animation: waterRipple 700ms ease-out forwards;
+    z-index: 9997;
+}
+
+.touch-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 1px solid rgba(26, 91, 143, 0.35);
+    animation: waterRippleInner 700ms ease-out forwards;
+}
+
+@keyframes waterRipple {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes waterRippleInner {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Mobile bottom sheet */
+.bottom-sheet-enter {
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-sheet-enter.active {
+    transform: translateY(0);
+}
+
+/* Mobile FAB menu animation */
+.fab-menu-item {
+    transform: scale(0) translateY(10px);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fab-menu-item.show {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Stagger animation for FAB items */
+.fab-menu-item:nth-child(1) { transition-delay: 0ms; }
+.fab-menu-item:nth-child(2) { transition-delay: 40ms; }
+.fab-menu-item:nth-child(3) { transition-delay: 80ms; }
+.fab-menu-item:nth-child(4) { transition-delay: 120ms; }
+
+@media (max-width: 639px) {
+    /* Ensure no horizontal overflow on mobile */
+    body {
+        overflow-x: hidden;
+    }
+    
+    /* Ensure pill headers don't overflow */
+    .pill-header-mobile {
+        max-width: 90vw;
+        font-size: 0.8rem;
+    }
+}
+

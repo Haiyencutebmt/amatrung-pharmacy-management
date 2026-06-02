@@ -129,7 +129,7 @@
                         <input type="checkbox" name="permissions[]" value="articles.manage" class="perm-cb" {{ in_array('articles.manage', $perms) ? 'checked' : '' }}> Quản lý Bài viết
                     </label>
                     <label style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" name="permissions[]" value="herb_dictionary.manage" class="perm-cb" {{ in_array('herb_dictionary.manage', $perms) ? 'checked' : '' }}> Quản lý Từ điển thuốc nam
+                        <input type="checkbox" name="permissions[]" value="herb_dictionary.manage" class="perm-cb" {{ in_array('herb_dictionary.manage', $perms) ? 'checked' : '' }}> Quản lý Từ điển dược liệu
                     </label>
                     <label style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; cursor: pointer;">
                         <input type="checkbox" name="permissions[]" value="comments.manage" class="perm-cb" {{ in_array('comments.manage', $perms) ? 'checked' : '' }}> Quản lý Bình luận

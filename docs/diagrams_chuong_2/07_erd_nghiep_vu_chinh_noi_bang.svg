@@ -1,0 +1,300 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1420" viewBox="0 0 1800 1420" role="img" aria-labelledby="title desc">
+  <title id="title">Bản nối bảng ERD nghiệp vụ chính AmaTrung</title>
+  <desc id="desc">Sơ đồ nối các bảng nghiệp vụ chính gồm users, patients, medical_records, prescriptions, inventory và ai logs.</desc>
+  <rect width="1800" height="1420" fill="#ffffff"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#26364a"/>
+    </marker>
+    <marker id="arrowSoft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <style>
+    .group { fill: #ffffff; stroke: #334155; stroke-width: 1.8; stroke-dasharray: 9 8; }
+    .groupTitle { font: 700 18px Arial, sans-serif; fill: #0f172a; text-decoration: underline; }
+    .table { fill: #ffffff; stroke: #111827; stroke-width: 1.5; }
+    .row { stroke: #111827; stroke-width: 1.1; }
+    .col { stroke: #111827; stroke-width: 1.1; }
+    .tableName { font: 700 20px Arial, sans-serif; fill: #000000; }
+    .cell { font: 400 18px Arial, sans-serif; fill: #000000; }
+    .key { font: 700 16px Arial, sans-serif; fill: #000000; }
+    .rel { stroke: #26364a; stroke-width: 2.3; fill: none; marker-end: url(#arrow); }
+    .relSoft { stroke: #64748b; stroke-width: 2.1; stroke-dasharray: 8 7; fill: none; marker-end: url(#arrowSoft); }
+    .label { font: 700 16px Arial, sans-serif; fill: #000000; paint-order: stroke; stroke: #ffffff; stroke-width: 5; }
+    .note { font: 400 17px Arial, sans-serif; fill: #334155; }
+  </style>
+
+  <!-- Group boxes -->
+  <rect class="group" x="60" y="70" width="370" height="1060"/>
+  <text class="groupTitle" x="150" y="52">tài khoản và bệnh nhân</text>
+
+  <rect class="group" x="465" y="70" width="430" height="1240"/>
+  <text class="groupTitle" x="560" y="52">bệnh án, lịch hẹn và AI</text>
+
+  <rect class="group" x="930" y="300" width="360" height="880"/>
+  <text class="groupTitle" x="980" y="282">đơn điều trị và dịch vụ</text>
+
+  <rect class="group" x="1360" y="300" width="390" height="910"/>
+  <text class="groupTitle" x="1450" y="282">kho dược liệu theo lô</text>
+
+  <!-- users -->
+  <g id="users" transform="translate(110 115)">
+    <rect class="table" width="270" height="170"/>
+    <line class="row" x1="0" y1="45" x2="270" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="270" y2="85"/>
+    <line class="col" x1="48" y1="45" x2="48" y2="170"/>
+    <text class="tableName" x="135" y="30" text-anchor="middle">users</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="62" y="70">id</text>
+    <text class="cell" x="62" y="112">name</text>
+    <text class="cell" x="62" y="140">role</text>
+    <text class="cell" x="62" y="164">is_active</text>
+  </g>
+
+  <!-- patients -->
+  <g id="patients" transform="translate(110 355)">
+    <rect class="table" width="270" height="230"/>
+    <line class="row" x1="0" y1="45" x2="270" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="270" y2="85"/>
+    <line class="col" x1="48" y1="45" x2="48" y2="230"/>
+    <text class="tableName" x="135" y="30" text-anchor="middle">patients</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="62" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="62" y="110">user_id</text>
+    <text class="cell" x="62" y="142">patient_code</text>
+    <text class="cell" x="62" y="174">full_name</text>
+    <text class="cell" x="62" y="206">phone</text>
+  </g>
+
+  <!-- patient_user_links -->
+  <g id="patient_user_links" transform="translate(110 705)">
+    <rect class="table" width="270" height="210"/>
+    <line class="row" x1="0" y1="45" x2="270" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="270" y2="85"/>
+    <line class="col" x1="48" y1="45" x2="48" y2="210"/>
+    <text class="tableName" x="135" y="30" text-anchor="middle">patient_user_links</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="62" y="110">user_id</text>
+    <text class="cell" x="62" y="142">patient_id</text>
+    <text class="cell" x="62" y="174">relationship_type</text>
+    <text class="cell" x="62" y="202">is_verified</text>
+  </g>
+
+  <!-- attachments -->
+  <g id="attachments" transform="translate(515 115)">
+    <rect class="table" width="330" height="190"/>
+    <line class="row" x1="0" y1="45" x2="330" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="330" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="190"/>
+    <text class="tableName" x="165" y="30" text-anchor="middle">medical_record_attachments</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">medical_record_id</text>
+    <text class="cell" x="64" y="145">file_name</text>
+    <text class="cell" x="64" y="178">file_path</text>
+  </g>
+
+  <!-- medical_records -->
+  <g id="medical_records" transform="translate(515 390)">
+    <rect class="table" width="330" height="275"/>
+    <line class="row" x1="0" y1="45" x2="330" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="330" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="275"/>
+    <text class="tableName" x="165" y="30" text-anchor="middle">medical_records</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">patient_id</text>
+    <text class="cell" x="64" y="142">staff_id</text>
+    <text class="cell" x="64" y="174">record_code</text>
+    <text class="cell" x="64" y="206">symptoms</text>
+    <text class="cell" x="64" y="238">diagnosis</text>
+    <text class="cell" x="64" y="266">status</text>
+  </g>
+
+  <!-- appointments -->
+  <g id="appointments" transform="translate(515 725)">
+    <rect class="table" width="330" height="210"/>
+    <line class="row" x1="0" y1="45" x2="330" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="330" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="210"/>
+    <text class="tableName" x="165" y="30" text-anchor="middle">appointments</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">patient_id</text>
+    <text class="cell" x="64" y="142">appointment_date</text>
+    <text class="cell" x="64" y="174">appointment_time</text>
+    <text class="cell" x="64" y="202">status</text>
+  </g>
+
+  <!-- ai_suggestion_logs -->
+  <g id="ai_suggestion_logs" transform="translate(515 1010)">
+    <rect class="table" width="330" height="250"/>
+    <line class="row" x1="0" y1="45" x2="330" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="330" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="250"/>
+    <text class="tableName" x="165" y="30" text-anchor="middle">ai_suggestion_logs</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">user_id</text>
+    <text class="cell" x="64" y="142">medical_record_id</text>
+    <text class="cell" x="64" y="174">payload</text>
+    <text class="cell" x="64" y="206">response</text>
+    <text class="cell" x="64" y="238">status</text>
+  </g>
+
+  <!-- prescriptions -->
+  <g id="prescriptions" transform="translate(980 350)">
+    <rect class="table" width="270" height="230"/>
+    <line class="row" x1="0" y1="45" x2="270" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="270" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="230"/>
+    <text class="tableName" x="135" y="30" text-anchor="middle">prescriptions</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">medical_record_id</text>
+    <text class="cell" x="64" y="142">staff_id</text>
+    <text class="cell" x="64" y="174">treatment_type</text>
+    <text class="cell" x="64" y="206">status</text>
+  </g>
+
+  <!-- prescription_items -->
+  <g id="prescription_items" transform="translate(980 680)">
+    <rect class="table" width="290" height="260"/>
+    <line class="row" x1="0" y1="45" x2="290" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="290" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="260"/>
+    <text class="tableName" x="145" y="30" text-anchor="middle">prescription_items</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">prescription_id</text>
+    <text class="key" x="14" y="142">FK</text>
+    <text class="cell" x="64" y="142">inventory_item_id</text>
+    <text class="cell" x="64" y="174">item_type</text>
+    <text class="cell" x="64" y="206">quantity</text>
+    <text class="cell" x="64" y="238">affects_stock</text>
+  </g>
+
+  <!-- therapy_services -->
+  <g id="therapy_services" transform="translate(980 1010)">
+    <rect class="table" width="270" height="180"/>
+    <line class="row" x1="0" y1="45" x2="270" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="270" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="180"/>
+    <text class="tableName" x="135" y="30" text-anchor="middle">therapy_services</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="cell" x="64" y="110">name</text>
+    <text class="cell" x="64" y="142">default_sessions</text>
+    <text class="cell" x="64" y="170">status</text>
+  </g>
+
+  <!-- inventory_items -->
+  <g id="inventory_items" transform="translate(1400 350)">
+    <rect class="table" width="290" height="230"/>
+    <line class="row" x1="0" y1="45" x2="290" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="290" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="230"/>
+    <text class="tableName" x="145" y="30" text-anchor="middle">inventory_items</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="cell" x="64" y="110">name</text>
+    <text class="cell" x="64" y="142">item_type</text>
+    <text class="cell" x="64" y="174">usage_route</text>
+    <text class="cell" x="64" y="206">unit</text>
+  </g>
+
+  <!-- inventory_batches -->
+  <g id="inventory_batches" transform="translate(1400 670)">
+    <rect class="table" width="300" height="230"/>
+    <line class="row" x1="0" y1="45" x2="300" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="300" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="230"/>
+    <text class="tableName" x="150" y="30" text-anchor="middle">inventory_batches</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">inventory_item_id</text>
+    <text class="cell" x="64" y="142">batch_number</text>
+    <text class="cell" x="64" y="174">quantity_remaining</text>
+    <text class="cell" x="64" y="206">expiry_date</text>
+  </g>
+
+  <!-- stock_movements -->
+  <g id="stock_movements" transform="translate(1400 1010)">
+    <rect class="table" width="310" height="250"/>
+    <line class="row" x1="0" y1="45" x2="310" y2="45"/>
+    <line class="row" x1="0" y1="85" x2="310" y2="85"/>
+    <line class="col" x1="50" y1="45" x2="50" y2="250"/>
+    <text class="tableName" x="155" y="30" text-anchor="middle">stock_movements</text>
+    <text class="key" x="14" y="70">PK</text>
+    <text class="cell" x="64" y="70">id</text>
+    <text class="key" x="14" y="110">FK</text>
+    <text class="cell" x="64" y="110">inventory_batch_id</text>
+    <text class="key" x="14" y="142">FK</text>
+    <text class="cell" x="64" y="142">prescription_item_id</text>
+    <text class="cell" x="64" y="174">performed_by</text>
+    <text class="cell" x="64" y="206">movement_type</text>
+    <text class="cell" x="64" y="238">quantity</text>
+  </g>
+
+  <!-- Relationship lines -->
+  <path class="rel" d="M245 285 V355"/>
+  <text class="label" x="270" y="330">1-N nếu có user_id</text>
+
+  <path class="rel" d="M110 205 H82 V810 H110"/>
+  <text class="label" x="76" y="655">N-N qua liên kết</text>
+
+  <path class="rel" d="M380 555 H410 V805 H380"/>
+  <text class="label" x="360" y="675">N-N qua liên kết</text>
+
+  <path class="rel" d="M380 465 H445 V525 H515"/>
+  <text class="label" x="392" y="448">1-N medical_records</text>
+
+  <path class="rel" d="M380 545 H445 V830 H515"/>
+  <text class="label" x="392" y="813">1-N appointments</text>
+
+  <path class="rel" d="M680 390 V305"/>
+  <text class="label" x="700" y="355">1-N attachments</text>
+
+  <path class="rel" d="M845 525 H980"/>
+  <text class="label" x="870" y="508">1-N prescriptions</text>
+
+  <path class="rel" d="M845 620 H875 V1135 H845"/>
+  <text class="label" x="710" y="985">1-N AI logs</text>
+
+  <path class="relSoft" d="M380 205 H445 V1110 H515"/>
+  <text class="label" x="395" y="1092">users 1-N AI logs</text>
+
+  <path class="rel" d="M1115 580 V680"/>
+  <text class="label" x="1135" y="640">1-N</text>
+
+  <path class="relSoft" d="M1115 1010 V940"/>
+  <text class="label" x="1135" y="985">danh mục dịch vụ</text>
+
+  <path class="rel" d="M1400 460 H1328 V810 H1270"/>
+  <text class="label" x="1280" y="790">inventory_items 1-N prescription_items</text>
+
+  <path class="rel" d="M1545 580 V670"/>
+  <text class="label" x="1565" y="630">1-N batches</text>
+
+  <path class="rel" d="M1550 900 V1010"/>
+  <text class="label" x="1570" y="970">1-N movements</text>
+
+  <path class="rel" d="M1270 820 H1345 V1135 H1400"/>
+  <text class="label" x="1285" y="1116">0-N stock_movements</text>
+
+  <path class="relSoft" d="M380 230 H420 V1340 H1360 V1135 H1400"/>
+  <text class="label" x="1195" y="1320">users 1-N performed_by</text>
+
+  <text class="note" x="70" y="1365">Ghi chú: đường liền là quan hệ chính; đường nét đứt là quan hệ người thao tác/tham chiếu nghiệp vụ. AI chỉ lưu log tham khảo, không tự tạo đơn và không tự trừ kho.</text>
+</svg>

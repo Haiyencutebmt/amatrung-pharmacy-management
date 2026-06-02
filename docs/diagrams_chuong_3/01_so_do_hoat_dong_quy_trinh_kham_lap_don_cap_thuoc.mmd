@@ -1,0 +1,69 @@
+%% Hình 2. Sơ đồ hoạt động quy trình khám, lập đơn và cấp thuốc trong hệ thống AmaTrung
+flowchart TD
+    A([Bắt đầu])
+    B[Tiếp nhận / tra cứu bệnh nhân]
+    C{Đã có hồ sơ bệnh nhân?}
+    D[Thêm mới bệnh nhân]
+    E[Chọn hồ sơ bệnh nhân]
+    F[Tạo hồ sơ bệnh án]
+    G[Nhập triệu chứng và thông tin khám ban đầu]
+    H{Có sử dụng AI nhận định sơ bộ không?}
+    I[Admin / Thầy thuốc chính tự nhập chẩn đoán]
+    J[AI trả về hướng nhận định và mức độ phù hợp tham khảo]
+    K[Admin / Thầy thuốc chính xác nhận chẩn đoán]
+    L{Có cần AI gợi ý điều trị không?}
+    M[Lập đơn điều trị thủ công]
+    N[AI gợi ý dược liệu / dịch vụ / theo dõi, Admin xem xét]
+    O[Lập đơn điều trị]
+    P{Đơn có thuốc ảnh hưởng kho không?}
+    Q[Lưu đơn / in đơn]
+    R[Kiểm tra tồn kho theo lô]
+    S{Đủ tồn kho?}
+    T[Cảnh báo thiếu kho]
+    U[Xác nhận cấp thuốc]
+    V[Trừ kho theo lô]
+    W[Ghi nhận biến động kho]
+    X[Lưu kết quả và hoàn tất]
+    Y([Kết thúc])
+
+    A --> B --> C
+    C -- "Chưa có" --> D --> E
+    C -- "Đã có" --> E
+    E --> F --> G --> H
+    H -- "Không" --> I --> K
+    H -- "Có" --> J --> K
+    K --> L
+    L -- "Không" --> M --> O
+    L -- "Có" --> N --> O
+    O --> P
+    P -- "Không" --> Q --> X
+    P -- "Có" --> R --> S
+    S -- "Không đủ" --> T --> X
+    S -- "Đủ" --> U --> V --> W --> X --> Y
+
+    note1["Ghi chú: AI chỉ hỗ trợ tham khảo, không tự xác nhận chẩn đoán, không tự lập đơn, không tự trừ kho."]
+    note2["Chẩn đoán do Admin / Thầy thuốc chính xác nhận. Staff chỉ thao tác khi được cấp quyền."]
+    note3["Chỉ khi xác nhận cấp thuốc mới trừ kho theo lô và ghi nhận biến động kho."]
+
+    J -.-> note1
+    N -.-> note1
+    K -.-> note2
+    U -.-> note3
+
+    classDef startEnd fill:#111827,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef process fill:#ffffff,stroke:#334155,color:#0f172a,stroke-width:2px;
+    classDef admin fill:#eff6ff,stroke:#2563eb,color:#0f172a,stroke-width:2px;
+    classDef ai fill:#fff7ed,stroke:#ea580c,color:#0f172a,stroke-width:2px;
+    classDef stock fill:#f0fdf4,stroke:#16a34a,color:#0f172a,stroke-width:2px;
+    classDef decision fill:#fefce8,stroke:#ca8a04,color:#0f172a,stroke-width:2px;
+    classDef warning fill:#fef2f2,stroke:#dc2626,color:#0f172a,stroke-width:2px;
+    classDef note fill:#f8fafc,stroke:#64748b,color:#334155,stroke-width:1.5px,stroke-dasharray:6 5;
+
+    class A,Y startEnd;
+    class B,D,E,F,G,Q,X process;
+    class I,K,M,O,U admin;
+    class J,N ai;
+    class R,V,W stock;
+    class C,H,L,P,S decision;
+    class T warning;
+    class note1,note2,note3 note;

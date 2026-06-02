@@ -27,7 +27,7 @@
 
     {{-- Floating Header --}}
     <div class="w-full max-w-[1400px] mx-auto px-4 pt-4 sticky top-0 z-[999] pointer-events-none">
-        <header class="bg-white/90 backdrop-blur-md rounded-full shadow-[0_12px_40px_rgba(59,130,246,0.1)] border border-sky-100/60 px-8 py-3.5 flex items-center justify-between pointer-events-auto transition-all duration-300">
+        <header class="bg-white/90 backdrop-blur-md rounded-full shadow-[0_12px_40px_rgba(59,130,246,0.1)] border border-sky-100/60 px-3 py-2 sm:px-8 sm:py-3.5 flex items-center justify-between pointer-events-auto transition-all duration-300">
             <!-- Left side: Mobile Menu & Logo & Brand Title -->
             <div class="flex items-center gap-3">
                 <!-- Mobile Menu Button -->
@@ -35,21 +35,33 @@
                     <button id="mobile-menu-btn" class="p-1.5 text-gray-500 hover:text-blue-500 focus:outline-none">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <!-- Mobile Dropdown -->
-                    <div id="mobile-menu-dropdown" class="absolute left-0 mt-3 w-56 bg-white rounded-2xl shadow-lg py-2.5 z-50 hidden border border-gray-100">
-                        <a href="{{ url('/') }}" class="block px-5 py-3 text-base font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-500">Trang chủ</a>
-                        <a href="{{ url('/bai-viet') }}" class="block px-5 py-3 text-base font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-500">Bài viết</a>
-                        <a href="{{ url('/tu-dien-thuoc-nam') }}" class="block px-5 py-3 text-base font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-500">Từ điển dược liệu</a>
-                        <button onclick="document.getElementById('chatbot-toggle').click();" class="w-full text-left block px-5 py-3 text-base font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-500">Tư vấn AI</button>
+                    <!-- Mobile Bottom Sheet Overlay -->
+                    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-[998] hidden" onclick="closeMobileMenu()"></div>
+                    <!-- Mobile Bottom Sheet -->
+                    <div id="mobile-menu-sheet" class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[999] p-6 pt-3 translate-y-full transition-transform duration-300 ease-out hidden">
+                        <!-- Drag Handle -->
+                        <div class="flex justify-center mb-4">
+                            <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+                        </div>
+                        <a href="{{ url('/') }}" class="block py-3.5 text-lg font-bold text-gray-700 hover:text-blue-500" onclick="closeMobileMenu()">Trang chủ</a>
+                        <a href="{{ url('/bai-viet') }}" class="block py-3.5 text-lg font-bold text-gray-700 hover:text-blue-500" onclick="closeMobileMenu()">Bài viết</a>
+                        <a href="{{ url('/tu-dien-thuoc-nam') }}" class="block py-3.5 text-lg font-bold text-gray-700 hover:text-blue-500" onclick="closeMobileMenu()">Từ điển dược liệu</a>
+                        <button onclick="document.getElementById('chatbot-toggle').click(); closeMobileMenu();" class="w-full text-left block py-3.5 text-lg font-bold text-gray-700 hover:text-blue-500">Tư vấn AI ✨</button>
+                        <div class="border-t border-gray-200 my-3"></div>
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="block py-3.5 text-lg font-bold text-gray-700 hover:text-blue-500" onclick="closeMobileMenu()">{{ auth()->user()->name }}</a>
+                        @else
+                            <a href="{{ url('/login') }}" class="block py-3.5 text-lg font-bold text-blue-500" onclick="closeMobileMenu()">Đăng nhập</a>
+                        @endauth
                     </div>
                 </div>
 
                 <!-- Logo & Brand info -->
                 <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-                    <img src="{{ asset('images/amatrung_logo.png') }}" class="w-12 h-12 object-contain group-hover:scale-105 transition-transform rounded-full" alt="AmaTrung">
+                    <img src="{{ asset('images/amatrung_logo.png') }}" class="w-9 h-9 sm:w-12 sm:h-12 object-contain group-hover:scale-105 transition-transform rounded-full" alt="AmaTrung">
                     <div class="flex flex-col leading-tight">
-                        <span class="text-xl font-black text-blue-600 tracking-wide">AMATRUNG</span>
-                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Nhà thuốc Y học cổ truyền</span>
+                        <span class="text-base sm:text-xl font-black text-blue-600 tracking-wide">AMATRUNG</span>
+                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider hidden sm:block">Nhà thuốc Y học cổ truyền</span>
                     </div>
                 </a>
             </div>
@@ -86,8 +98,8 @@
             <div class="flex items-center gap-3.5">
                 @auth
                     <!-- Tài khoản dropdown pill -->
-                    <div class="relative group/user">
-                        <button class="inline-flex items-center gap-1.5 pl-1.5 pr-4 py-1 text-base font-bold bg-white border border-slate-200 hover:border-blue-200 text-slate-700 rounded-full transition-all shadow-sm focus:outline-none">
+                    <div class="relative">
+                        <button id="user-dropdown-btn" class="inline-flex items-center gap-1.5 pl-1.5 pr-4 py-1 text-base font-bold bg-white border border-slate-200 hover:border-blue-200 text-slate-700 rounded-full transition-all shadow-sm focus:outline-none">
                             @if(auth()->user()->avatar)
                                 <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover">
                             @else
@@ -95,11 +107,11 @@
                                     {{ mb_substr(auth()->user()->name, 0, 1) }}
                                 </div>
                             @endif
-                            <span class="max-w-[100px] truncate">{{ auth()->user()->name }}</span>
-                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                            <span class="max-w-[100px] truncate hidden sm:inline">{{ auth()->user()->name }}</span>
+                            <svg class="w-3 h-3 text-slate-400 hidden sm:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <!-- User Dropdown Menu -->
-                        <div class="absolute right-0 pt-2.5 w-52 z-50 hidden group-hover/user:block">
+                        <div id="user-dropdown-menu" class="absolute right-0 pt-2.5 w-52 z-50 hidden">
                             <div class="bg-white rounded-2xl shadow-xl py-2 border border-slate-100 overflow-hidden">
                                 <a href="{{ url('/dashboard') }}" class="block px-5 py-3 text-base font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Bảng điều khiển</a>
                                 <div class="border-t border-slate-100 my-1"></div>
@@ -113,16 +125,20 @@
                         </div>
                     </div>
                 @else
-                    <!-- Login Button -->
-                    <a href="{{ url('/login') }}" class="inline-flex items-center gap-1.5 px-6 py-2.5 text-base font-bold bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all shadow-md shadow-blue-500/10">
+                    <!-- Login Button for Desktop -->
+                    <a href="{{ url('/login') }}" class="hidden sm:inline-flex items-center gap-1.5 px-6 py-2.5 text-base font-bold bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-all shadow-md shadow-blue-500/10">
                         <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
                         <span>Đăng nhập</span>
+                    </a>
+                    <!-- Login Button for Mobile -->
+                    <a href="{{ url('/login') }}" class="inline-flex sm:hidden w-9 h-9 rounded-full bg-slate-50 hover:bg-blue-50/50 flex items-center justify-center text-slate-400 hover:text-blue-500 border border-slate-100 transition-all focus:outline-none" title="Đăng nhập">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </a>
                 @endauth
 
                 <!-- Favorites Heart Button -->
-                <a href="{{ route('profile.favorites') }}" class="w-11 h-11 rounded-full bg-slate-50 hover:bg-rose-50 flex items-center justify-center text-slate-400 hover:text-rose-500 border border-slate-100 transition-all focus:outline-none relative group/fav cursor-pointer" title="Mục yêu thích">
-                    <svg class="w-6 h-6 fill-none group-hover/fav:fill-rose-500 transition-all" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                <a href="{{ route('profile.favorites') }}" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-slate-50 hover:bg-rose-50 flex items-center justify-center text-slate-400 hover:text-rose-500 border border-slate-100 transition-all focus:outline-none relative group/fav cursor-pointer" title="Mục yêu thích">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 fill-none group-hover/fav:fill-rose-500 transition-all" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     @auth
                         @php
                             $favCount = auth()->user()->likedArticles()->count() + auth()->user()->herbDictionaryFavorites()->count();
@@ -136,11 +152,11 @@
                 </a>
 
                 <!-- Settings/Theme Toggle Dropdown -->
-                <div class="relative group/settings">
-                    <button class="w-11 h-11 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-500 border border-slate-100 transition-all focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <div class="relative">
+                    <button id="settings-dropdown-btn" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-500 border border-slate-100 transition-all focus:outline-none">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </button>
-                    <div class="absolute right-0 pt-2.5 w-52 z-50 hidden group-hover/settings:block">
+                    <div id="settings-dropdown-menu" class="absolute right-0 pt-2.5 w-52 z-50 hidden">
                         <div class="bg-white rounded-2xl shadow-xl py-3 border border-slate-100">
                             <div class="px-5 py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ngôn ngữ</div>
                             <a href="#" onclick="changeLanguage('vi'); return false;" class="block px-5 py-2.5 text-base font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-500">🇻🇳 Tiếng Việt</a>
@@ -200,10 +216,10 @@
     </main>
 
     {{-- Footer --}}
-    <footer class="bg-primary-900 text-white mt-20 pt-16 pb-8">
+    <footer class="bg-primary-900 text-white mt-20 pt-10 pb-6 sm:pt-16 sm:pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                <div class="col-span-1 md:col-span-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-12 mb-12">
+                <div class="col-span-2 md:col-span-2">
                     <div class="flex items-center gap-3 mb-6">
                         <img src="{{ asset('images/amatrung_logo.png') }}" alt="AmaTrung Logo" class="h-10 w-10 object-contain drop-shadow-md rounded-full bg-white p-1">
                         <span class="text-2xl font-extrabold text-white tracking-tight block">AmaTrung</span>
@@ -239,7 +255,7 @@
             </div>
             <div class="border-t border-primary-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-primary-100/60">
                 <p>Designed for AmaTrung Clinic.</p>
-                <div class="flex space-x-6 mt-4 md:mt-0 text-sm">
+                <div class="flex space-x-6 mt-3 md:mt-0 text-sm">
                     <a href="https://www.facebook.com/hieu.trieu.3382" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors font-bold">Facebook</a>
                     <a href="https://www.tiktok.com/@nhyn.ieaie.04?lang=vi-VN" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors font-bold">Tiktok</a>
                     <a href="https://zalo.me/0983009748" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors font-bold">Zalo</a>
@@ -390,125 +406,196 @@
             });
         }
 
-        // Mobile Menu Toggle
+        // Mobile Bottom Sheet Menu Toggle
         var mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        var mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
-        if (mobileMenuBtn && mobileMenuDropdown) {
-            mobileMenuBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                mobileMenuDropdown.classList.toggle('hidden');
-            });
-            document.addEventListener('click', function(e) {
-                if (!mobileMenuBtn.contains(e.target) && !mobileMenuDropdown.contains(e.target)) {
-                    mobileMenuDropdown.classList.add('hidden');
-                }
+        var mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        var mobileMenuSheet = document.getElementById('mobile-menu-sheet');
+
+        function openMobileMenu() {
+            mobileMenuOverlay.classList.remove('hidden');
+            mobileMenuSheet.classList.remove('hidden');
+            mobileMenuSheet.style.display = 'block';
+            requestAnimationFrame(function() {
+                mobileMenuSheet.classList.remove('translate-y-full');
+                mobileMenuSheet.classList.add('translate-y-0');
             });
         }
+
+        function closeMobileMenu() {
+            mobileMenuSheet.classList.remove('translate-y-0');
+            mobileMenuSheet.classList.add('translate-y-full');
+            mobileMenuOverlay.classList.add('hidden');
+            setTimeout(function() {
+                mobileMenuSheet.classList.add('hidden');
+            }, 300);
+        }
+
+        if (mobileMenuBtn && mobileMenuOverlay && mobileMenuSheet) {
+            mobileMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openMobileMenu();
+            });
+        }
+
+        // Desktop User & Settings Dropdowns Toggle
+        var userBtn = document.getElementById('user-dropdown-btn');
+        var userMenu = document.getElementById('user-dropdown-menu');
+        var settingsBtn = document.getElementById('settings-dropdown-btn');
+        var settingsMenu = document.getElementById('settings-dropdown-menu');
+
+        if (userBtn && userMenu) {
+            userBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userMenu.classList.toggle('hidden');
+                if (settingsMenu) settingsMenu.classList.add('hidden');
+            });
+        }
+
+        if (settingsBtn && settingsMenu) {
+            settingsBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                settingsMenu.classList.toggle('hidden');
+                if (userMenu) userMenu.classList.add('hidden');
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (userMenu && !userMenu.contains(e.target) && e.target !== userBtn && (userBtn && !userBtn.contains(e.target))) {
+                userMenu.classList.add('hidden');
+            }
+            if (settingsMenu && !settingsMenu.contains(e.target) && e.target !== settingsBtn && (settingsBtn && !settingsBtn.contains(e.target))) {
+                settingsMenu.classList.add('hidden');
+            }
+        });
     </script>
 
     <!-- AI Chatbot -->
-    <x-chatbot />
+    @if(!Request::is('login') && !Request::is('register') && !Request::is('forgot-password') && !Request::is('password/*') && !Request::is('reset-password'))
+        <x-chatbot />
+    @endif
 
-    <!-- Mouse Wind/Smoke Effect Canvas -->
-    <canvas id="mouse-smoke-canvas" class="fixed inset-0 pointer-events-none z-[9998] w-full h-full"></canvas>
+    <!-- Mouse Wind/Smoke Effect Canvas (Desktop only) -->
+    <canvas id="mouse-smoke-canvas" class="fixed inset-0 pointer-events-none z-[9998] w-full h-full hidden sm:block"></canvas>
+
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const canvas = document.getElementById('mouse-smoke-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            let width = canvas.width = window.innerWidth;
-            let height = canvas.height = window.innerHeight;
-            
-            window.addEventListener('resize', () => {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            });
+            // Desktop: Mouse Smoke Effect
+            if (window.innerWidth >= 640) {
+                const canvas = document.getElementById('mouse-smoke-canvas');
+                if (canvas) {
+                    canvas.classList.remove('hidden');
+                    const ctx = canvas.getContext('2d');
 
-            // 3 dải khói (ribbons) để tạo hiệu ứng gió đa tầng
-            const ribbons = [
-                { points: [], phase: 0, speed: 1.2, widthFactor: 1.0, color: '165, 215, 255' },
-                { points: [], phase: 2.5, speed: 1.6, widthFactor: 0.6, color: '200, 230, 255' },
-                { points: [], phase: 4.2, speed: 0.8, widthFactor: 1.4, color: '135, 190, 245' }
-            ];
+                    let width = canvas.width = window.innerWidth;
+                    let height = canvas.height = window.innerHeight;
 
-            let time = 0;
-            let lastX = null, lastY = null;
-            let mouseTimeout;
+                    window.addEventListener('resize', () => {
+                        width = canvas.width = window.innerWidth;
+                        height = canvas.height = window.innerHeight;
+                    });
 
-            window.addEventListener('mousemove', (e) => {
-                // Điền thêm các điểm giữa 2 lần di chuột để dải khói không bị đứt đoạn khi di nhanh
-                if (lastX !== null && lastY !== null) {
-                    const dx = e.clientX - lastX;
-                    const dy = e.clientY - lastY;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
-                    const steps = Math.min(Math.floor(dist / 8), 12); 
-                    
-                    for (let i = 1; i <= steps; i++) {
-                        let ix = lastX + (dx * i) / steps;
-                        let iy = lastY + (dy * i) / steps;
-                        ribbons.forEach(ribbon => ribbon.points.push({ x: ix, y: iy, age: 0 }));
-                    }
-                }
-                
-                ribbons.forEach(ribbon => ribbon.points.push({ x: e.clientX, y: e.clientY, age: 0 }));
-                
-                lastX = e.clientX;
-                lastY = e.clientY;
+                    const ribbons = [
+                        { points: [], phase: 0, speed: 1.2, widthFactor: 1.0, color: '165, 215, 255' },
+                        { points: [], phase: 2.5, speed: 1.6, widthFactor: 0.6, color: '200, 230, 255' },
+                        { points: [], phase: 4.2, speed: 0.8, widthFactor: 1.4, color: '135, 190, 245' }
+                    ];
 
-                clearTimeout(mouseTimeout);
-                mouseTimeout = setTimeout(() => { lastX = null; lastY = null; }, 100);
-            });
+                    let time = 0;
+                    let lastX = null, lastY = null;
+                    let mouseTimeout;
 
-            window.addEventListener('mouseout', () => { lastX = null; lastY = null; });
+                    window.addEventListener('mousemove', (e) => {
+                        if (lastX !== null && lastY !== null) {
+                            const dx = e.clientX - lastX;
+                            const dy = e.clientY - lastY;
+                            const dist = Math.sqrt(dx*dx + dy*dy);
+                            const steps = Math.min(Math.floor(dist / 8), 12);
 
-            function animate() {
-                ctx.clearRect(0, 0, width, height);
-                time += 0.05;
-
-                ribbons.forEach(ribbon => {
-                    // Cập nhật vị trí các điểm (bay lên và uốn lượn)
-                    for (let i = 0; i < ribbon.points.length; i++) {
-                        let p = ribbon.points[i];
-                        p.age += 1;
-                        p.y -= ribbon.speed; // Gió bay lên
-                        // Tạo độ lượn sóng cho khói
-                        p.x += Math.sin(time + p.age * 0.05 + ribbon.phase) * (1.5 * ribbon.speed); 
-                    }
-
-                    // Xoá các điểm đã già (mờ hẳn)
-                    ribbon.points = ribbon.points.filter(p => p.age < 80);
-
-                    // Vẽ dải khói
-                    if (ribbon.points.length > 1) {
-                        ctx.lineCap = 'round';
-                        ctx.lineJoin = 'round';
-
-                        for (let i = 0; i < ribbon.points.length - 1; i++) {
-                            let p1 = ribbon.points[i];
-                            let p2 = ribbon.points[i + 1];
-                            let life = Math.max(0, 1 - (p1.age / 80));
-                            
-                            ctx.beginPath();
-                            ctx.moveTo(p1.x, p1.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            
-                            // Càng về đuôi khói càng mờ dần và loãng ra
-                            ctx.strokeStyle = `rgba(${ribbon.color}, ${Math.pow(life, 1.5) * 0.18})`;
-                            ctx.lineWidth = (8 + p1.age * 0.6) * ribbon.widthFactor; 
-                            ctx.stroke();
+                            for (let i = 1; i <= steps; i++) {
+                                let ix = lastX + (dx * i) / steps;
+                                let iy = lastY + (dy * i) / steps;
+                                ribbons.forEach(ribbon => ribbon.points.push({ x: ix, y: iy, age: 0 }));
+                            }
                         }
-                    }
-                });
 
-                requestAnimationFrame(animate);
+                        ribbons.forEach(ribbon => ribbon.points.push({ x: e.clientX, y: e.clientY, age: 0 }));
+
+                        lastX = e.clientX;
+                        lastY = e.clientY;
+
+                        clearTimeout(mouseTimeout);
+                        mouseTimeout = setTimeout(() => { lastX = null; lastY = null; }, 100);
+                    });
+
+                    window.addEventListener('mouseout', () => { lastX = null; lastY = null; });
+
+                    function animate() {
+                        ctx.clearRect(0, 0, width, height);
+                        time += 0.05;
+
+                        ribbons.forEach(ribbon => {
+                            for (let i = 0; i < ribbon.points.length; i++) {
+                                let p = ribbon.points[i];
+                                p.age += 1;
+                                p.y -= ribbon.speed;
+                                p.x += Math.sin(time + p.age * 0.05 + ribbon.phase) * (1.5 * ribbon.speed);
+                            }
+
+                            ribbon.points = ribbon.points.filter(p => p.age < 80);
+
+                            if (ribbon.points.length > 1) {
+                                ctx.lineCap = 'round';
+                                ctx.lineJoin = 'round';
+
+                                for (let i = 0; i < ribbon.points.length - 1; i++) {
+                                    let p1 = ribbon.points[i];
+                                    let p2 = ribbon.points[i + 1];
+                                    let life = Math.max(0, 1 - (p1.age / 80));
+
+                                    ctx.beginPath();
+                                    ctx.moveTo(p1.x, p1.y);
+                                    ctx.lineTo(p2.x, p2.y);
+
+                                    ctx.strokeStyle = `rgba(${ribbon.color}, ${Math.pow(life, 1.5) * 0.18})`;
+                                    ctx.lineWidth = (8 + p1.age * 0.6) * ribbon.widthFactor;
+                                    ctx.stroke();
+                                }
+                            }
+                        });
+
+                        requestAnimationFrame(animate);
+                    }
+
+                    animate();
+                }
+            } else {
+                // Mobile: Touch Ripple Effect
+                let rippleCount = 0;
+                const maxRipples = 3;
+
+                document.addEventListener('touchstart', function(e) {
+                    if (rippleCount >= maxRipples) return;
+                    const touch = e.touches[0];
+                    const ripple = document.createElement('div');
+                    ripple.className = 'touch-ripple';
+                    ripple.style.left = touch.clientX + 'px';
+                    ripple.style.top = touch.clientY + 'px';
+                    document.body.appendChild(ripple);
+                    rippleCount++;
+
+                    ripple.addEventListener('animationend', function() {
+                        ripple.remove();
+                        rippleCount--;
+                    });
+                }, { passive: true });
             }
-            
-            animate();
         });
     </script>
-    <!-- Floating Social Contacts Sidebar -->
-    <div id="floating-social-contacts" data-floating-social class="fixed right-4 md:right-6 top-1/2 -translate-y-1/2 z-[9990] flex flex-col items-center gap-4 bg-white/90 backdrop-blur-md rounded-full py-6 px-3 shadow-[0_15px_45px_rgba(0,0,0,0.12)] border border-sky-100/70 hover:shadow-[0_20px_55px_rgba(0,0,0,0.18)] transition-all duration-300">
+    @if(!Request::is('login') && !Request::is('register') && !Request::is('forgot-password') && !Request::is('password/*') && !Request::is('reset-password'))
+    <!-- Floating Social Contacts Sidebar (Desktop) -->
+    <div id="floating-social-contacts" data-floating-social class="hidden sm:flex fixed right-4 md:right-6 top-1/2 -translate-y-1/2 z-[9990] flex-col items-center gap-4 bg-white/90 backdrop-blur-md rounded-full py-6 px-3 shadow-[0_15px_45px_rgba(0,0,0,0.12)] border border-sky-100/70 hover:shadow-[0_20px_55px_rgba(0,0,0,0.18)] transition-all duration-300">
         <!-- Facebook -->
         <a href="https://www.facebook.com/hieu.trieu.3382" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full flex items-center justify-center bg-[#1877F2]/10 hover:bg-[#1877F2] text-[#1877F2] hover:text-white transition-all duration-300 hover:scale-110 shadow-sm" title="Facebook">
             <svg class="w-5.5 h-5.5 fill-current" viewBox="0 0 24 24">
@@ -535,6 +622,55 @@
             </svg>
         </a>
     </div>
+
+    <!-- Mobile FAB (Floating Action Button) -->
+    <div id="mobile-fab-container" class="sm:hidden fixed right-4 bottom-24 z-[9990]">
+        <!-- Sub-buttons (hidden by default) -->
+        <div id="mobile-fab-menu" class="flex flex-col items-center gap-3 mb-3 opacity-0 scale-75 pointer-events-none transition-all duration-300">
+            <!-- Facebook -->
+            <a href="https://www.facebook.com/hieu.trieu.3382" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full flex items-center justify-center bg-[#1877F2] text-white shadow-lg" title="Facebook">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <!-- TikTok -->
+            <a href="https://www.tiktok.com/@nhyn.ieaie.04?lang=vi-VN" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full flex items-center justify-center bg-slate-900 text-white shadow-lg" title="Tiktok">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.525.07c1.147-.033 2.274.015 3.398.113V4.02c-.87-.044-1.745-.035-2.613.018-.323.018-.633.097-.899.273-.385.253-.559.684-.58 1.127v2.775c1.32-.014 2.641.002 3.962-.008.125 1.25.132 2.505.132 3.757-.013.132-.036.262-.061.393-.23 1.306-.217 2.628-.088 3.939-.029.351-.106.716-.338 1.01-.806 1.017-2.15 1.45-3.414 1.45-1.442-.023-2.825-.584-3.778-1.63-.842-.938-1.22-2.222-1.074-3.483.155-1.392.977-2.611 2.219-3.23.402-.204.835-.306 1.272-.315v3.832c-.347.03-.699.162-.953.42-.351.357-.454.896-.273 1.36.195.49.681.802 1.201.8.525-.01.99-.344 1.15-.833.09-.27.1-.55.1-.83V.07h-3.32v3.742c-.01.939-.297 1.868-.868 2.607-.828 1.066-2.17 1.584-3.509 1.47-1.464-.117-2.766-.966-3.447-2.269-.718-1.378-.636-3.132.23-4.417C6.096 1.171 7.697.35 9.38.332c.691-.013 1.383.072 2.052.24.364.088.697.26 1 .485.034-.33.064-.662.096-.99z"/></svg>
+            </a>
+            <!-- Zalo -->
+            <a href="https://zalo.me/0983009748" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full flex items-center justify-center bg-[#0068FF] text-white shadow-lg" title="Zalo">
+                <span class="font-extrabold text-[10px] tracking-tight">Zalo</span>
+            </a>
+            <!-- Phone -->
+            <a href="tel:0983009748" class="w-10 h-10 rounded-full flex items-center justify-center bg-emerald-500 text-white shadow-lg" title="Gọi hotline">
+                <svg class="w-5 h-5 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            </a>
+        </div>
+        <!-- Main FAB button -->
+        <button id="mobile-fab-btn" class="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-xl transition-all duration-300 focus:outline-none" onclick="toggleMobileFab()">
+            <svg class="w-6 h-6 fill-none stroke-current transition-transform duration-300" id="mobile-fab-icon" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Mobile FAB Toggle
+        var mobileFabOpen = false;
+        function toggleMobileFab() {
+            var menu = document.getElementById('mobile-fab-menu');
+            var icon = document.getElementById('mobile-fab-icon');
+            mobileFabOpen = !mobileFabOpen;
+            if (mobileFabOpen) {
+                menu.classList.remove('opacity-0', 'scale-75', 'pointer-events-none');
+                menu.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+                icon.classList.add('rotate-[135deg]');
+            } else {
+                menu.classList.add('opacity-0', 'scale-75', 'pointer-events-none');
+                menu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+                icon.classList.remove('rotate-[135deg]');
+            }
+        }
+    </script>
+    @endif
 
     </div>
 </html>

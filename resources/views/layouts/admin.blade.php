@@ -89,7 +89,7 @@
                 @if(auth()->user()->hasPermission('herb_dictionary.manage'))
                 <a href="{{ route('admin.herb-dictionary.index') }}"
                    class="nav-link {{ request()->is('admin/herb-dictionary*') ? 'active' : '' }}">
-                    <span class="nav-icon" style="color: var(--color-primary-600);">🌱</span> Từ điển thuốc nam
+                    <span class="nav-icon" style="color: var(--color-primary-600);">🌱</span> Từ điển dược liệu
                 </a>
                 @endif
                 @if(auth()->user()->hasPermission('comments.manage'))

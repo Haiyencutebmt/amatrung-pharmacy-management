@@ -1,0 +1,299 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1450" viewBox="0 0 1900 1450" role="img" aria-labelledby="title desc">
+  <title id="title">Hình 2. Sơ đồ hoạt động đăng nhập, đăng ký và quên mật khẩu trong hệ thống AmaTrung</title>
+  <desc id="desc">Sơ đồ gồm ba luồng: đăng nhập, đăng ký tài khoản và quên mật khẩu bằng OTP email.</desc>
+  <rect width="1900" height="1450" fill="#ffffff"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1f2937"/>
+    </marker>
+    <filter id="shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#cbd5e1" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title { font: 700 32px Arial, sans-serif; fill: #0f172a; }
+    .subtitle { font: 400 19px Arial, sans-serif; fill: #475569; }
+    .lane { fill: #ffffff; stroke-width: 2.4; rx: 18; }
+    .laneTitle { font: 700 22px Arial, sans-serif; fill: #0f172a; }
+    .node { stroke-width: 2.1; filter: url(#shadow); }
+    .process { fill: #ffffff; stroke: #334155; }
+    .success { fill: #f0fdf4; stroke: #16a34a; }
+    .warning { fill: #fef2f2; stroke: #dc2626; }
+    .decision { fill: #fefce8; stroke: #ca8a04; stroke-width: 2.2; filter: url(#shadow); }
+    .terminal { fill: #111827; stroke: #111827; stroke-width: 2.1; filter: url(#shadow); }
+    .noteBox { fill: #f8fafc; stroke: #64748b; stroke-width: 1.7; stroke-dasharray: 8 6; rx: 12; }
+    .nodeText { font: 700 16px Arial, sans-serif; fill: #0f172a; }
+    .nodeTextSmall { font: 700 15px Arial, sans-serif; fill: #0f172a; }
+    .terminalText { font: 700 17px Arial, sans-serif; fill: #ffffff; }
+    .noteText { font: 400 15px Arial, sans-serif; fill: #334155; }
+    .noteTitle { font: 700 17px Arial, sans-serif; fill: #0f172a; }
+    .label { font: 700 14px Arial, sans-serif; fill: #111827; paint-order: stroke; stroke: #ffffff; stroke-width: 5; stroke-linejoin: round; }
+    .arrow { stroke: #1f2937; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+  </style>
+
+  <text class="title" x="950" y="48" text-anchor="middle">Hình 2. Sơ đồ hoạt động đăng nhập, đăng ký và quên mật khẩu trong hệ thống AmaTrung</text>
+  <text class="subtitle" x="950" y="82" text-anchor="middle">Ba luồng xác thực chính: đăng nhập, đăng ký tài khoản và đặt lại mật khẩu bằng OTP email</text>
+
+  <!-- Start and selection -->
+  <rect class="terminal" x="810" y="115" width="280" height="52" rx="26"/>
+  <text class="terminalText" x="950" y="148" text-anchor="middle">Bắt đầu</text>
+
+  <polygon class="decision" points="950,205 1145,265 950,325 755,265"/>
+  <text class="nodeTextSmall" x="950" y="259" text-anchor="middle">Người dùng</text>
+  <text class="nodeTextSmall" x="950" y="281" text-anchor="middle">chọn chức năng</text>
+
+  <path class="arrow" d="M950 167 L950 205"/>
+
+  <!-- Lanes -->
+  <rect class="lane" x="55" y="370" width="545" height="900" fill="#eff6ff" stroke="#2563eb"/>
+  <text class="laneTitle" x="328" y="410" text-anchor="middle">Luồng đăng nhập</text>
+
+  <rect class="lane" x="680" y="370" width="545" height="900" fill="#f0fdf4" stroke="#16a34a"/>
+  <text class="laneTitle" x="953" y="410" text-anchor="middle">Luồng đăng ký</text>
+
+  <rect class="lane" x="1305" y="370" width="545" height="900" fill="#fff7ed" stroke="#ea580c"/>
+  <text class="laneTitle" x="1578" y="410" text-anchor="middle">Luồng quên mật khẩu bằng OTP</text>
+
+  <!-- Selection arrows -->
+  <path class="arrow" d="M755 265 L328 265 L328 448"/>
+  <text class="label" x="500" y="252">Đăng nhập</text>
+  <path class="arrow" d="M950 325 L950 448"/>
+  <text class="label" x="980" y="366">Đăng ký</text>
+  <path class="arrow" d="M1145 265 L1578 265 L1578 448"/>
+  <text class="label" x="1375" y="252">Quên mật khẩu</text>
+
+  <!-- Login nodes -->
+  <g transform="translate(145 448)">
+    <rect class="node process" width="365" height="58" rx="12"/>
+    <text class="nodeText" x="183" y="36" text-anchor="middle">Mở form đăng nhập</text>
+  </g>
+  <g transform="translate(145 540)">
+    <rect class="node process" width="365" height="74" rx="12"/>
+    <text class="nodeText" x="183" y="29" text-anchor="middle">Nhập email / số điện thoại</text>
+    <text class="nodeText" x="183" y="53" text-anchor="middle">và mật khẩu</text>
+  </g>
+  <polygon class="decision" points="328,655 488,710 328,765 168,710"/>
+  <text class="nodeTextSmall" x="328" y="704" text-anchor="middle">Dữ liệu</text>
+  <text class="nodeTextSmall" x="328" y="725" text-anchor="middle">hợp lệ?</text>
+
+  <polygon class="decision" points="328,810 510,875 328,940 146,875"/>
+  <text class="nodeTextSmall" x="328" y="866" text-anchor="middle">Tài khoản đúng</text>
+  <text class="nodeTextSmall" x="328" y="887" text-anchor="middle">và đang hoạt động?</text>
+
+  <g transform="translate(105 995)">
+    <rect class="node warning" width="445" height="58" rx="12"/>
+    <text class="nodeText" x="223" y="36" text-anchor="middle">Hiển thị lỗi đăng nhập</text>
+  </g>
+  <g transform="translate(145 1088)">
+    <rect class="node success" width="365" height="74" rx="12"/>
+    <text class="nodeText" x="183" y="29" text-anchor="middle">Đăng nhập thành công,</text>
+    <text class="nodeText" x="183" y="53" text-anchor="middle">tái tạo session</text>
+  </g>
+  <polygon class="decision" points="328,1195 490,1248 328,1301 166,1248"/>
+  <text class="nodeTextSmall" x="328" y="1242" text-anchor="middle">Là Admin</text>
+  <text class="nodeTextSmall" x="328" y="1263" text-anchor="middle">hoặc Staff?</text>
+
+  <g transform="translate(78 1340)">
+    <rect class="node success" width="230" height="58" rx="12"/>
+    <text class="nodeText" x="115" y="35" text-anchor="middle">Trang quản trị</text>
+  </g>
+  <g transform="translate(350 1340)">
+    <rect class="node success" width="220" height="58" rx="12"/>
+    <text class="nodeText" x="110" y="35" text-anchor="middle">Dashboard user</text>
+  </g>
+
+  <!-- Login arrows -->
+  <path class="arrow" d="M328 506 L328 540"/>
+  <path class="arrow" d="M328 614 L328 655"/>
+  <path class="arrow" d="M328 765 L328 810"/>
+  <text class="label" x="356" y="790">Có</text>
+  <path class="arrow" d="M168 710 L110 710 L110 1024 L105 1024"/>
+  <text class="label" x="125" y="696">Không</text>
+  <path class="arrow" d="M146 875 L110 875 L110 1016"/>
+  <text class="label" x="124" y="861">Không</text>
+  <path class="arrow" d="M328 940 L328 1088"/>
+  <text class="label" x="357" y="968">Có</text>
+  <path class="arrow" d="M328 1162 L328 1195"/>
+  <path class="arrow" d="M166 1248 L193 1248 L193 1340"/>
+  <text class="label" x="185" y="1232">Có</text>
+  <path class="arrow" d="M490 1248 L460 1248 L460 1340"/>
+  <text class="label" x="474" y="1232">Không</text>
+
+  <!-- Register nodes -->
+  <g transform="translate(770 448)">
+    <rect class="node process" width="365" height="58" rx="12"/>
+    <text class="nodeText" x="183" y="36" text-anchor="middle">Mở form đăng ký</text>
+  </g>
+  <g transform="translate(735 540)">
+    <rect class="node process" width="435" height="98" rx="12"/>
+    <text class="nodeText" x="218" y="29" text-anchor="middle">Nhập họ tên, email, số điện thoại,</text>
+    <text class="nodeText" x="218" y="53" text-anchor="middle">mật khẩu, xác nhận mật khẩu</text>
+    <text class="nodeText" x="218" y="77" text-anchor="middle">và đồng ý chính sách</text>
+  </g>
+  <polygon class="decision" points="953,690 1145,760 953,830 761,760"/>
+  <text class="nodeTextSmall" x="953" y="750" text-anchor="middle">Thông tin hợp lệ</text>
+  <text class="nodeTextSmall" x="953" y="771" text-anchor="middle">và không trùng?</text>
+
+  <g transform="translate(735 880)">
+    <rect class="node warning" width="435" height="58" rx="12"/>
+    <text class="nodeText" x="218" y="36" text-anchor="middle">Hiển thị lỗi đăng ký</text>
+  </g>
+  <g transform="translate(770 990)">
+    <rect class="node success" width="365" height="74" rx="12"/>
+    <text class="nodeText" x="183" y="29" text-anchor="middle">Tạo tài khoản mới</text>
+    <text class="nodeText" x="183" y="53" text-anchor="middle">với vai trò user</text>
+  </g>
+  <g transform="translate(770 1100)">
+    <rect class="node success" width="365" height="58" rx="12"/>
+    <text class="nodeText" x="183" y="36" text-anchor="middle">Mã hóa mật khẩu</text>
+  </g>
+  <g transform="translate(770 1192)">
+    <rect class="node success" width="365" height="58" rx="12"/>
+    <text class="nodeText" x="183" y="36" text-anchor="middle">Tự động đăng nhập</text>
+  </g>
+  <g transform="translate(770 1284)">
+    <rect class="node success" width="365" height="58" rx="12"/>
+    <text class="nodeText" x="183" y="36" text-anchor="middle">Chuyển đến dashboard user</text>
+  </g>
+
+  <!-- Register arrows -->
+  <path class="arrow" d="M953 506 L953 540"/>
+  <path class="arrow" d="M953 638 L953 690"/>
+  <path class="arrow" d="M761 760 L700 760 L700 909 L735 909"/>
+  <text class="label" x="715" y="746">Không</text>
+  <path class="arrow" d="M953 830 L953 990"/>
+  <text class="label" x="982" y="858">Có</text>
+  <path class="arrow" d="M953 1064 L953 1100"/>
+  <path class="arrow" d="M953 1158 L953 1192"/>
+  <path class="arrow" d="M953 1250 L953 1284"/>
+
+  <!-- Forgot password nodes -->
+  <g transform="translate(1395 448)">
+    <rect class="node process" width="365" height="58" rx="12"/>
+    <text class="nodeText" x="183" y="36" text-anchor="middle">Mở form quên mật khẩu</text>
+  </g>
+  <g transform="translate(1395 538)">
+    <rect class="node process" width="365" height="64" rx="12"/>
+    <text class="nodeText" x="183" y="26" text-anchor="middle">Nhập email hoặc</text>
+    <text class="nodeText" x="183" y="50" text-anchor="middle">số điện thoại</text>
+  </g>
+  <polygon class="decision" points="1578,635 1745,690 1578,745 1411,690"/>
+  <text class="nodeTextSmall" x="1578" y="684" text-anchor="middle">Tìm thấy</text>
+  <text class="nodeTextSmall" x="1578" y="705" text-anchor="middle">tài khoản?</text>
+
+  <polygon class="decision" points="1578,785 1748,842 1578,899 1408,842"/>
+  <text class="nodeTextSmall" x="1578" y="836" text-anchor="middle">Có email</text>
+  <text class="nodeTextSmall" x="1578" y="857" text-anchor="middle">khôi phục?</text>
+
+  <g transform="translate(1338 935)">
+    <rect class="node success" width="480" height="74" rx="12"/>
+    <text class="nodeText" x="240" y="29" text-anchor="middle">Tạo OTP 6 số, lưu mã</text>
+    <text class="nodeText" x="240" y="53" text-anchor="middle">và hạn 10 phút</text>
+  </g>
+  <polygon class="decision" points="1578,1050 1750,1106 1578,1162 1406,1106"/>
+  <text class="nodeTextSmall" x="1578" y="1100" text-anchor="middle">Gửi email OTP</text>
+  <text class="nodeTextSmall" x="1578" y="1121" text-anchor="middle">thành công?</text>
+
+  <g transform="translate(1328 1200)">
+    <rect class="node process" width="500" height="58" rx="12"/>
+    <text class="nodeText" x="250" y="36" text-anchor="middle">Mở form xác thực OTP và nhập mã</text>
+  </g>
+  <polygon class="decision" points="1578,1300 1760,1360 1578,1420 1396,1360"/>
+  <text class="nodeTextSmall" x="1578" y="1354" text-anchor="middle">OTP đúng</text>
+  <text class="nodeTextSmall" x="1578" y="1375" text-anchor="middle">và còn hạn?</text>
+
+  <g transform="translate(1215 690)">
+    <rect class="node warning" width="170" height="74" rx="12"/>
+    <text class="nodeTextSmall" x="85" y="29" text-anchor="middle">Không tìm</text>
+    <text class="nodeTextSmall" x="85" y="51" text-anchor="middle">thấy tài khoản</text>
+  </g>
+  <g transform="translate(1215 805)">
+    <rect class="node warning" width="170" height="74" rx="12"/>
+    <text class="nodeTextSmall" x="85" y="29" text-anchor="middle">Liên hệ</text>
+    <text class="nodeTextSmall" x="85" y="51" text-anchor="middle">Admin</text>
+  </g>
+  <g transform="translate(1215 1068)">
+    <rect class="node warning" width="170" height="74" rx="12"/>
+    <text class="nodeTextSmall" x="85" y="29" text-anchor="middle">Lỗi gửi</text>
+    <text class="nodeTextSmall" x="85" y="51" text-anchor="middle">email OTP</text>
+  </g>
+
+  <g transform="translate(1320 230)">
+    <rect class="node success" width="510" height="76" rx="12"/>
+    <text class="nodeText" x="255" y="30" text-anchor="middle">Tạo token tạm trong session</text>
+    <text class="nodeText" x="255" y="55" text-anchor="middle">và mở form đặt mật khẩu mới</text>
+  </g>
+  <g transform="translate(1320 325)">
+    <rect class="node process" width="510" height="70" rx="12"/>
+    <text class="nodeText" x="255" y="29" text-anchor="middle">Nhập mật khẩu mới</text>
+    <text class="nodeText" x="255" y="53" text-anchor="middle">và xác nhận mật khẩu</text>
+  </g>
+  <polygon class="decision" points="1578,425 1770,486 1578,547 1386,486"/>
+  <text class="nodeTextSmall" x="1578" y="480" text-anchor="middle">Token hợp lệ và</text>
+  <text class="nodeTextSmall" x="1578" y="501" text-anchor="middle">mật khẩu đạt yêu cầu?</text>
+
+  <g transform="translate(1320 135)">
+    <rect class="node success" width="510" height="58" rx="12"/>
+    <text class="nodeText" x="255" y="36" text-anchor="middle">Cập nhật mật khẩu, xóa OTP/session reset</text>
+  </g>
+  <g transform="translate(1320 70)">
+    <rect class="node success" width="510" height="48" rx="12"/>
+    <text class="nodeText" x="255" y="31" text-anchor="middle">Chuyển về trang đăng nhập</text>
+  </g>
+
+  <!-- Forgot arrows -->
+  <path class="arrow" d="M1578 506 L1578 538"/>
+  <path class="arrow" d="M1578 602 L1578 635"/>
+  <path class="arrow" d="M1411 690 L1385 690"/>
+  <text class="label" x="1398" y="676">Không</text>
+  <path class="arrow" d="M1578 745 L1578 785"/>
+  <text class="label" x="1605" y="770">Có</text>
+  <path class="arrow" d="M1408 842 L1385 842"/>
+  <text class="label" x="1396" y="828">Không</text>
+  <path class="arrow" d="M1578 899 L1578 935"/>
+  <text class="label" x="1604" y="924">Có</text>
+  <path class="arrow" d="M1578 1009 L1578 1050"/>
+  <path class="arrow" d="M1406 1106 L1385 1106"/>
+  <text class="label" x="1395" y="1092">Không</text>
+  <path class="arrow" d="M1578 1162 L1578 1200"/>
+  <text class="label" x="1605" y="1188">Có</text>
+  <path class="arrow" d="M1578 1258 L1578 1300"/>
+  <path class="arrow" d="M1396 1360 L1320 1360 L1320 1258"/>
+  <text class="label" x="1338" y="1345">Không</text>
+  <path class="arrow" d="M1760 1360 L1840 1360 L1840 270 L1830 270"/>
+  <text class="label" x="1806" y="1344">Có</text>
+  <path class="arrow" d="M1578 306 L1578 325"/>
+  <path class="arrow" d="M1578 395 L1578 425"/>
+  <path class="arrow" d="M1386 486 L1300 486 L1300 360 L1320 360"/>
+  <text class="label" x="1326" y="472">Không</text>
+  <path class="arrow" d="M1578 425 L1578 193"/>
+  <text class="label" x="1606" y="222">Có</text>
+  <path class="arrow" d="M1578 135 L1578 118"/>
+
+  <!-- End node and final arrows -->
+  <rect class="terminal" x="810" y="1362" width="280" height="52" rx="26"/>
+  <text class="terminalText" x="950" y="1395" text-anchor="middle">Kết thúc</text>
+  <path class="arrow" d="M193 1398 L193 1425 L950 1425 L950 1414"/>
+  <path class="arrow" d="M460 1398 L460 1425 L950 1425"/>
+  <path class="arrow" d="M953 1342 L953 1362"/>
+  <path class="arrow" d="M1320 94 L1240 94 L1240 1425 L950 1425"/>
+
+  <!-- Notes -->
+  <g transform="translate(55 1290)">
+    <rect class="noteBox" width="545" height="72"/>
+    <text class="noteTitle" x="18" y="28">Ghi chú đăng nhập</text>
+    <text class="noteText" x="18" y="54">Hỗ trợ đăng nhập bằng email hoặc số điện thoại; tài khoản phải đang hoạt động.</text>
+  </g>
+  <g transform="translate(680 1360)">
+    <rect class="noteBox" width="545" height="62"/>
+    <text class="noteTitle" x="18" y="26">Ghi chú đăng ký</text>
+    <text class="noteText" x="18" y="50">Tài khoản đăng ký mới có vai trò user và được tự động đăng nhập.</text>
+  </g>
+  <g transform="translate(1305 1280)">
+    <rect class="noteBox" width="545" height="68"/>
+    <text class="noteTitle" x="18" y="27">Ghi chú quên mật khẩu</text>
+    <text class="noteText" x="18" y="52">OTP gồm 6 chữ số, gửi qua email và có thời hạn 10 phút.</text>
+  </g>
+</svg>

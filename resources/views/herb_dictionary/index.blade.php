@@ -107,43 +107,55 @@
             @if($entries->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-stretch">
                     @foreach($entries as $entry)
-                        <div class="bg-white rounded-[1.75rem] border border-slate-100/80 p-5 shadow-sm hover:shadow-[0_10px_25px_rgba(59,130,246,0.05)] hover:border-sky-100/70 transition-all flex flex-col justify-between relative overflow-hidden min-h-[280px]">
+                        <div class="bg-white rounded-[1.75rem] border border-slate-100/80 p-3 sm:p-5 shadow-sm hover:shadow-[0_10px_25px_rgba(59,130,246,0.05)] hover:border-sky-100/70 transition-all flex flex-row sm:flex-col justify-between items-center sm:items-stretch min-h-0 sm:min-h-[280px]">
                             
                             {{-- Compact image at the top --}}
-                            <div class="w-full h-32 rounded-2xl bg-sky-50/70 p-2 flex items-center justify-center border border-slate-100/50 overflow-hidden shadow-inner mb-4 shrink-0">
+                            @auth
+                                <a href="{{ route('herb-dictionary.show', $entry->slug) }}" class="block w-20 h-20 sm:w-full sm:h-32 shrink-0 rounded-xl sm:rounded-2xl bg-sky-50/70 p-1.5 sm:p-2 flex items-center justify-center border border-slate-100/50 overflow-hidden shadow-inner mb-0 mr-3 sm:mb-4 sm:mr-0">
+                            @else
+                                <a href="{{ route('login') }}" class="block w-20 h-20 sm:w-full sm:h-32 shrink-0 rounded-xl sm:rounded-2xl bg-sky-50/70 p-1.5 sm:p-2 flex items-center justify-center border border-slate-100/50 overflow-hidden shadow-inner mb-0 mr-3 sm:mb-4 sm:mr-0">
+                            @endauth
                                 @if($entry->primary_image_url)
-                                    <img src="{{ $entry->primary_image_url }}" alt="{{ $entry->name }}" class="w-full h-full object-cover rounded-xl">
+                                    <img src="{{ $entry->primary_image_url }}" alt="{{ $entry->name }}" class="w-full h-full object-cover rounded-lg sm:rounded-xl">
                                 @else
-                                    <span class="text-3xl">🌿</span>
+                                    <span class="text-2xl sm:text-3xl">🌿</span>
                                 @endif
-                            </div>
+                            </a>
 
                             {{-- Text details below image --}}
-                            <div class="flex-grow flex flex-col justify-between">
+                            <div class="flex-grow flex-1 flex flex-col justify-between h-20 sm:h-auto min-w-0">
                                 <div>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-sky-50 text-sky-600 border border-sky-100/50">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-extrabold uppercase tracking-wide bg-sky-50 text-sky-600 border border-sky-100/50">
                                         dược liệu
                                     </span>
-                                    <h4 class="font-black text-slate-800 text-base mt-1 leading-snug truncate">
-                                        {{ $entry->name }}
+                                    <h4 class="font-black text-slate-800 text-sm sm:text-base mt-0.5 sm:mt-1 leading-snug truncate">
+                                        @auth
+                                            <a href="{{ route('herb-dictionary.show', $entry->slug) }}" class="hover:text-sky-600 transition">
+                                                {{ $entry->name }}
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login') }}" class="hover:text-sky-600 transition">
+                                                {{ $entry->name }}
+                                            </a>
+                                        @endauth
                                     </h4>
-                                    <p class="text-[11px] font-bold text-slate-400 italic truncate mt-0.5">
+                                    <p class="text-[10px] sm:text-[11px] font-bold text-slate-400 italic truncate mt-0.5">
                                         {{ $entry->scientific_name }}
                                     </p>
                                 </div>
 
                                 <div>
                                     {{-- Divider --}}
-                                    <div class="border-t border-slate-100/60 my-2"></div>
+                                    <div class="border-t border-slate-100/60 my-1.5 sm:my-2 hidden sm:block"></div>
 
                                     {{-- Action Row --}}
-                                    <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center justify-between gap-1.5 sm:gap-2 mt-1 sm:mt-0">
                                         @auth
-                                            <a href="{{ route('herb-dictionary.show', $entry->slug) }}" class="inline-flex items-center justify-center gap-1 flex-grow py-2 bg-sky-500 hover:bg-sky-600 text-white font-extrabold rounded-full text-xs shadow-sm transition-all cursor-pointer">
-                                                Xem chi tiết <span class="text-[9px]">▶</span>
+                                            <a href="{{ route('herb-dictionary.show', $entry->slug) }}" class="inline-flex items-center justify-center gap-1 flex-grow py-1.5 sm:py-2 bg-sky-500 hover:bg-sky-600 text-white font-extrabold rounded-full text-[10px] sm:text-xs shadow-sm transition-all cursor-pointer">
+                                                Xem chi tiết <span class="text-[8px] sm:text-[9px] hidden sm:inline">▶</span>
                                             </a>
                                         @else
-                                            <a href="{{ route('login') }}" class="inline-flex items-center justify-center gap-1 flex-grow py-2 bg-slate-105 text-slate-500 font-extrabold rounded-full text-xs transition-all cursor-pointer">
+                                            <a href="{{ route('login') }}" class="inline-flex items-center justify-center gap-1 flex-grow py-1.5 sm:py-2 bg-slate-105 text-slate-500 font-extrabold rounded-full text-[10px] sm:text-xs transition-all cursor-pointer">
                                                 Đăng nhập để xem
                                             </a>
                                         @endauth
@@ -152,13 +164,13 @@
                                             {{-- Favorite heart button toggle --}}
                                             <form action="{{ route('herb-dictionary.favorite', $entry->slug) }}" method="POST" class="inline shrink-0">
                                                 @csrf
-                                                <button type="submit" class="w-9 h-9 rounded-full bg-white hover:bg-rose-50 border border-slate-100 hover:border-rose-100 flex items-center justify-center shadow-sm text-rose-500 hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none" title="{{ $entry->isFavoritedBy(auth()->user()) ? 'Bỏ thích' : 'Yêu thích' }}">
+                                                <button type="submit" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white hover:bg-rose-50 border border-slate-100 hover:border-rose-100 flex items-center justify-center shadow-sm text-rose-500 hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none" title="{{ $entry->isFavoritedBy(auth()->user()) ? 'Bỏ thích' : 'Yêu thích' }}">
                                                     @if($entry->isFavoritedBy(auth()->user()))
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 fill-current text-rose-500" viewBox="0 0 24 24">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-4.5 sm:w-4.5 fill-current text-rose-500" viewBox="0 0 24 24">
                                                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                                         </svg>
                                                     @else
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 fill-none stroke-current text-slate-400 hover:text-rose-500" stroke-width="2" viewBox="0 0 24 24">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-4.5 sm:w-4.5 fill-none stroke-current text-slate-400 hover:text-rose-500" stroke-width="2" viewBox="0 0 24 24">
                                                             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                                         </svg>
                                                     @endif

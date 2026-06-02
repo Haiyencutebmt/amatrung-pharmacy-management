@@ -12,8 +12,9 @@ class ContactMessageController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'message' => 'required|string|max:2000',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'message' => 'nullable|string|max:2000',
         ]);
 
         if ($validator->fails()) {
@@ -25,6 +26,7 @@ class ContactMessageController extends Controller
 
         ContactMessage::create([
             'name' => $request->name,
+            'phone' => $request->phone,
             'email' => $request->email,
             'message' => $request->message,
             'status' => 'pending'

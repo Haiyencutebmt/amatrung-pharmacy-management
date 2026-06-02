@@ -41,7 +41,7 @@
                 <nav class="hidden md:flex space-x-4">
                     <a href="{{ url('/') }}" class="px-5 py-2 bg-[#59A8ED] text-white rounded-full font-bold text-sm hover:bg-blue-500 transition-colors shadow-sm">Trang chủ</a>
                     <a href="{{ url('/bai-viet') }}" class="px-5 py-2 bg-[#59A8ED] text-white rounded-full font-bold text-sm hover:bg-blue-500 transition-colors shadow-sm">Bài viết</a>
-                    <a href="{{ route('herb-dictionary.index') }}" class="px-5 py-2 bg-[#59A8ED] text-white rounded-full font-bold text-sm hover:bg-blue-500 transition-colors shadow-sm">Từ điển thuốc nam</a>
+                    <a href="{{ route('herb-dictionary.index') }}" class="px-5 py-2 bg-[#59A8ED] text-white rounded-full font-bold text-sm hover:bg-blue-500 transition-colors shadow-sm">Từ điển dược liệu</a>
                 </nav>
 
                 <!-- Right Actions -->

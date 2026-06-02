@@ -75,7 +75,7 @@
             'tone' => 'rose',
             'items' => [
                 ['value' => 'articles.manage', 'label' => 'Quản lý bài viết', 'basic' => false],
-                ['value' => 'herb_dictionary.manage', 'label' => 'Quản lý từ điển thuốc nam', 'basic' => false],
+                ['value' => 'herb_dictionary.manage', 'label' => 'Quản lý từ điển dược liệu', 'basic' => false],
                 ['value' => 'comments.manage', 'label' => 'Quản lý bình luận', 'basic' => false],
                 ['value' => 'ai.suggest', 'label' => 'Sử dụng AI gợi ý', 'basic' => true],
             ],

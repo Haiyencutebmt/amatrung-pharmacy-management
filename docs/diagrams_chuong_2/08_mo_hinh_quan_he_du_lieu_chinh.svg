@@ -1,0 +1,336 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2200" viewBox="0 0 3300 2200" role="img" aria-labelledby="title desc">
+  <title id="title">Hình 2.8. Mô hình quan hệ dữ liệu chính của website AmaTrung</title>
+  <desc id="desc">ERD chính, chia theo cụm dữ liệu: tài khoản phân quyền, bệnh nhân bệnh án, đơn điều trị, kho theo lô, bài viết bình luận, từ điển dược liệu và trí tuệ nhân tạo.</desc>
+  <rect width="3300" height="2200" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <style>
+    .title { font: 700 44px Arial, sans-serif; fill: #0f172a; }
+    .subtitle { font: 400 24px Arial, sans-serif; fill: #475569; }
+    .group { fill: #ffffff; stroke-width: 3; rx: 18; }
+    .groupTitle { font: 700 28px Arial, sans-serif; fill: #0f172a; }
+    .table { fill: #ffffff; stroke: #334155; stroke-width: 2.2; rx: 10; }
+    .tableName { font: 700 23px Arial, sans-serif; fill: #0f172a; }
+    .field { font: 400 19px Arial, sans-serif; fill: #334155; }
+    .rel { stroke: #334155; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+    .relSoft { stroke: #64748b; stroke-width: 2.1; fill: none; stroke-dasharray: 8 7; marker-end: url(#arrow-soft); }
+    .relLabel { font: 700 18px Arial, sans-serif; fill: #0f172a; paint-order: stroke; stroke: #ffffff; stroke-width: 5; }
+    .noteBox { fill: #ffffff; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 8 6; rx: 16; }
+    .noteTitle { font: 700 26px Arial, sans-serif; fill: #0f172a; }
+    .noteText { font: 400 23px Arial, sans-serif; fill: #1f2937; }
+    .legendText { font: 400 20px Arial, sans-serif; fill: #475569; }
+  </style>
+
+  <text class="title" x="1650" y="70" text-anchor="middle">Hình 2.8. Mô hình quan hệ dữ liệu chính của website AmaTrung</text>
+  <text class="subtitle" x="1650" y="108" text-anchor="middle">Tập trung vào bảng nghiệp vụ chính; không đưa bảng hệ thống Laravel và bảng legacy/cũ vào ERD chính</text>
+
+  <!-- Group containers -->
+  <rect class="group" x="850" y="150" width="1600" height="430" fill="#eef2ff" stroke="#4f46e5"/>
+  <text class="groupTitle" x="880" y="195">Tài khoản và phân quyền</text>
+
+  <rect class="group" x="70" y="650" width="1090" height="580" fill="#ecfdf5" stroke="#059669"/>
+  <text class="groupTitle" x="100" y="695">Bệnh nhân và hồ sơ bệnh án</text>
+
+  <rect class="group" x="1250" y="650" width="700" height="450" fill="#fff7ed" stroke="#ea580c"/>
+  <text class="groupTitle" x="1280" y="695">Đơn điều trị và dịch vụ</text>
+
+  <rect class="group" x="2030" y="650" width="1090" height="450" fill="#eff6ff" stroke="#2563eb"/>
+  <text class="groupTitle" x="2060" y="695">Kho dược liệu theo lô</text>
+
+  <rect class="group" x="70" y="1300" width="900" height="390" fill="#fdf2f8" stroke="#db2777"/>
+  <text class="groupTitle" x="100" y="1345">Bài viết và bình luận</text>
+
+  <rect class="group" x="1030" y="1300" width="920" height="390" fill="#f0fdfa" stroke="#0f766e"/>
+  <text class="groupTitle" x="1060" y="1345">Từ điển dược liệu</text>
+
+  <rect class="group" x="2070" y="1230" width="1050" height="360" fill="#f8fafc" stroke="#475569"/>
+  <text class="groupTitle" x="2100" y="1275">Trí tuệ nhân tạo</text>
+
+  <!-- Account and permission tables -->
+  <g transform="translate(1510 240)">
+    <rect class="table" width="290" height="130"/>
+    <text class="tableName" x="145" y="34" text-anchor="middle">users</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="94">role, is_active</text>
+    <text class="field" x="18" y="120">email, phone</text>
+  </g>
+
+  <g transform="translate(1030 230)">
+    <rect class="table" width="250" height="100"/>
+    <text class="tableName" x="125" y="34" text-anchor="middle">roles</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="90">name, guard_name</text>
+  </g>
+
+  <g transform="translate(2070 230)">
+    <rect class="table" width="280" height="100"/>
+    <text class="tableName" x="140" y="34" text-anchor="middle">permissions</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="90">name, guard_name</text>
+  </g>
+
+  <g transform="translate(1020 390)">
+    <rect class="table" width="310" height="115"/>
+    <text class="tableName" x="155" y="34" text-anchor="middle">model_has_roles</text>
+    <text class="field" x="18" y="66">FK: role_id</text>
+    <text class="field" x="18" y="93">model_id, model_type</text>
+  </g>
+
+  <g transform="translate(1850 390)">
+    <rect class="table" width="380" height="115"/>
+    <text class="tableName" x="190" y="34" text-anchor="middle">model_has_permissions</text>
+    <text class="field" x="18" y="66">FK: permission_id</text>
+    <text class="field" x="18" y="93">model_id, model_type</text>
+  </g>
+
+  <g transform="translate(1410 420)">
+    <rect class="table" width="330" height="100"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">role_has_permissions</text>
+    <text class="field" x="18" y="66">FK: role_id</text>
+    <text class="field" x="18" y="90">FK: permission_id</text>
+  </g>
+
+  <!-- Clinical tables -->
+  <g transform="translate(140 760)">
+    <rect class="table" width="280" height="120"/>
+    <text class="tableName" x="140" y="34" text-anchor="middle">patients</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="93">UK: patient_code</text>
+    <text class="field" x="18" y="115">FK: user_id</text>
+  </g>
+
+  <g transform="translate(480 740)">
+    <rect class="table" width="320" height="120"/>
+    <text class="tableName" x="160" y="34" text-anchor="middle">patient_user_links</text>
+    <text class="field" x="18" y="66">FK: patient_id</text>
+    <text class="field" x="18" y="93">FK: user_id</text>
+    <text class="field" x="18" y="115">is_verified</text>
+  </g>
+
+  <g transform="translate(820 760)">
+    <rect class="table" width="280" height="110"/>
+    <text class="tableName" x="140" y="34" text-anchor="middle">appointments</text>
+    <text class="field" x="18" y="66">FK: patient_id</text>
+    <text class="field" x="18" y="93">date, time, status</text>
+  </g>
+
+  <g transform="translate(350 940)">
+    <rect class="table" width="360" height="145"/>
+    <text class="tableName" x="180" y="34" text-anchor="middle">medical_records</text>
+    <text class="field" x="18" y="66">PK: id, UK: record_code</text>
+    <text class="field" x="18" y="93">FK: patient_id, staff_id</text>
+    <text class="field" x="18" y="120">symptoms, diagnosis</text>
+    <text class="field" x="18" y="140">status, treatment_direction</text>
+  </g>
+
+  <g transform="translate(760 965)">
+    <rect class="table" width="330" height="115"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">medical_record_attachments</text>
+    <text class="field" x="18" y="66">FK: medical_record_id</text>
+    <text class="field" x="18" y="93">uploaded_by, file_path</text>
+  </g>
+
+  <!-- Treatment tables -->
+  <g transform="translate(1340 760)">
+    <rect class="table" width="330" height="130"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">prescriptions</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="93">FK: medical_record_id</text>
+    <text class="field" x="18" y="120">FK: staff_id, status</text>
+  </g>
+
+  <g transform="translate(1340 940)">
+    <rect class="table" width="330" height="130"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">prescription_items</text>
+    <text class="field" x="18" y="66">FK: prescription_id</text>
+    <text class="field" x="18" y="93">FK: inventory_item_id</text>
+    <text class="field" x="18" y="120">quantity, affects_stock</text>
+  </g>
+
+  <g transform="translate(1600 800)">
+    <rect class="table" width="290" height="120"/>
+    <text class="tableName" x="145" y="34" text-anchor="middle">therapy_services</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="93">name, sessions</text>
+    <text class="field" x="18" y="115">status</text>
+  </g>
+
+  <!-- Inventory tables -->
+  <g transform="translate(2110 770)">
+    <rect class="table" width="330" height="130"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">inventory_items</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="93">name, item_type</text>
+    <text class="field" x="18" y="120">usage_route, unit</text>
+  </g>
+
+  <g transform="translate(2520 760)">
+    <rect class="table" width="330" height="120"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">inventory_batches</text>
+    <text class="field" x="18" y="66">FK: inventory_item_id</text>
+    <text class="field" x="18" y="93">batch_number</text>
+    <text class="field" x="18" y="115">expiry_date, remaining</text>
+  </g>
+
+  <g transform="translate(2520 940)">
+    <rect class="table" width="330" height="120"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">stock_movements</text>
+    <text class="field" x="18" y="66">FK: inventory_batch_id</text>
+    <text class="field" x="18" y="93">FK: prescription_item_id</text>
+    <text class="field" x="18" y="115">performed_by, quantity</text>
+  </g>
+
+  <!-- Content tables -->
+  <g transform="translate(140 1410)">
+    <rect class="table" width="280" height="120"/>
+    <text class="tableName" x="140" y="34" text-anchor="middle">articles</text>
+    <text class="field" x="18" y="66">FK: user_id</text>
+    <text class="field" x="18" y="93">title, slug</text>
+    <text class="field" x="18" y="115">is_published</text>
+  </g>
+
+  <g transform="translate(470 1390)">
+    <rect class="table" width="280" height="120"/>
+    <text class="tableName" x="140" y="34" text-anchor="middle">comments</text>
+    <text class="field" x="18" y="66">FK: article_id</text>
+    <text class="field" x="18" y="93">FK: user_id</text>
+    <text class="field" x="18" y="115">is_approved</text>
+  </g>
+
+  <g transform="translate(470 1535)">
+    <rect class="table" width="280" height="95"/>
+    <text class="tableName" x="140" y="34" text-anchor="middle">article_likes</text>
+    <text class="field" x="18" y="66">FK: article_id, user_id</text>
+    <text class="field" x="18" y="88">unique pair</text>
+  </g>
+
+  <!-- Dictionary tables -->
+  <g transform="translate(1110 1410)">
+    <rect class="table" width="330" height="130"/>
+    <text class="tableName" x="165" y="34" text-anchor="middle">herb_dictionary_entries</text>
+    <text class="field" x="18" y="66">PK: id</text>
+    <text class="field" x="18" y="93">FK: created_by</text>
+    <text class="field" x="18" y="120">name, slug, status</text>
+  </g>
+
+  <g transform="translate(1490 1390)">
+    <rect class="table" width="310" height="110"/>
+    <text class="tableName" x="155" y="34" text-anchor="middle">herb_dictionary_images</text>
+    <text class="field" x="18" y="66">FK: entry_id</text>
+    <text class="field" x="18" y="93">image_path, sort_order</text>
+  </g>
+
+  <g transform="translate(1490 1530)">
+    <rect class="table" width="310" height="110"/>
+    <text class="tableName" x="155" y="34" text-anchor="middle">herb_dictionary_favorites</text>
+    <text class="field" x="18" y="66">FK: user_id, entry_id</text>
+    <text class="field" x="18" y="93">unique pair</text>
+  </g>
+
+  <!-- AI table -->
+  <g transform="translate(2220 1340)">
+    <rect class="table" width="380" height="130"/>
+    <text class="tableName" x="190" y="34" text-anchor="middle">ai_suggestion_logs</text>
+    <text class="field" x="18" y="66">FK: user_id</text>
+    <text class="field" x="18" y="93">FK: medical_record_id</text>
+    <text class="field" x="18" y="120">payload, response, status</text>
+  </g>
+
+  <!-- Relationships within account group -->
+  <path class="rel" d="M1155 330 L1155 390"/>
+  <text class="relLabel" x="1168" y="365">1-N</text>
+  <path class="rel" d="M2210 330 L2210 390"/>
+  <text class="relLabel" x="2222" y="365">1-N</text>
+  <path class="rel" d="M1510 330 C1460 365 1395 420 1330 445"/>
+  <text class="relLabel" x="1395" y="386">M-N</text>
+  <path class="rel" d="M1800 330 L1850 445"/>
+  <text class="relLabel" x="1810" y="392">M-N</text>
+  <path class="rel" d="M1280 310 L1440 420"/>
+  <text class="relLabel" x="1340" y="382">1-N</text>
+  <path class="rel" d="M2070 310 L1740 455"/>
+  <text class="relLabel" x="1885" y="384">1-N</text>
+
+  <!-- Relationships inside clinical group -->
+  <path class="rel" d="M420 820 L480 810"/>
+  <text class="relLabel" x="436" y="802">1-N</text>
+  <path class="rel" d="M420 860 L530 940"/>
+  <text class="relLabel" x="446" y="930">1-N</text>
+  <path class="rel" d="M420 795 L820 815"/>
+  <text class="relLabel" x="610" y="790">1-N</text>
+  <path class="rel" d="M710 1015 L760 1020"/>
+  <text class="relLabel" x="720" y="1000">1-N</text>
+
+  <!-- Relationships inside treatment and inventory groups -->
+  <path class="rel" d="M1505 890 L1505 940"/>
+  <text class="relLabel" x="1518" y="920">1-N</text>
+  <path class="relSoft" d="M1600 910 L1670 990"/>
+  <text class="relLabel" x="1665" y="935">ghi vào</text>
+  <path class="rel" d="M2440 835 L2520 825"/>
+  <text class="relLabel" x="2460" y="812">1-N</text>
+  <path class="rel" d="M2685 880 L2685 940"/>
+  <text class="relLabel" x="2698" y="915">1-N</text>
+
+  <!-- Relationships inside article group -->
+  <path class="rel" d="M420 1460 L470 1450"/>
+  <text class="relLabel" x="430" y="1438">1-N</text>
+  <path class="rel" d="M420 1510 L470 1575"/>
+  <text class="relLabel" x="430" y="1560">1-N</text>
+
+  <!-- Relationships inside dictionary group -->
+  <path class="rel" d="M1440 1460 L1490 1450"/>
+  <text class="relLabel" x="1452" y="1438">1-N</text>
+  <path class="rel" d="M1440 1510 L1490 1580"/>
+  <text class="relLabel" x="1452" y="1560">1-N</text>
+
+  <!-- Cross-group clinical and treatment relationships -->
+  <path class="rel" d="M710 1012 L1340 825"/>
+  <text class="relLabel" x="1010" y="900">medical_records 1-N prescriptions</text>
+  <path class="rel" d="M1670 1005 L2110 835"/>
+  <text class="relLabel" x="1760" y="905">inventory_items 1-N prescription_items</text>
+  <path class="rel" d="M1670 1035 L2520 1000"/>
+  <text class="relLabel" x="2020" y="1030">0-N stock_movements</text>
+
+  <!-- User relations to clinical data -->
+  <path class="relSoft" d="M1510 310 C980 430 360 610 280 760"/>
+  <text class="relLabel" x="720" y="548">users 1-N patients</text>
+  <path class="relSoft" d="M1510 335 C1050 500 720 610 640 740"/>
+  <text class="relLabel" x="900" y="615">users 1-N patient_user_links</text>
+  <path class="relSoft" d="M1510 365 C1160 560 770 720 530 940"/>
+  <text class="relLabel" x="990" y="738">staff_id</text>
+  <path class="relSoft" d="M1800 340 C2250 520 2680 720 2685 940"/>
+  <text class="relLabel" x="2340" y="690">performed_by</text>
+  <path class="relSoft" d="M1800 350 C1660 520 1535 650 1505 760"/>
+  <text class="relLabel" x="1608" y="603">staff_id</text>
+
+  <!-- User relations to content and dictionary -->
+  <path class="relSoft" d="M1510 360 C1050 820 440 1050 280 1410"/>
+  <text class="relLabel" x="650" y="1130">users tạo articles</text>
+  <path class="relSoft" d="M1510 365 C1120 890 735 1110 610 1390"/>
+  <text class="relLabel" x="760" y="1225">users tạo comments</text>
+  <path class="relSoft" d="M1510 370 C1120 960 750 1250 610 1535"/>
+  <text class="relLabel" x="700" y="1505">users có article_likes</text>
+  <path class="relSoft" d="M1655 370 C1560 780 1320 1110 1275 1410"/>
+  <text class="relLabel" x="1350" y="1155">users tạo entries</text>
+  <path class="relSoft" d="M1680 370 C1685 820 1665 1160 1645 1530"/>
+  <text class="relLabel" x="1695" y="1285">users có favorites</text>
+  <path class="relSoft" d="M1800 365 C2200 780 2400 1050 2410 1340"/>
+  <text class="relLabel" x="2180" y="1105">users 1-N AI logs</text>
+
+  <!-- Medical record to AI logs -->
+  <path class="relSoft" d="M710 1080 C1160 1310 1800 1390 2220 1405"/>
+  <text class="relLabel" x="1390" y="1350">medical_records 1-N ai_suggestion_logs</text>
+
+  <!-- Notes -->
+  <rect class="noteBox" x="70" y="1800" width="3060" height="255"/>
+  <text class="noteTitle" x="110" y="1842">Ghi chú dưới hình</text>
+  <text class="noteText" x="110" y="1886">• Admin/Thầy thuốc chính là người quyết định chuyên môn; Staff là nhân viên được Admin cấp quyền.</text>
+  <text class="noteText" x="110" y="1926">• AI chỉ lưu nhật ký hỗ trợ tham khảo trong `ai_suggestion_logs`, không tự tạo đơn điều trị và không tự trừ kho.</text>
+  <text class="noteText" x="110" y="1966">• Kho chính của hệ thống dùng `inventory_items`, `inventory_batches`, `stock_movements`; không trình bày các bảng kho cũ trong ERD chính.</text>
+  <text class="legendText" x="110" y="2015">Đường liền: quan hệ khóa ngoại/nghiệp vụ chính. Đường nét đứt: quan hệ qua bảng pivot hoặc quan hệ nghiệp vụ tham chiếu.</text>
+</svg>

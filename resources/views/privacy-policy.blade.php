@@ -588,7 +588,7 @@
             </p>
             <p class="policy-text-sub"><strong>Duy trì phiên làm việc:</strong> Lưu giữ khóa bảo mật phiên đăng nhập tạm thời, giúp bạn không cần nhập lại mật khẩu liên tục khi chuyển hướng trang.</p>
             <p class="policy-text-sub"><strong>Bảo mật CSRF:</strong> Sử dụng Token chống giả mạo yêu cầu chéo trang để bảo vệ biểu mẫu đăng ký, đăng nhập trước các cuộc tấn công của hacker.</p>
-            <p class="policy-text-sub"><strong>Lưu trữ tùy chọn:</strong> Ghi nhớ danh sách các thảo dược bạn yêu thích từ Từ điển thuốc nam để hiển thị nhanh mà không cần tải lại từ máy chủ.</p>
+            <p class="policy-text-sub"><strong>Lưu trữ tùy chọn:</strong> Ghi nhớ danh sách các thảo dược bạn yêu thích từ Từ điển dược liệu để hiển thị nhanh mà không cần tải lại từ máy chủ.</p>
         </div>
 
         <!-- Section 8: Quyền lợi của bạn -->

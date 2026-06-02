@@ -1,0 +1,103 @@
+%% Hình 2. Sơ đồ hoạt động đăng nhập, đăng ký và quên mật khẩu trong hệ thống AmaTrung
+flowchart LR
+    A([Bắt đầu])
+    B{Người dùng chọn chức năng}
+
+    A --> B
+
+    subgraph LOGIN["Luồng đăng nhập"]
+        L1[Mở form đăng nhập]
+        L2[Nhập email / số điện thoại và mật khẩu]
+        L3{Dữ liệu hợp lệ?}
+        L4{Tài khoản đúng và đang hoạt động?}
+        L5[Hiển thị lỗi đăng nhập]
+        L6[Đăng nhập thành công, tái tạo session]
+        L7{Là Admin / Staff?}
+        L8[Chuyển đến trang quản trị]
+        L9[Chuyển đến dashboard người dùng]
+    end
+
+    subgraph REGISTER["Luồng đăng ký"]
+        R1[Mở form đăng ký]
+        R2[Nhập họ tên, email, số điện thoại, mật khẩu và xác nhận đồng ý chính sách]
+        R3{Thông tin hợp lệ và không trùng?}
+        R4[Hiển thị lỗi đăng ký]
+        R5[Tạo tài khoản mới với vai trò user]
+        R6[Mã hóa mật khẩu]
+        R7[Tự động đăng nhập]
+        R8[Chuyển đến dashboard người dùng]
+    end
+
+    subgraph FORGOT["Luồng quên mật khẩu bằng OTP"]
+        F1[Mở form quên mật khẩu]
+        F2[Nhập email hoặc số điện thoại]
+        F3{Tìm thấy tài khoản?}
+        F4[Thông báo không tìm thấy tài khoản]
+        F5{Tài khoản có email khôi phục?}
+        F6[Thông báo liên hệ Admin]
+        F7[Tạo OTP 6 số, lưu mã và hạn 10 phút]
+        F8{Gửi email OTP thành công?}
+        F9[Thông báo lỗi gửi email]
+        F10[Mở form xác thực OTP]
+        F11[Nhập mã OTP]
+        F12{OTP đúng và còn hạn?}
+        F13[Thông báo OTP sai / hết hạn, có thể gửi lại]
+        F14[Tạo token tạm trong session]
+        F15[Mở form đặt mật khẩu mới]
+        F16[Nhập mật khẩu mới và xác nhận]
+        F17{Token hợp lệ và mật khẩu đạt yêu cầu?}
+        F18[Thông báo lỗi đặt lại mật khẩu]
+        F19[Cập nhật mật khẩu mới, xóa OTP và session reset]
+        F20[Chuyển về đăng nhập]
+    end
+
+    Z([Kết thúc])
+
+    B -- "Đăng nhập" --> L1
+    B -- "Đăng ký" --> R1
+    B -- "Quên mật khẩu" --> F1
+
+    L1 --> L2 --> L3
+    L3 -- "Không" --> L5 --> L1
+    L3 -- "Có" --> L4
+    L4 -- "Không" --> L5
+    L4 -- "Có" --> L6 --> L7
+    L7 -- "Có" --> L8 --> Z
+    L7 -- "Không" --> L9 --> Z
+
+    R1 --> R2 --> R3
+    R3 -- "Không" --> R4 --> R1
+    R3 -- "Có" --> R5 --> R6 --> R7 --> R8 --> Z
+
+    F1 --> F2 --> F3
+    F3 -- "Không" --> F4 --> F1
+    F3 -- "Có" --> F5
+    F5 -- "Không" --> F6 --> F1
+    F5 -- "Có" --> F7 --> F8
+    F8 -- "Không" --> F9 --> F1
+    F8 -- "Có" --> F10 --> F11 --> F12
+    F12 -- "Không" --> F13 --> F10
+    F12 -- "Có" --> F14 --> F15 --> F16 --> F17
+    F17 -- "Không" --> F18 --> F15
+    F17 -- "Có" --> F19 --> F20 --> Z
+
+    note1["Ghi chú: Đăng nhập hỗ trợ email hoặc số điện thoại; tài khoản phải đang hoạt động."]
+    note2["Ghi chú: Đăng ký tạo tài khoản vai trò user và tự động đăng nhập."]
+    note3["Ghi chú: Quên mật khẩu dùng OTP gửi qua email, OTP có hạn 10 phút."]
+
+    L6 -.-> note1
+    R5 -.-> note2
+    F7 -.-> note3
+
+    classDef startEnd fill:#111827,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef process fill:#ffffff,stroke:#334155,color:#0f172a,stroke-width:2px;
+    classDef decision fill:#fefce8,stroke:#ca8a04,color:#0f172a,stroke-width:2px;
+    classDef success fill:#f0fdf4,stroke:#16a34a,color:#0f172a,stroke-width:2px;
+    classDef warning fill:#fef2f2,stroke:#dc2626,color:#0f172a,stroke-width:2px;
+    classDef note fill:#f8fafc,stroke:#64748b,color:#334155,stroke-width:1.5px,stroke-dasharray:6 5;
+
+    class A,Z startEnd;
+    class B,L3,L4,L7,R3,F3,F5,F8,F12,F17 decision;
+    class L5,R4,F4,F6,F9,F13,F18 warning;
+    class L6,L8,L9,R5,R6,R7,R8,F7,F14,F19,F20 success;
+    class note1,note2,note3 note;

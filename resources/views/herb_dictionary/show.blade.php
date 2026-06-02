@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', $entry->name . ' — Từ điển thuốc nam')
+@section('title', $entry->name . ' — Từ điển dược liệu')
 
 @section('content')
 

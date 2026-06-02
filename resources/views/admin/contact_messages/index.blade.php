@@ -24,7 +24,7 @@
                 <thead>
                     <tr>
                         <th style="font-size: 0.75rem;">NGƯỜI GỬI</th>
-                        <th style="font-size: 0.75rem;">EMAIL</th>
+                        <th style="font-size: 0.75rem;">SỐ ĐIỆN THOẠI</th>
                         <th style="font-size: 0.75rem; width: 40%;">NỘI DUNG YÊU CẦU</th>
                         <th style="font-size: 0.75rem;">NGÀY GỬI</th>
                         <th style="font-size: 0.75rem;">TRẠNG THÁI</th>
@@ -43,7 +43,7 @@
                             </div>
                         </td>
                         <td>
-                            <span style="font-size: 0.9rem; font-weight: 600; color: #475569;">{{ $msg->email }}</span>
+                            <span style="font-size: 0.9rem; font-weight: 600; color: #475569;">{{ $msg->phone }}</span>
                         </td>
                         <td>
                             <div style="font-size: 0.9rem; color: #334155; line-height: 1.5; background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; white-space: pre-line;">{{ $msg->message }}</div>

@@ -1,0 +1,66 @@
+%% Hình 2.x. Sơ đồ hoạt động AI hỗ trợ khám chữa bệnh trong hệ thống AmaTrung
+flowchart TD
+    A([Bắt đầu])
+    B[Mở hồ sơ bệnh án]
+    C{Người dùng có quyền dùng AI?}
+    D[Thông báo không đủ quyền]
+    E[Nhập / kiểm tra triệu chứng và thông tin khám ban đầu]
+    F{Đã có chẩn đoán chính thức?}
+
+    G[AI nhận định sơ bộ]
+    H[Backend tạo ngữ cảnh đã lọc dữ liệu nhạy cảm]
+    I[AI trả về hướng nhận định, mức độ phù hợp tham khảo và cảnh báo]
+    J[Ghi nhật ký vào ai_suggestion_logs]
+    K[Admin / Thầy thuốc chính xem xét kết quả AI]
+    L{Áp dụng làm chẩn đoán?}
+    M[Admin / Thầy thuốc chính nhập chẩn đoán thủ công]
+    N[Cập nhật chẩn đoán được xác nhận]
+
+    O{Có cần AI gợi ý điều trị?}
+    P[Lập đơn điều trị thủ công]
+    Q[Kiểm tra điều kiện: có chẩn đoán, không phải ca chuyển viện]
+    R[Backend tạo ngữ cảnh lâm sàng và danh sách tồn kho khả dụng]
+    S[AI gợi ý dược liệu / dịch vụ / theo dõi]
+    T[Ghi nhật ký gợi ý vào ai_suggestion_logs]
+    U[Admin / Thầy thuốc chính xem xét, điều chỉnh]
+    V[Lập đơn điều trị theo quyết định chuyên môn]
+    W[Lưu kết quả, không tự trừ kho]
+    X([Kết thúc])
+
+    A --> B --> C
+    C -- "Không" --> D --> X
+    C -- "Có" --> E --> F
+    F -- "Chưa có" --> G --> H --> I --> J --> K --> L
+    L -- "Có" --> N
+    L -- "Không" --> M --> N
+    F -- "Đã có" --> O
+    N --> O
+    O -- "Không" --> P --> V
+    O -- "Có" --> Q --> R --> S --> T --> U --> V
+    V --> W --> X
+
+    note1["AI chỉ hỗ trợ tham khảo, không tự xác nhận chẩn đoán."]
+    note2["Gợi ý điều trị chỉ dùng sau khi có chẩn đoán chính thức."]
+    note3["AI không tự lập đơn và không tự trừ kho."]
+
+    I -.-> note1
+    S -.-> note2
+    W -.-> note3
+
+    classDef startEnd fill:#111827,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef process fill:#ffffff,stroke:#334155,color:#0f172a,stroke-width:2px;
+    classDef admin fill:#eff6ff,stroke:#2563eb,color:#0f172a,stroke-width:2px;
+    classDef ai fill:#fff7ed,stroke:#ea580c,color:#0f172a,stroke-width:2px;
+    classDef log fill:#f8fafc,stroke:#64748b,color:#0f172a,stroke-width:2px;
+    classDef decision fill:#fefce8,stroke:#ca8a04,color:#0f172a,stroke-width:2px;
+    classDef warning fill:#fef2f2,stroke:#dc2626,color:#0f172a,stroke-width:2px;
+    classDef note fill:#f8fafc,stroke:#64748b,color:#334155,stroke-width:1.5px,stroke-dasharray:6 5;
+
+    class A,X startEnd;
+    class B,E,H,R,W process;
+    class K,M,N,P,U,V admin;
+    class G,I,Q,S ai;
+    class J,T log;
+    class C,F,L,O decision;
+    class D warning;
+    class note1,note2,note3 note;

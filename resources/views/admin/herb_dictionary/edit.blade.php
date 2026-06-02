@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Sửa từ điển thuốc nam — AmaTrung')
+@section('title', 'Sửa từ điển dược liệu — AmaTrung')
 @section('page-title', '')
 
 @section('header-left')

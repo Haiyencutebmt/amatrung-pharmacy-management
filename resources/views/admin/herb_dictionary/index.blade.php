@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
-@section('title', 'Từ điển thuốc nam — AmaTrung')
+@section('title', 'Từ điển dược liệu — AmaTrung')
 @section('page-title', '')
 
 @section('header-left')
 <div class="header-title" style="display:flex;align-items:center;gap:1rem;">
     <div style="width:44px;height:44px;background:#eff6ff;color:#2563eb;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;border:1px solid #dbeafe;">🌿</div>
     <div>
-        <h1 style="font-size:1.5rem;font-weight:850;color:#1e293b;margin:0;line-height:1.2;">Từ điển thuốc nam</h1>
+        <h1 style="font-size:1.5rem;font-weight:850;color:#1e293b;margin:0;line-height:1.2;">Từ điển dược liệu</h1>
         <p style="margin:0;color:#64748b;font-size:0.85rem;font-weight:500;">Quản lý cây thuốc, hình ảnh, tác dụng và lưu ý an toàn</p>
     </div>
 </div>
@@ -84,7 +84,7 @@
                             <input type="checkbox" id="dict-select-all" class="dict-check" aria-label="Chọn tất cả mục trên trang này">
                         </th>
                         <th>Hình ảnh</th>
-                        <th>Tên thuốc nam</th>
+                        <th>Tên dược liệu</th>
                         <th>Thông tin nhanh</th>
                         <th>Yêu thích</th>
                         <th>Trạng thái</th>

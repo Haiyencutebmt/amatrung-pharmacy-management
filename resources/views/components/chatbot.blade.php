@@ -57,6 +57,12 @@
     </div>
 </div>
 
+@php
+    $chatbotHistoryStorageKey = auth()->check()
+        ? 'amatrung_chat_history_user_' . auth()->id()
+        : 'amatrung_chat_history_guest';
+@endphp
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('chatbot-toggle');
@@ -72,6 +78,45 @@
         const input = document.getElementById('chatbot-input');
         const messagesArea = document.getElementById('chatbot-messages');
         const sendBtn = document.getElementById('chatbot-send');
+
+        const chatHistoryStorageKey = @json($chatbotHistoryStorageKey);
+        const legacyChatHistoryStorageKey = 'amatrung_chat_history';
+
+        try {
+            sessionStorage.removeItem(legacyChatHistoryStorageKey);
+        } catch (e) {
+            console.error('Failed to clear legacy chat history', e);
+        }
+
+        let chatHistory = [];
+
+        function saveMessageToHistory(text, isUser) {
+            chatHistory.push({ text: text, isUser: isUser });
+            try {
+                sessionStorage.setItem(chatHistoryStorageKey, JSON.stringify(chatHistory));
+            } catch (e) {
+                console.error('Failed to save chat history to sessionStorage', e);
+            }
+        }
+
+        function loadChatHistory() {
+            try {
+                const storedHistory = sessionStorage.getItem(chatHistoryStorageKey);
+                if (storedHistory) {
+                    const parsed = JSON.parse(storedHistory);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        chatHistory = parsed;
+                        // Do not clear the default message in HTML, just append the loaded history
+                        chatHistory.forEach(msg => {
+                            appendMessage(msg.text, msg.isUser, false);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load chat history from sessionStorage', e);
+                chatHistory = [];
+            }
+        }
         const defaultChatSize = {
             width: 520,
             height: 680,
@@ -362,7 +407,13 @@
                 .replace(/'/g, '&#039;');
         }
 
-        function appendMessage(text, isUser = false) {
+        function appendMessage(text, isUser = false, saveToHistory = true) {
+            if (!text) return;
+            
+            if (saveToHistory) {
+                saveMessageToHistory(text, isUser);
+            }
+
             const msgDiv = document.createElement('div');
             msgDiv.className = isUser ? 'flex gap-2 flex-row-reverse' : 'flex gap-2';
             
@@ -390,6 +441,30 @@
             
             messagesArea.appendChild(msgDiv);
             messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function shouldSaveBotMessage(text) {
+            const transientErrors = [
+                'Hiện tại Trợ lý AmaTrung chưa thể phản hồi',
+                'Không thể kết nối đến máy chủ',
+                'Xin lỗi, đã có lỗi xảy ra',
+            ];
+
+            return !transientErrors.some(errorText => String(text || '').includes(errorText));
+        }
+
+        function formatAnswerWithSources(answer, sources = []) {
+            if (!Array.isArray(sources) || sources.length === 0) {
+                return answer;
+            }
+
+            const sourceLines = sources.slice(0, 5).map((source, index) => {
+                const title = source.title || 'Nguồn tham khảo';
+                const url = source.url || '';
+                return `${index + 1}. ${title}${url ? ` (${url})` : ''}`;
+            });
+
+            return `${answer}\n\nNguồn tham khảo:\n${sourceLines.join('\n')}`;
         }
 
         function appendTyping() {
@@ -421,7 +496,7 @@
             if (!message) return;
 
             // 1. Add User Message
-            appendMessage(message, true);
+            appendMessage(message, true, true);
             input.value = '';
             input.style.height = '48px';
             input.disabled = true;
@@ -443,15 +518,17 @@
             .then(response => response.json())
             .then(data => {
                 removeTyping();
+                const botAnswer = data.answer || data.reply || "Xin lỗi, đã có lỗi xảy ra. Hãy thử lại sau nhé.";
+                const answerWithSources = formatAnswerWithSources(botAnswer, data.sources || []);
                 if (data.success) {
-                    appendMessage(data.answer || data.reply || '', false);
+                    appendMessage(answerWithSources, false, shouldSaveBotMessage(botAnswer));
                 } else {
-                    appendMessage(data.answer || data.reply || "Xin lỗi, đã có lỗi xảy ra. Hãy thử lại sau nhé.", false);
+                    appendMessage(answerWithSources, false, false);
                 }
             })
             .catch(err => {
                 removeTyping();
-                appendMessage("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.", false);
+                appendMessage("Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng.", false, false);
             })
             .finally(() => {
                 input.disabled = false;
@@ -460,6 +537,9 @@
                 input.focus();
             });
         });
+
+        // Load chat history if it exists in the current session
+        loadChatHistory();
     });
 </script>
 <style>
@@ -533,11 +613,11 @@ body.chatbot-resizing {
         bottom: 88px !important;
         left: 12px !important;
         width: calc(100vw - 24px) !important;
-        height: 80vh !important;
+        height: 68vh !important;
         min-width: 0 !important;
         min-height: 0 !important;
         max-width: calc(100vw - 24px) !important;
-        max-height: 82vh !important;
+        max-height: 70vh !important;
         margin: 0 !important;
     }
 

@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1850" viewBox="0 0 1500 1850" role="img" aria-labelledby="title desc">
+  <title id="title">Hình 2.x. Sơ đồ hoạt động quản lý kho dược liệu theo lô trong hệ thống AmaTrung</title>
+  <desc id="desc">Sơ đồ mô tả nhập lô, kiểm tồn, cấp thuốc, trừ kho theo lô và ghi nhận biến động kho.</desc>
+  <rect width="1500" height="1850" fill="#ffffff"/>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#1f2937"/>
+    </marker>
+    <filter id="shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#cbd5e1" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title { font: 700 32px Arial, sans-serif; fill: #0f172a; }
+    .subtitle { font: 400 19px Arial, sans-serif; fill: #475569; }
+    .lane { stroke-width: 2.3; rx: 18; }
+    .laneTitle { font: 700 22px Arial, sans-serif; fill: #0f172a; }
+    .node { stroke-width: 2.2; filter: url(#shadow); }
+    .process { fill: #ffffff; stroke: #334155; }
+    .admin { fill: #eff6ff; stroke: #2563eb; }
+    .stock { fill: #f0fdf4; stroke: #16a34a; }
+    .warning { fill: #fef2f2; stroke: #dc2626; }
+    .decision { fill: #fefce8; stroke: #ca8a04; stroke-width: 2.2; filter: url(#shadow); }
+    .terminal { fill: #111827; stroke: #111827; stroke-width: 2.2; filter: url(#shadow); }
+    .noteBox { fill: #f8fafc; stroke: #64748b; stroke-width: 1.7; stroke-dasharray: 8 6; rx: 12; }
+    .nodeText { font: 700 18px Arial, sans-serif; fill: #0f172a; }
+    .nodeTextSmall { font: 700 16px Arial, sans-serif; fill: #0f172a; }
+    .terminalText { font: 700 18px Arial, sans-serif; fill: #ffffff; }
+    .label { font: 700 15px Arial, sans-serif; fill: #111827; paint-order: stroke; stroke: #ffffff; stroke-width: 6; stroke-linejoin: round; }
+    .noteText { font: 400 16px Arial, sans-serif; fill: #334155; }
+    .noteTitle { font: 700 18px Arial, sans-serif; fill: #0f172a; }
+    .arrow { stroke: #1f2937; stroke-width: 2.3; fill: none; marker-end: url(#arrow); }
+  </style>
+
+  <text class="title" x="750" y="48" text-anchor="middle">Hình 2.x. Sơ đồ hoạt động quản lý kho dược liệu theo lô trong hệ thống AmaTrung</text>
+  <text class="subtitle" x="750" y="82" text-anchor="middle">Kho chính dùng inventory_items, inventory_batches và stock_movements; chỉ trừ kho sau khi xác nhận cấp thuốc</text>
+
+  <rect class="terminal" x="610" y="120" width="280" height="54" rx="27"/>
+  <text class="terminalText" x="750" y="154" text-anchor="middle">Bắt đầu</text>
+
+  <rect class="node process" x="520" y="210" width="460" height="66" rx="12"/>
+  <text class="nodeText" x="750" y="250" text-anchor="middle">Mở chức năng quản lý kho dược liệu</text>
+
+  <polygon class="decision" points="750,320 970,390 750,460 530,390"/>
+  <text class="nodeTextSmall" x="750" y="383" text-anchor="middle">Chọn nghiệp vụ</text>
+  <text class="nodeTextSmall" x="750" y="405" text-anchor="middle">kho</text>
+
+  <!-- Lanes -->
+  <rect class="lane" x="60" y="510" width="600" height="900" fill="#f0fdf4" stroke="#16a34a"/>
+  <text class="laneTitle" x="360" y="550" text-anchor="middle">Nhập / cập nhật lô dược liệu</text>
+
+  <rect class="lane" x="840" y="510" width="600" height="900" fill="#eff6ff" stroke="#2563eb"/>
+  <text class="laneTitle" x="1140" y="550" text-anchor="middle">Cấp thuốc theo đơn điều trị</text>
+
+  <!-- Left branch: inventory input -->
+  <rect class="node process" x="145" y="590" width="430" height="72" rx="12"/>
+  <text class="nodeText" x="360" y="620" text-anchor="middle">Thêm / cập nhật dược liệu</text>
+  <text class="nodeText" x="360" y="645" text-anchor="middle">trong inventory_items</text>
+
+  <rect class="node stock" x="145" y="705" width="430" height="88" rx="12"/>
+  <text class="nodeText" x="360" y="737" text-anchor="middle">Nhập thông tin lô:</text>
+  <text class="nodeText" x="360" y="762" text-anchor="middle">số lô, hạn dùng, số lượng, đơn vị</text>
+
+  <polygon class="decision" points="360,835 555,900 360,965 165,900"/>
+  <text class="nodeTextSmall" x="360" y="894" text-anchor="middle">Thông tin lô</text>
+  <text class="nodeTextSmall" x="360" y="916" text-anchor="middle">hợp lệ?</text>
+
+  <rect class="node warning" x="95" y="1010" width="250" height="68" rx="12"/>
+  <text class="nodeText" x="220" y="1038" text-anchor="middle">Thông báo lỗi</text>
+  <text class="nodeText" x="220" y="1063" text-anchor="middle">nhập lô</text>
+
+  <rect class="node stock" x="380" y="1010" width="250" height="68" rx="12"/>
+  <text class="nodeText" x="505" y="1038" text-anchor="middle">Lưu lô vào</text>
+  <text class="nodeText" x="505" y="1063" text-anchor="middle">inventory_batches</text>
+
+  <rect class="node stock" x="250" y="1130" width="310" height="74" rx="12"/>
+  <text class="nodeText" x="405" y="1160" text-anchor="middle">Ghi nhận biến động</text>
+  <text class="nodeText" x="405" y="1185" text-anchor="middle">nhập kho nếu có</text>
+
+  <!-- Right branch: dispensing -->
+  <rect class="node process" x="925" y="590" width="430" height="72" rx="12"/>
+  <text class="nodeText" x="1140" y="620" text-anchor="middle">Tiếp nhận yêu cầu cấp thuốc</text>
+  <text class="nodeText" x="1140" y="645" text-anchor="middle">từ đơn điều trị</text>
+
+  <polygon class="decision" points="1140,705 1365,775 1140,845 915,775"/>
+  <text class="nodeTextSmall" x="1140" y="768" text-anchor="middle">Đơn có thuốc</text>
+  <text class="nodeTextSmall" x="1140" y="790" text-anchor="middle">ảnh hưởng kho?</text>
+
+  <rect class="node process" x="905" y="890" width="260" height="74" rx="12"/>
+  <text class="nodeText" x="1035" y="920" text-anchor="middle">Lưu đơn / in đơn</text>
+  <text class="nodeText" x="1035" y="945" text-anchor="middle">không trừ kho</text>
+
+  <rect class="node stock" x="1195" y="890" width="210" height="74" rx="12"/>
+  <text class="nodeText" x="1300" y="920" text-anchor="middle">Kiểm tra tồn</text>
+  <text class="nodeText" x="1300" y="945" text-anchor="middle">theo lô</text>
+
+  <polygon class="decision" points="1300,1005 1460,1062 1300,1119 1140,1062"/>
+  <text class="nodeTextSmall" x="1300" y="1056" text-anchor="middle">Đủ tồn kho?</text>
+
+  <rect class="node warning" x="905" y="1030" width="210" height="74" rx="12"/>
+  <text class="nodeText" x="1010" y="1059" text-anchor="middle">Cảnh báo thiếu</text>
+  <text class="nodeText" x="1010" y="1084" text-anchor="middle">kho / hết hạn</text>
+
+  <rect class="node admin" x="1115" y="1160" width="370" height="74" rx="12"/>
+  <text class="nodeText" x="1300" y="1190" text-anchor="middle">Admin / Thầy thuốc chính</text>
+  <text class="nodeText" x="1300" y="1215" text-anchor="middle">xác nhận cấp thuốc</text>
+
+  <rect class="node stock" x="1115" y="1265" width="370" height="64" rx="12"/>
+  <text class="nodeText" x="1300" y="1305" text-anchor="middle">Trừ số lượng trên từng lô</text>
+
+  <rect class="node stock" x="1115" y="1355" width="370" height="64" rx="12"/>
+  <text class="nodeText" x="1300" y="1395" text-anchor="middle">Ghi stock_movements</text>
+
+  <rect class="node stock" x="1115" y="1445" width="370" height="64" rx="12"/>
+  <text class="nodeText" x="1300" y="1485" text-anchor="middle">Cập nhật tồn kho còn lại</text>
+
+  <!-- Finish -->
+  <rect class="node process" x="540" y="1560" width="420" height="72" rx="12"/>
+  <text class="nodeText" x="750" y="1590" text-anchor="middle">Lưu kết quả</text>
+  <text class="nodeText" x="750" y="1615" text-anchor="middle">và hoàn tất</text>
+
+  <rect class="terminal" x="610" y="1700" width="280" height="54" rx="27"/>
+  <text class="terminalText" x="750" y="1734" text-anchor="middle">Kết thúc</text>
+
+  <g transform="translate(80 1690)">
+    <rect class="noteBox" width="395" height="105"/>
+    <text class="noteTitle" x="20" y="32">Ghi chú</text>
+    <text class="noteText" x="20" y="62">AI không tự trừ kho.</text>
+    <text class="noteText" x="20" y="88">Kho chỉ trừ khi người có quyền xác nhận cấp thuốc.</text>
+  </g>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M750 174 L750 210"/>
+  <path class="arrow" d="M750 276 L750 320"/>
+  <path class="arrow" d="M530 390 L360 390 L360 590"/>
+  <text class="label" x="430" y="375">Nhập / cập nhật kho</text>
+  <path class="arrow" d="M970 390 L1140 390 L1140 590"/>
+  <text class="label" x="1080" y="375">Cấp thuốc theo đơn</text>
+
+  <path class="arrow" d="M360 662 L360 705"/>
+  <path class="arrow" d="M360 793 L360 835"/>
+  <path class="arrow" d="M165 900 L95 900 L95 1044"/>
+  <text class="label" x="145" y="884">Không</text>
+  <path class="arrow" d="M555 900 L505 900 L505 1010"/>
+  <text class="label" x="535" y="884">Có</text>
+  <path class="arrow" d="M220 1078 L220 1110 L120 1110 L120 748 L145 748"/>
+  <path class="arrow" d="M505 1078 L505 1130"/>
+  <path class="arrow" d="M405 1204 L405 1596 L540 1596"/>
+
+  <path class="arrow" d="M1140 662 L1140 705"/>
+  <path class="arrow" d="M915 775 L1035 775 L1035 890"/>
+  <text class="label" x="985" y="760">Không</text>
+  <path class="arrow" d="M1365 775 L1300 775 L1300 890"/>
+  <text class="label" x="1342" y="760">Có</text>
+  <path class="arrow" d="M1035 964 L1035 1596 L960 1596"/>
+  <path class="arrow" d="M1300 964 L1300 1005"/>
+  <path class="arrow" d="M1140 1062 L1115 1062"/>
+  <text class="label" x="1128" y="1046">Không đủ</text>
+  <path class="arrow" d="M1010 1104 L1010 1596 L960 1596"/>
+  <path class="arrow" d="M1300 1119 L1300 1160"/>
+  <text class="label" x="1328" y="1144">Đủ</text>
+  <path class="arrow" d="M1300 1234 L1300 1265"/>
+  <path class="arrow" d="M1300 1329 L1300 1355"/>
+  <path class="arrow" d="M1300 1419 L1300 1445"/>
+  <path class="arrow" d="M1115 1477 L960 1477 L960 1596"/>
+  <path class="arrow" d="M750 1632 L750 1700"/>
+</svg>

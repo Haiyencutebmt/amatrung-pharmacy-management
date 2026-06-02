@@ -2,34 +2,34 @@
 @section('title', 'Trang chủ - AmaTrung')
 
 @section('content')
-<div class="relative bg-gradient-to-b from-sky-50 via-white to-sky-100 min-h-screen pb-20 overflow-hidden font-sans">
+<div class="relative bg-gradient-to-b from-sky-50 via-white to-sky-100 min-h-screen pb-10 sm:pb-20 overflow-hidden font-sans">
     
     <!-- Hero Section -->
-    <div class="max-w-[1400px] mx-auto px-4 mt-14 md:mt-16">
-        <div class="relative bg-cover bg-center bg-no-repeat rounded-[2.5rem] pt-10 sm:pt-12 md:pt-16 pb-24 sm:pb-28 md:pb-36 text-center shadow-lg border border-sky-100" style="background-image: url('{{ asset('images/home-imagecute.png') }}');">
+    <div class="max-w-[1400px] mx-auto px-3 sm:px-4 mt-6 md:mt-16">
+        <div class="relative bg-cover bg-center bg-no-repeat rounded-[1.5rem] sm:rounded-[2.5rem] pt-8 sm:pt-12 md:pt-16 pb-14 sm:pb-28 md:pb-36 text-center shadow-lg border border-sky-100" style="background-image: url('{{ asset('images/home-imagecute.png') }}');">
             
             <!-- Logo -->
-            <div class="absolute -top-10 md:-top-14 left-1/2 -translate-x-1/2 z-20">
-                <div class="bg-white/95 p-2 rounded-full shadow-md border-4 border-sky-100/80">
-                    <img src="{{ asset('images/amatrung_logo.png') }}" class="w-16 h-16 md:w-24 md:h-24 object-contain rounded-full" alt="Logo">
+            <div class="absolute -top-4 sm:-top-10 md:-top-14 left-1/2 -translate-x-1/2 z-20">
+                <div class="bg-white/95 p-1 sm:p-2 rounded-full shadow-md border-2 sm:border-4 border-sky-100/80">
+                    <img src="{{ asset('images/amatrung_logo.png') }}" class="w-8 h-8 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain rounded-full" alt="Logo">
                 </div>
             </div>
 
             <!-- Golden Badge -->
-            <div class="flex justify-center mb-4 md:mb-5">
-                <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-[#d4af37]/45 bg-[#fffdf9]/90 text-[#b58e3d] font-bold text-[10px] md:text-xs tracking-wider shadow-sm transition-transform hover:scale-105 duration-300">
-                    <span class="text-xs opacity-80">⚜️</span>
+            <div class="flex justify-center mb-2 sm:mb-4 md:mb-5">
+                <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 rounded-full border border-[#d4af37]/45 bg-[#fffdf9]/90 text-[#b58e3d] font-bold text-[8px] sm:text-[10px] md:text-xs tracking-wider shadow-sm transition-transform hover:scale-105 duration-300">
+                    <span class="text-[10px] sm:text-xs opacity-80">⚜️</span>
                     <span>Tinh hoa thảo dược – Chăm sóc từ tâm</span>
-                    <span class="text-xs opacity-80">⚜️</span>
+                    <span class="text-[10px] sm:text-xs opacity-80">⚜️</span>
                 </div>
             </div>
             
             <!-- Title -->
-            <h1 class="text-xl md:text-4xl font-extrabold text-[#1a5b8f] tracking-wide mb-1.5 md:mb-2 drop-shadow-sm leading-tight">NHÀ THUỐC Y HỌC CỔ TRUYỀN</h1>
-            <h2 class="text-2.5xl md:text-5.5xl lg:text-6.5xl font-black text-[#1a5b8f] uppercase tracking-widest drop-shadow-md mb-4 md:mb-6">AMATRUNG</h2>
+            <h1 class="text-sm sm:text-xl md:text-4xl font-extrabold text-[#1a5b8f] tracking-wide mb-1 sm:mb-1.5 md:mb-2 drop-shadow-sm leading-tight">NHÀ THUỐC Y HỌC CỔ TRUYỀN</h1>
+            <h2 class="text-xl sm:text-2.5xl md:text-5.5xl lg:text-6.5xl font-black text-[#1a5b8f] uppercase tracking-widest drop-shadow-md mb-2 sm:mb-4 md:mb-6">AMATRUNG</h2>
             
             <!-- Quote -->
-            <div class="max-w-3xl mx-auto mb-6 md:mb-8 relative px-2 md:px-4">
+            <div class="hidden sm:block max-w-3xl mx-auto mb-6 md:mb-8 relative px-2 md:px-4">
                 <p class="text-sm md:text-lg text-[#1a5b8f] font-semibold italic leading-relaxed text-center drop-shadow-sm">
                     "Thuốc đắng dã tật, sự sống đơm hoa.<br>
                     Mỗi vị thuốc đều mang trong mình linh khí của đất trời,<br class="hidden md:block">
@@ -38,11 +38,36 @@
             </div>
 
             <!-- 5 Elements Characters (Overlapping bottom edge) -->
-            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-5xl px-2 md:px-4 flex justify-center items-end gap-1 sm:gap-4 md:gap-6 z-50 h-[80px] sm:h-[140px] md:h-[200px]">
+            {{-- Mobile: Compact 5-icon grid below hero --}}
+            <div class="flex sm:hidden justify-center items-center gap-2 mt-4 px-2 relative z-20">
+                <a href="{{ route('articles.index') }}" class="flex flex-col items-center gap-1 w-1/5">
+                    <img src="{{ asset('images/Kim.png') }}" alt="Kim" class="w-11 h-11 object-contain drop-shadow-md">
+                    <span class="text-[7px] font-bold text-[#6a5b48] bg-[#f0e6d2]/80 px-2 py-0.5 rounded-full whitespace-nowrap">Bài viết</span>
+                </a>
+                <a href="{{ route('herb-dictionary.index') }}" class="flex flex-col items-center gap-1 w-1/5">
+                    <img src="{{ asset('images/Mộc.png') }}" alt="Mộc" class="w-12 h-12 object-contain drop-shadow-md">
+                    <span class="text-[7px] font-bold text-[#3a6121] bg-[#d1eeb2]/80 px-1.5 py-0.5 rounded-full whitespace-nowrap">Dược liệu</span>
+                </a>
+                <a href="{{ url('/') }}" class="flex flex-col items-center gap-1 w-1/5">
+                    <img src="{{ asset('images/Thủy.png') }}" alt="Thủy" class="w-14 h-14 object-contain drop-shadow-md">
+                    <span class="text-[7px] font-bold text-[#155096] bg-[#badbff]/80 px-2 py-0.5 rounded-full whitespace-nowrap">Trang chủ</span>
+                </a>
+                <a href="{{ route('profile.favorites') }}" class="flex flex-col items-center gap-1 w-1/5">
+                    <img src="{{ asset('images/Hỏa.png') }}" alt="Hỏa" class="w-12 h-12 object-contain drop-shadow-md">
+                    <span class="text-[7px] font-bold text-[#a34110] bg-[#ffd0a8]/80 px-1.5 py-0.5 rounded-full whitespace-nowrap">Yêu thích</span>
+                </a>
+                <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 w-1/5">
+                    <img src="{{ asset('images/Thổ.png') }}" alt="Thổ" class="w-11 h-11 object-contain drop-shadow-md">
+                    <span class="text-[7px] font-bold text-[#6b4721] bg-[#e8cdb0]/80 px-1.5 py-0.5 rounded-full whitespace-nowrap">Hồ sơ</span>
+                </a>
+            </div>
+
+            {{-- Desktop: Original absolute positioned characters --}}
+            <div class="hidden sm:flex absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-full max-w-5xl px-2 md:px-4 justify-center items-end gap-4 md:gap-6 z-50 h-[140px] md:h-[200px]">
                 <!-- KIM -->
                 <a href="{{ route('articles.index') }}" class="group w-[14%] max-w-[150px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12 flex flex-col items-center">
                     <img src="{{ asset('images/Kim.png') }}" alt="Kim" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
-                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-gray-50 via-[#f0e6d2] to-gray-200 border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#6a5b48] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-gray-50 via-[#f0e6d2] to-gray-200 border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#6a5b48] font-bold text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
                         <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Bài viết
                     </div>
@@ -51,7 +76,7 @@
                 <!-- MỘC -->
                 <a href="{{ route('herb-dictionary.index') }}" class="group w-[17%] max-w-[190px] transform hover:-translate-y-4 transition-all duration-300 relative z-30 hover:z-50 mb-2 md:mb-6 flex flex-col items-center">
                     <img src="{{ asset('images/Mộc.png') }}" alt="Mộc" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
-                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#eefade] via-[#d1eeb2] to-[#a4d673] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#3a6121] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#eefade] via-[#d1eeb2] to-[#a4d673] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#3a6121] font-bold text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
                         <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="currentColor" viewBox="0 0 24 24"><path d="M17.75 2a8.75 8.75 0 0 0-7.39 13.43l-4.07 4.07a1 1 0 0 0 1.42 1.42l4.07-4.07A8.75 8.75 0 0 0 22 10.75V4a2 2 0 0 0-2-2h-2.25Zm-3 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"></path></svg>
                         Từ điển dược liệu
                     </div>
@@ -60,7 +85,7 @@
                 <!-- THỦY (Center, Biggest) -->
                 <a href="{{ url('/') }}" class="group w-[24%] max-w-[240px] transform hover:-translate-y-4 transition-all duration-300 relative z-40 hover:z-50 mb-0 flex flex-col items-center">
                     <img src="{{ asset('images/Thủy.png') }}" alt="Thủy" class="w-full h-auto drop-shadow-[0_15px_20px_rgba(59,130,246,0.3)] hover:drop-shadow-[0_20px_25px_rgba(59,130,246,0.5)]">
-                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-3 py-1 md:px-5 md:py-2 bg-gradient-to-br from-[#e6f2ff] via-[#badbff] to-[#7dbbfa] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#155096] font-bold text-[10px] sm:text-xs md:text-[15px] whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-3 py-1 md:px-5 md:py-2 bg-gradient-to-br from-[#e6f2ff] via-[#badbff] to-[#7dbbfa] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#155096] font-bold text-xs md:text-[15px] whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
                         <svg class="w-3 h-3 md:w-5 md:h-5 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                         Trang chủ
                     </div>
@@ -69,7 +94,7 @@
                 <!-- HỎA -->
                 <a href="{{ route('profile.favorites') }}" class="group w-[17%] max-w-[190px] transform hover:-translate-y-4 transition-all duration-300 relative z-30 hover:z-50 mb-2 md:mb-6 flex flex-col items-center">
                     <img src="{{ asset('images/Hỏa.png') }}" alt="Hỏa" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
-                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#fff1e6] via-[#ffd0a8] to-[#ff9e66] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#a34110] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#fff1e6] via-[#ffd0a8] to-[#ff9e66] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#a34110] font-bold text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
                         <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
                         Góc yêu thích
                     </div>
@@ -78,7 +103,7 @@
                 <!-- THỔ -->
                 <a href="{{ route('dashboard') }}" class="group w-[14%] max-w-[150px] transform hover:-translate-y-4 transition-all duration-300 relative z-20 hover:z-50 mb-4 md:mb-12 flex flex-col items-center">
                     <img src="{{ asset('images/Thổ.png') }}" alt="Thổ" class="w-full h-auto drop-shadow-xl hover:drop-shadow-2xl">
-                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#fcf4ea] via-[#e8cdb0] to-[#c9a073] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#6b4721] font-bold text-[9px] sm:text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
+                    <div class="mt-2 flex items-center justify-center gap-1 md:gap-1.5 px-2 py-1 md:px-4 md:py-2 bg-gradient-to-br from-[#fcf4ea] via-[#e8cdb0] to-[#c9a073] border-2 border-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.08)] text-[#6b4721] font-bold text-[11px] md:text-sm whitespace-nowrap group-hover:shadow-[0_6px_15px_rgba(0,0,0,0.12)] group-hover:scale-105 transition-all">
                         <svg class="w-3 h-3 md:w-4 md:h-4 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                         Bảng điều khiển
                     </div>
@@ -88,58 +113,58 @@
     </div>
 
     <!-- Section 2: Core Values (Image based) -->
-    <div class="max-w-[1400px] mx-auto px-4 relative z-10 mt-24 sm:mt-32 md:mt-48 lg:mt-56 mb-16">
-        <div class="bg-[#fbfcfa] border-2 border-[#e7efe9] rounded-[3rem] p-6 md:p-10 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-12 md:mt-16">
+    <div class="hidden sm:block max-w-[1400px] mx-auto px-3 sm:px-4 relative z-10 mt-10 sm:mt-32 md:mt-48 lg:mt-56 mb-10 sm:mb-16">
+        <div class="bg-[#fbfcfa] border-2 border-[#e7efe9] rounded-[2rem] sm:rounded-[3rem] p-4 sm:p-6 md:p-10 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] mt-8 sm:mt-12 md:mt-16">
             <!-- Title Badge -->
-            <div class="absolute -top-6 md:-top-10 left-1/2 -translate-x-1/2 z-10 w-full flex justify-center">
-                <img src="{{ asset('images/suckhoe-tunhien-connguoi.png') }}" class="w-[280px] sm:w-[380px] md:w-[500px] lg:w-[600px] h-auto object-contain drop-shadow-sm hover:scale-105 transition-transform" alt="Vì sức khỏe - Vì tự nhiên - Vì con người">
+            <div class="absolute -top-4 sm:-top-6 md:-top-10 left-1/2 -translate-x-1/2 z-10 w-full flex justify-center">
+                <img src="{{ asset('images/suckhoe-tunhien-connguoi.png') }}" class="w-[200px] sm:w-[380px] md:w-[500px] lg:w-[600px] h-auto object-contain drop-shadow-sm hover:scale-105 transition-transform" alt="Vì sức khỏe - Vì tự nhiên - Vì con người">
             </div>
             
-            <!-- 5 Items -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-4 mt-8 md:mt-6 px-2 md:px-4">
+            <!-- 5 Items: Grid on mobile, flex on desktop -->
+            <div class="grid grid-cols-5 gap-1 md:gap-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-4 mt-6 sm:mt-6 px-0 sm:px-2 md:px-4">
                 <!-- Item 1 -->
-                <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/Thao-duoc-chat-luong.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Thảo dược chất lượng">
+                <div class="flex flex-col items-center text-center sm:w-1/5 group">
+                    <img src="{{ asset('images/Thao-duoc-chat-luong.png') }}" class="w-full h-auto max-w-[52px] min-[375px]:max-w-[64px] min-[410px]:max-w-[76px] sm:max-w-none object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Thảo dược chất lượng">
                 </div>
                 
                 <!-- Arrow -->
-                <div class="hidden md:flex flex-col items-center text-green-400">
+                <div class="hidden md:flex flex-col items-center text-green-400 shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                 </div>
 
                 <!-- Item 2 -->
-                <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/An-toan-lanh-tinh.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="An toàn lành tính">
+                <div class="flex flex-col items-center text-center sm:w-1/5 group">
+                    <img src="{{ asset('images/An-toan-lanh-tinh.png') }}" class="w-full h-auto max-w-[52px] min-[375px]:max-w-[64px] min-[410px]:max-w-[76px] sm:max-w-none object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="An toàn lành tính">
                 </div>
 
                 <!-- Arrow -->
-                <div class="hidden md:flex flex-col items-center text-green-400">
+                <div class="hidden md:flex flex-col items-center text-green-400 shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                 </div>
 
                 <!-- Item 3 -->
-                <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Y học cổ truyền bài bản">
+                <div class="flex flex-col items-center text-center sm:w-1/5 group">
+                    <img src="{{ asset('images/y-hoc-co-truyen.png') }}" class="w-full h-auto max-w-[52px] min-[375px]:max-w-[64px] min-[410px]:max-w-[76px] sm:max-w-none object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Y học cổ truyền bài bản">
                 </div>
 
                 <!-- Arrow -->
-                <div class="hidden md:flex flex-col items-center text-green-400">
+                <div class="hidden md:flex flex-col items-center text-green-400 shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                 </div>
 
                 <!-- Item 4 -->
-                <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/Tan-tam-trach-nhiem.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Tận tâm trách nhiệm">
+                <div class="flex flex-col items-center text-center sm:w-1/5 group">
+                    <img src="{{ asset('images/Tan-tam-trach-nhiem.png') }}" class="w-full h-auto max-w-[52px] min-[375px]:max-w-[64px] min-[410px]:max-w-[76px] sm:max-w-none object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Tận tâm trách nhiệm">
                 </div>
 
                 <!-- Arrow -->
-                <div class="hidden md:flex flex-col items-center text-green-400">
+                <div class="hidden md:flex flex-col items-center text-green-400 shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                 </div>
 
                 <!-- Item 5 -->
-                <div class="flex flex-col items-center text-center w-full md:w-1/5 group">
-                    <img src="{{ asset('images/Ket-noi-tu-nhien.png') }}" class="w-40 md:w-full h-auto object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Kết nối tự nhiên">
+                <div class="flex flex-col items-center text-center sm:w-1/5 group">
+                    <img src="{{ asset('images/Ket-noi-tu-nhien.png') }}" class="w-full h-auto max-w-[52px] min-[375px]:max-w-[64px] min-[410px]:max-w-[76px] sm:max-w-none object-contain rounded-2xl group-hover:-translate-y-2 transition-transform duration-300 drop-shadow-sm" alt="Kết nối tự nhiên">
                 </div>
             </div>
         </div>
@@ -184,9 +209,9 @@
                         <div>
                             <h2 class="text-lg md:text-xl font-bold text-white/90 mb-4 border-b border-white/20 pb-3 uppercase tracking-wide">BÀI VIẾT ĐÁNG CHÚ Ý</h2>
                             
-                            <a href="{{ route('articles.show', $latestArticle->slug) }}" class="group flex flex-col gap-5 mt-2 hover:-translate-y-1 transition-transform duration-300">
+                            <a href="{{ route('articles.show', $latestArticle->slug) }}" class="group flex flex-row sm:flex-col gap-3 sm:gap-5 mt-2 hover:-translate-y-1 transition-transform duration-300">
                                 <!-- Article Thumbnail -->
-                                <div class="w-full h-48 md:h-64 rounded-xl overflow-hidden shadow-lg border border-white/10 relative">
+                                <div class="w-28 h-24 sm:w-full sm:h-48 md:h-64 shrink-0 rounded-xl overflow-hidden shadow-lg border border-white/10 relative">
                                     @if($latestArticle->featured_image)
                                         <img src="{{ Storage::url($latestArticle->featured_image) }}" alt="{{ $latestArticle->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                                     @else
@@ -195,28 +220,31 @@
                                         </div>
                                     @endif
                                     @if($latestArticle->category)
-                                    <div class="absolute top-3 left-3 bg-[#1a5b8f]/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm border border-white/20">
+                                    <div class="absolute top-3 left-3 bg-[#1a5b8f]/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm border border-white/20 hidden sm:block">
                                         {{ $latestArticle->category_label }}
                                     </div>
                                     @endif
                                 </div>
                                 
                                 <!-- Article Content -->
-                                <div class="flex flex-col">
-                                    <h3 class="font-bold text-xl md:text-2xl text-white leading-snug mb-3 group-hover:text-blue-200 transition-colors uppercase">
+                                <div class="flex flex-col flex-1 min-w-0">
+                                    <span class="text-[9px] font-bold text-blue-200 sm:hidden block mb-0.5">
+                                        {{ $latestArticle->category_label }}
+                                    </span>
+                                    <h3 class="font-bold text-sm sm:text-xl md:text-2xl text-white leading-snug mb-1.5 sm:mb-3 group-hover:text-blue-200 transition-colors uppercase line-clamp-2">
                                         {{ $latestArticle->title }}
                                     </h3>
-                                    <div class="text-blue-100/90 text-sm md:text-base mb-4 line-clamp-3 leading-relaxed">
+                                    <div class="text-blue-100/90 text-xs sm:text-sm md:text-base mb-2 sm:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed hidden sm:block">
                                         {!! $latestArticle->excerpt !!}
                                     </div>
                                     
-                                    <div class="flex items-center gap-6 mt-2 text-sm text-blue-200 font-medium">
-                                        <div class="flex items-center gap-1.5">
-                                            <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    <div class="flex items-center gap-3 sm:gap-6 mt-1 sm:mt-2 text-[10px] sm:text-sm text-blue-200 font-medium">
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                             {{ $latestArticle->author->name ?? 'AmaTrung' }}
                                         </div>
-                                        <div class="flex items-center gap-1.5">
-                                            <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                             {{ $latestArticle->published_at ? $latestArticle->published_at->format('d/m/Y') : $latestArticle->created_at->format('d/m/Y') }}
                                         </div>
                                     </div>
@@ -303,14 +331,14 @@
                 <span class="font-extrabold text-[#1a5b8f] text-base md:text-lg uppercase tracking-wide border-l border-gray-200 pl-4">Từ điển hôm nay</span>
             </div>
 
-            <div class="relative z-10">
-                @if(isset($randomHerbs) && $randomHerbs->count() > 0)
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            @if(isset($randomHerbs) && $randomHerbs->count() > 0)
+                <div class="relative z-10">
+                    <!-- Layout for Desktop & Tablet (>= sm) -->
+                    <div class="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-6xl mx-auto">
                         @foreach($randomHerbs as $entry)
-                            <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-sm border border-sky-100/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
-                                
+                            <div class="bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-sm border border-sky-100/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group relative">
                                 {{-- Media --}}
-                                <div class="aspect-[4/3] bg-slate-50 relative overflow-hidden">
+                                <div class="aspect-[4/3] bg-slate-50 relative overflow-hidden shrink-0">
                                     @if($entry->primary_image_url)
                                         <img src="{{ $entry->primary_image_url }}" alt="{{ $entry->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                     @else
@@ -345,18 +373,60 @@
                             </div>
                         @endforeach
                     </div>
-                    
+
+                    <!-- Layout for Mobile (< sm) -->
+                    <div class="flex sm:hidden flex-col gap-3.5 max-w-md mx-auto">
+                        @foreach($randomHerbs as $entry)
+                            @php
+                                $detailUrl = auth()->check() ? route('herb-dictionary.show', $entry) : route('login');
+                            @endphp
+                            <a href="{{ $detailUrl }}" class="relative flex flex-row items-center bg-white/95 backdrop-blur-sm rounded-2xl p-2.5 border border-sky-100/60 shadow-[0_2px_8px_rgba(59,130,246,0.04)] hover:shadow-md hover:border-sky-200/80 transition-all duration-300 group">
+                                {{-- Image --}}
+                                <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-50 border border-slate-100 relative">
+                                    @if($entry->primary_image_url)
+                                        <img src="{{ $entry->primary_image_url }}" alt="{{ $entry->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center bg-sky-50/50 text-sky-300">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                {{-- Content --}}
+                                <div class="ml-3 flex-grow min-w-0 pr-2">
+                                    <h3 class="text-sm font-bold text-slate-800 truncate">
+                                        {{ $entry->name }}
+                                    </h3>
+                                    @if($entry->scientific_name)
+                                        <p class="text-slate-400 italic text-[10px] font-serif truncate">
+                                            {{ $entry->scientific_name }}
+                                        </p>
+                                    @endif
+                                    <p class="text-slate-500 text-xs line-clamp-1 mt-0.5 leading-relaxed">
+                                        {{ $entry->short_info ?: 'Đang cập nhật thông tin cơ bản.' }}
+                                    </p>
+                                </div>
+
+                                {{-- Arrow Indicator --}}
+                                <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-[#5a90d4]/10 flex items-center justify-center text-slate-300 group-hover:text-[#1a5b8f] shrink-0 transition-colors">
+                                    <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+
                     <div class="mt-8 flex justify-center">
                         <a href="{{ route('herb-dictionary.index') }}" class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-[#1a5b8f] bg-white hover:bg-blue-50 px-4 md:px-5 py-2 md:py-2.5 rounded-full transition-all duration-300 shadow-sm border border-slate-100">
                             Khám phá thêm dược liệu khác
                             <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </a>
                     </div>
-                @else
-                    <div class="text-center text-slate-400 py-12 bg-white/80 rounded-3xl max-w-3xl mx-auto border border-slate-100 shadow-sm">
-                        Đang cập nhật danh mục từ điển thuốc nam.
-                    </div>
-                @endif
+                </div>
+            @else
+                <div class="text-center text-slate-400 py-12 bg-white/80 rounded-3xl max-w-3xl mx-auto border border-slate-100 shadow-sm">
+                    Đang cập nhật danh mục từ điển dược liệu.
+                </div>
+            @endif
             </div>
         </div>
     </div>
@@ -459,7 +529,7 @@
     </div>
 
     <!-- Bottom Banner -->
-    <div class="max-w-4xl mx-auto px-4 mt-24 relative z-10 text-center pb-8">
+    <div class="hidden sm:block max-w-4xl mx-auto px-4 mt-24 relative z-10 text-center pb-8">
         <div class="inline-block bg-[#fffcf5] border-y-[6px] border-[#e8d5b5] py-5 px-10 md:px-20 shadow-2xl relative rounded-[2px]">
             <div class="absolute top-0 left-0 w-6 h-full bg-[#cca673] block border-r-2 border-[#b58f5c] shadow-[inset_2px_0_4px_rgba(0,0,0,0.1)]"></div>
             <div class="absolute top-0 right-0 w-6 h-full bg-[#cca673] block border-l-2 border-[#b58f5c] shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]"></div>
@@ -588,7 +658,7 @@
                     },
                     body: JSON.stringify({
                         name: formData.get('name'),
-                        email: formData.get('email'),
+                        phone: formData.get('phone'),
                         message: formData.get('message')
                     })
                 })

@@ -62,7 +62,14 @@ class ArticleController extends Controller
             })
             ->take(3);
 
-        return view('articles.index', compact('articles', 'featuredArticles', 'articleCategories', 'selectedCategory', 'search'));
+        // Fetch top 3 latest articles
+        $latestArticles = Article::with('author')
+            ->published()
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        return view('articles.index', compact('articles', 'featuredArticles', 'latestArticles', 'articleCategories', 'selectedCategory', 'search'));
     }
 
     public function show($slug)

@@ -35,7 +35,7 @@
     $latestArticles = $articles->getCollection()->take(3);
 @endphp
 
-<div class="bg-[var(--color-surface-bg)] min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+<div class="bg-gradient-to-b from-sky-50 via-white to-sky-100/50 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
 
 
@@ -81,77 +81,80 @@
             @if($articles->count() > 0 || (isset($featuredArticles) && $featuredArticles->count() > 0))
                 <div class="flex flex-col gap-10">
                     
-                    {{-- Featured Articles --}}
-                    @if(!$search && !$selectedCategory && isset($featuredArticles) && $featuredArticles->count() > 0)
+
+
+                    {{-- Latest Articles --}}
+                    @if(!$search && !$selectedCategory && isset($latestArticles) && $latestArticles->count() > 0)
                     <div>
                         <div class="mb-4 flex items-center justify-between">
                             <h2 class="flex items-center gap-3 text-lg font-black text-blue-950">
                                 <span class="h-6 w-1 rounded-full bg-blue-600"></span>
-                                Bài viết nổi bật
+                                Bài viết mới nhất
                             </h2>
                         </div>
                         <div class="grid gap-5 md:grid-cols-3">
-                            @foreach($featuredArticles as $index => $article)
+                            @foreach($latestArticles as $article)
                                 @php
                                     $isLiked = auth()->check()
                                         && $article->relationLoaded('likedByUsers')
                                         && $article->likedByUsers->contains('id', auth()->id());
                                 @endphp
-                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)] relative">
-                                    {{-- Ranking Badge --}}
-                                    <div class="absolute top-0 left-0 z-20 w-10 h-10 flex items-center justify-center font-black text-sky-700 text-lg rounded-br-2xl shadow-md bg-sky-200">
-                                        {{ $loop->iteration }}
-                                    </div>
-                                    <div class="relative">
-                                        <a href="{{ route('articles.show', $article->slug) }}" class="block">
-                                            <div class="relative aspect-[4/2.6] overflow-hidden bg-blue-50">
+                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)] relative flex flex-row sm:flex-col">
+                                    <div class="relative w-28 h-24 sm:w-full sm:h-auto shrink-0">
+                                        <a href="{{ route('articles.show', $article->slug) }}" class="block h-full sm:h-auto">
+                                            <div class="relative h-full sm:h-auto sm:w-full sm:aspect-[3/2] overflow-hidden bg-blue-50">
                                                 @if($article->featured_image)
                                                     <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
                                                 @else
                                                     <img src="{{ asset('images/y-hoc-co-truyen.png') }}" alt="{{ $article->title }}" class="h-full w-full object-cover object-center opacity-90 transition duration-700 group-hover:scale-105">
                                                 @endif
 
-                                                <div class="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-blue-600 shadow-sm">
+                                                <div class="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-blue-600 shadow-sm hidden sm:block">
                                                     {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
                                                 </div>
 
-                                                <div class="absolute left-3 top-3 ml-10 max-w-[50%] rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-black text-sky-600 shadow-sm truncate">
+                                                <div class="absolute left-3 top-3 max-w-[74%] rounded-full bg-sky-50 border border-sky-100/50 px-2.5 py-1 text-[10px] font-bold text-sky-600 shadow-sm truncate hidden sm:block">
                                                     {{ $article->category_label }}
                                                 </div>
                                             </div>
                                         </a>
-
-                                        <button type="button"
-                                                class="article-like-btn absolute right-3 top-3 z-10 flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border px-2 text-xs font-black shadow-md backdrop-blur transition {{ $isLiked ? 'border-rose-200 bg-rose-500 text-white' : 'border-white/70 bg-white/95 text-slate-500 hover:text-rose-500' }}"
-                                                data-like-url="{{ route('articles.like', $article->id) }}"
-                                                data-login-url="{{ route('login') }}"
-                                                data-liked="{{ $isLiked ? '1' : '0' }}"
-                                                data-authenticated="{{ auth()->check() ? '1' : '0' }}"
-                                                title="{{ $isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}">
-                                            <svg class="h-4.5 w-4.5 {{ $isLiked ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c-3.86-3.16-7.5-6.5-7.5-10.88A4.12 4.12 0 0 1 8.62 6c1.32 0 2.55.63 3.38 1.62A4.42 4.42 0 0 1 15.38 6a4.12 4.12 0 0 1 4.12 4.12C19.5 14.5 15.86 17.84 12 21Z"/>
-                                            </svg>
-                                            <span class="article-like-count text-[11px]">{{ $article->liked_by_users_count }}</span>
-                                        </button>
                                     </div>
 
-                                    <a href="{{ route('articles.show', $article->slug) }}" class="block">
-                                        <div class="p-4">
-                                            <h3 class="line-clamp-2 min-h-[3rem] text-base font-black leading-6 text-blue-950 transition group-hover:text-blue-700">
-                                                {{ $article->title }}
-                                            </h3>
-                                            <p class="mt-2 line-clamp-3 min-h-[3.75rem] text-xs font-semibold leading-relaxed text-slate-650">
-                                                {{ $article->summary ?: $article->excerpt }}
-                                            </p>
+                                    <button type="button"
+                                            class="article-like-btn absolute right-2 top-2 sm:right-3 sm:top-3 z-10 flex h-7 min-w-7 sm:h-9 sm:min-w-9 items-center justify-center gap-1 rounded-full border px-1.5 sm:px-2 text-[10px] sm:text-xs font-black shadow-md backdrop-blur transition {{ $isLiked ? 'border-rose-200 bg-rose-500 text-white' : 'border-white/70 bg-white/95 text-slate-500 hover:text-rose-500' }}"
+                                            data-like-url="{{ route('articles.like', $article->id) }}"
+                                            data-login-url="{{ route('login') }}"
+                                            data-liked="{{ $isLiked ? '1' : '0' }}"
+                                            data-authenticated="{{ auth()->check() ? '1' : '0' }}"
+                                            title="{{ $isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}">
+                                        <svg class="h-3.5 w-3.5 sm:h-4.5 sm:w-4.5 {{ $isLiked ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c-3.86-3.16-7.5-6.5-7.5-10.88A4.12 4.12 0 0 1 8.62 6c1.32 0 2.55.63 3.38 1.62A4.42 4.42 0 0 1 15.38 6a4.12 4.12 0 0 1 4.12 4.12C19.5 14.5 15.86 17.84 12 21Z"/>
+                                        </svg>
+                                        <span class="article-like-count text-[9px] sm:text-[11px]">{{ $article->liked_by_users_count }}</span>
+                                    </button>
 
-                                            <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] font-bold text-slate-500">
+                                    <a href="{{ route('articles.show', $article->slug) }}" class="block flex-1">
+                                        <div class="p-3 sm:p-4 h-full flex flex-col justify-between">
+                                            <div>
+                                                <span class="text-[9px] font-bold text-sky-600 sm:hidden block mb-0.5">
+                                                    {{ $article->category_label }}
+                                                </span>
+                                                <h3 class="line-clamp-2 sm:min-h-[3rem] text-sm sm:text-base font-black leading-snug sm:leading-6 text-sky-600 transition group-hover:text-sky-500">
+                                                    {{ $article->title }}
+                                                </h3>
+                                                <p class="mt-1 line-clamp-2 sm:line-clamp-3 sm:min-h-[3.75rem] text-[11px] sm:text-xs font-semibold leading-relaxed text-slate-650 hidden sm:block">
+                                                    {{ $article->summary ?: $article->excerpt }}
+                                                </p>
+                                            </div>
+
+                                            <div class="mt-2 sm:mt-4 flex items-center justify-between border-t border-slate-100 pt-2 sm:pt-3 text-[10px] sm:text-[11px] font-bold text-slate-500">
                                                 <span class="inline-flex items-center gap-1">
-                                                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0 1 19.5 6.75v12A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5.25Z"/></svg>
+                                                    <svg class="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0 1 19.5 6.75v12A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5.25Z"/></svg>
                                                     {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
                                                 </span>
-                                                <span class="inline-flex items-center gap-1">
-                                                    <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12s3.5-6.75 9.75-6.75S21.75 12 21.75 12 18.25 18.75 12 18.75 2.25 12 2.25 12Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"/></svg>
+                                                <span class="inline-flex items-center gap-1 px-3 py-1 bg-sky-500 hover:bg-sky-600 text-white font-extrabold rounded-full text-[10px] sm:text-xs shadow-sm hover:shadow transition duration-300 select-none">
                                                     Xem bài
+                                                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
                                                 </span>
                                             </div>
                                         </div>
@@ -178,57 +181,62 @@
                                         && $article->relationLoaded('likedByUsers')
                                         && $article->likedByUsers->contains('id', auth()->id());
                                 @endphp
-                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)] flex flex-col md:flex-row">
-                                    <div class="relative md:w-1/3 shrink-0">
+                                <article class="group overflow-hidden rounded-2xl border border-slate-100/80 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(37,99,235,0.06)] flex flex-row">
+                                    <div class="relative w-28 h-24 md:w-1/3 md:h-auto shrink-0">
                                         <a href="{{ route('articles.show', $article->slug) }}" class="block h-full">
-                                            <div class="relative h-48 md:h-full overflow-hidden bg-blue-50">
+                                            <div class="relative h-full overflow-hidden bg-blue-50">
                                                 @if($article->featured_image)
                                                     <img src="{{ Storage::url($article->featured_image) }}" alt="{{ $article->title }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-105">
                                                 @else
                                                     <img src="{{ asset('images/y-hoc-co-truyen.png') }}" alt="{{ $article->title }}" class="h-full w-full object-cover object-center opacity-90 transition duration-700 group-hover:scale-105">
                                                 @endif
 
-                                                <div class="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-blue-600 shadow-sm">
+                                                <div class="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-blue-600 shadow-sm hidden md:block">
                                                     {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
                                                 </div>
 
-                                                <div class="absolute left-3 top-3 max-w-[74%] rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-black text-sky-600 shadow-sm truncate">
+                                                <div class="absolute left-3 top-3 max-w-[74%] rounded-full bg-sky-50 border border-sky-100/50 px-2.5 py-1 text-[10px] font-bold text-sky-600 shadow-sm truncate hidden md:block">
                                                     {{ $article->category_label }}
                                                 </div>
                                             </div>
                                         </a>
 
                                         <button type="button"
-                                                class="article-like-btn absolute right-3 top-3 z-10 flex h-9 min-w-9 items-center justify-center gap-1 rounded-full border px-2 text-xs font-black shadow-md backdrop-blur transition {{ $isLiked ? 'border-rose-200 bg-rose-500 text-white' : 'border-white/70 bg-white/95 text-slate-500 hover:text-rose-500' }}"
+                                                class="article-like-btn absolute right-2 top-2 md:right-3 md:top-3 z-10 flex h-7 min-w-7 md:h-9 md:min-w-9 items-center justify-center gap-1 rounded-full border px-1.5 md:px-2 text-[10px] md:text-xs font-black shadow-md backdrop-blur transition {{ $isLiked ? 'border-rose-200 bg-rose-500 text-white' : 'border-white/70 bg-white/95 text-slate-500 hover:text-rose-500' }}"
                                                 data-like-url="{{ route('articles.like', $article->id) }}"
                                                 data-login-url="{{ route('login') }}"
                                                 data-liked="{{ $isLiked ? '1' : '0' }}"
                                                 data-authenticated="{{ auth()->check() ? '1' : '0' }}"
                                                 title="{{ $isLiked ? 'Bỏ yêu thích' : 'Thêm vào yêu thích' }}">
-                                            <svg class="h-4.5 w-4.5 {{ $isLiked ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="h-3.5 w-3.5 md:h-4.5 md:w-4.5 {{ $isLiked ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c-3.86-3.16-7.5-6.5-7.5-10.88A4.12 4.12 0 0 1 8.62 6c1.32 0 2.55.63 3.38 1.62A4.42 4.42 0 0 1 15.38 6a4.12 4.12 0 0 1 4.12 4.12C19.5 14.5 15.86 17.84 12 21Z"/>
                                             </svg>
-                                            <span class="article-like-count text-[11px]">{{ $article->liked_by_users_count }}</span>
+                                            <span class="article-like-count text-[9px] md:text-[11px]">{{ $article->liked_by_users_count }}</span>
                                         </button>
                                     </div>
 
                                     <div class="flex-1 flex flex-col justify-center">
-                                        <a href="{{ route('articles.show', $article->slug) }}" class="block p-5 md:p-6 h-full flex flex-col">
-                                            <h3 class="text-lg md:text-xl font-black leading-snug text-blue-950 transition group-hover:text-blue-700 mb-3 line-clamp-2">
-                                                {{ $article->title }}
-                                            </h3>
-                                            <p class="text-sm font-semibold leading-relaxed text-slate-650 flex-1 line-clamp-3">
-                                                {{ $article->summary ?: $article->excerpt }}
-                                            </p>
+                                        <a href="{{ route('articles.show', $article->slug) }}" class="block p-3 md:p-6 h-full flex flex-col justify-between">
+                                            <div>
+                                                <span class="text-[9px] font-bold text-sky-600 md:hidden block mb-0.5">
+                                                    {{ $article->category_label }}
+                                                </span>
+                                                <h3 class="text-sm md:text-xl font-black leading-snug text-sky-600 transition group-hover:text-sky-500 mb-1 md:mb-3 line-clamp-2">
+                                                    {{ $article->title }}
+                                                </h3>
+                                                <p class="text-xs md:text-sm font-semibold leading-relaxed text-slate-650 flex-1 line-clamp-3 hidden md:block">
+                                                    {{ $article->summary ?: $article->excerpt }}
+                                                </p>
+                                            </div>
 
-                                            <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs font-bold text-slate-500">
-                                                <span class="inline-flex items-center gap-1.5">
-                                                    <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0 1 19.5 6.75v12A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5.25Z"/></svg>
+                                            <div class="mt-2 md:mt-5 flex items-center justify-between border-t border-slate-100 pt-2 md:pt-4 text-[10px] md:text-xs font-bold text-slate-500">
+                                                <span class="inline-flex items-center gap-1 md:gap-1.5">
+                                                    <svg class="h-3 w-3 md:h-4 md:w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M4.5 9.75h15M6 5.25h12A1.5 1.5 0 0 1 19.5 6.75v12A1.5 1.5 0 0 1 18 20.25H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5.25Z"/></svg>
                                                     {{ $article->published_at ? $article->published_at->format('d/m/Y') : $article->created_at->format('d/m/Y') }}
                                                 </span>
                                                 <span class="inline-flex items-center gap-1.5 text-blue-600 group-hover:text-blue-800 transition">
-                                                    Xem chi tiết
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                                                    <span class="hidden md:inline">Xem chi tiết</span>
+                                                    <svg class="h-3.5 w-3.5 md:h-4 md:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
                                                 </span>
                                             </div>
                                         </a>

@@ -1,0 +1,18 @@
+%% Cụm tài khoản và bệnh nhân - tách riêng từ Hình 2.8
+flowchart TB
+    classDef box fill:#ffffff,stroke:#334155,color:#0f172a,stroke-width:1.5px
+    classDef group fill:#eef2ff,stroke:#4f46e5,color:#0f172a,stroke-width:2px
+
+    subgraph G["Bên trái: tài khoản và bệnh nhân"]
+        direction TB
+        users["users<br/>PK: id<br/>name, role<br/>is_active"]
+        patients["patients<br/>PK: id<br/>FK: user_id<br/>patient_code, full_name<br/>phone"]
+        patient_user_links["patient_user_links<br/>FK: user_id, patient_id<br/>relationship_type<br/>is_verified"]
+    end
+
+    users -->|"1-N nếu có user_id"| patients
+    users -->|"N-N qua liên kết"| patient_user_links
+    patients -->|"N-N qua liên kết"| patient_user_links
+
+    class users,patients,patient_user_links box
+    class G group
