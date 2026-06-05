@@ -46,6 +46,54 @@ class HerbDictionaryController extends Controller implements HasMiddleware
         return view('admin.herb_dictionary.index', compact('entries'));
     }
 
+    public function exportExcel(Request $request)
+    {
+        $entries = HerbDictionaryEntry::orderByDesc('created_at')->get();
+
+        $data = [];
+        foreach ($entries as $entry) {
+            $data[] = [
+                'name' => $entry->name,
+                'scientific_name' => $entry->scientific_name,
+                'other_names' => $entry->other_names,
+                'family' => $entry->family,
+                'plant_part' => $entry->plant_part,
+                'properties' => $entry->properties,
+                'basic_info' => $entry->basic_info,
+                'effects' => $entry->effects,
+                'usage_notes' => $entry->usage_notes,
+                'safety_warning' => $entry->safety_warning,
+                'status' => $entry->status === 'published' ? 'Đã xuất bản' : 'Bản nháp',
+            ];
+        }
+
+        $tempJsonPath = tempnam(sys_get_temp_dir(), 'export_dict_json_');
+        file_put_contents($tempJsonPath, json_encode($data, JSON_UNESCAPED_UNICODE));
+
+        $tempXlsxPath = tempnam(sys_get_temp_dir(), 'export_dict_xlsx_') . '.xlsx';
+        $templatePath = public_path('templates/mau_import_tu_dien_thuoc_nam.xlsx');
+
+        $pythonScript = base_path('app/Scripts/export_herb_dictionary.py');
+        $cmd = "python " . escapeshellarg($pythonScript) . " " . escapeshellarg($tempJsonPath) . " " . escapeshellarg($templatePath) . " " . escapeshellarg($tempXlsxPath);
+
+        $output = [];
+        $resultCode = 0;
+        exec($cmd, $output, $resultCode);
+
+        if (file_exists($tempJsonPath)) {
+            @unlink($tempJsonPath);
+        }
+
+        if ($resultCode === 0 && file_exists($tempXlsxPath)) {
+            return response()->download($tempXlsxPath, 'danh_sach_tu_dien_thuoc_nam_' . now()->format('Ymd') . '.xlsx')->deleteFileAfterSend(true);
+        } else {
+            if (file_exists($tempXlsxPath)) {
+                @unlink($tempXlsxPath);
+            }
+            return back()->with('error', 'Lỗi xuất file Excel: ' . implode("\n", $output));
+        }
+    }
+
     public function create()
     {
         return view('admin.herb_dictionary.create');

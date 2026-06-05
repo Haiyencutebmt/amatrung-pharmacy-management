@@ -25,11 +25,7 @@ class PublicChatbotGeminiService
         }
 
         if ($normalizedQuery['is_treatment_request'] ?? false) {
-            $sourceNote = !empty($searchResult['sources'])
-                ? ' Mình có để nguồn tham khảo trên AmaTrung bên dưới để bạn đọc thêm.'
-                : '';
-
-            return 'Mình không thể chẩn đoán chắc chắn, kê đơn thuốc, hoặc hướng dẫn liều dùng điều trị cá nhân cho bạn qua chatbot public. Thông tin mình cung cấp chỉ mang tính tham khảo; để dùng thuốc an toàn, bạn nên đến nhà thuốc/phòng khám và trao đổi trực tiếp với thầy thuốc.' . $sourceNote;
+            return 'Mình không thể chẩn đoán chắc chắn, kê đơn thuốc, hoặc hướng dẫn liều dùng điều trị cá nhân cho bạn qua chatbot public. Thông tin mình cung cấp chỉ mang tính tham khảo; để dùng thuốc an toàn, bạn nên đến nhà thuốc/phòng khám và trao đổi trực tiếp với thầy thuốc.';
         }
 
         return null;
@@ -78,7 +74,7 @@ class PublicChatbotGeminiService
 
             $answer = $this->extractText($response->json());
 
-            return filled($answer) ? trim($answer) : self::UNAVAILABLE_MESSAGE;
+            return filled($answer) ? $this->sanitizePublicAnswer($answer) : self::UNAVAILABLE_MESSAGE;
         } catch (\Throwable $e) {
             Log::warning('[PublicChatbot] Gemini request failed: ' . $e->getMessage());
 
@@ -151,7 +147,7 @@ Bạn là "Trợ lý Y tế AmaTrung", chatbot public của website nhà thuốc
 Vai trò:
 - Hỗ trợ người dùng tra cứu và hiểu thông tin tham khảo về dược liệu, bài viết y khoa, chăm sóc sức khỏe và y học cổ truyền trên website AmaTrung.
 - Viết tiếng Việt tự nhiên, rõ ràng, dễ hiểu với người lớn tuổi.
-- Ưu tiên dữ liệu AmaTrung trong phần NGỮ CẢNH. Không bịa nguồn hoặc bịa dữ liệu nếu ngữ cảnh không có.
+- Chỉ dùng dữ liệu AmaTrung trong phần NGỮ CẢNH làm nền tảng trả lời. Không bịa nguồn hoặc bịa dữ liệu nếu ngữ cảnh không có.
 
 Quy tắc an toàn bắt buộc:
 - Không chẩn đoán chắc chắn người dùng mắc bệnh gì.
@@ -167,10 +163,55 @@ Cách trả lời:
 - Nếu chưa tìm thấy nội dung AmaTrung phù hợp, nói rõ điều này rồi chỉ cung cấp thông tin tổng quát an toàn.
 - Trình bày thành 2-5 đoạn ngắn hoặc gạch đầu dòng vừa đủ.
 - Luôn nhắc nhẹ rằng nội dung chỉ mang tính tham khảo khi câu hỏi liên quan sức khỏe/điều trị.
+- Không hiển thị tiêu đề "Nguồn tham khảo", "Tài liệu tham khảo", "Tham khảo", "Sources" hoặc "References".
+- Không liệt kê URL, không liệt kê danh sách bài viết/dược liệu ở cuối câu trả lời.
+- Không đưa đường dẫn /bai-viet/..., /tu-dien-thuoc-nam/... hoặc /duoc-lieu/... vào nội dung chat.
+- Chỉ trả lời tự nhiên như một trợ lý tư vấn thông tin tham khảo.
+- Nếu cần nhắc nguồn, chỉ nói ngắn gọn: "Thông tin được tổng hợp từ dữ liệu tham khảo trên AmaTrung", nhưng không liệt kê danh sách nguồn.
 
 NGỮ CẢNH TỪ WEBSITE AMATRUNG:
 {$context}
 PROMPT;
+    }
+
+    public function sanitizePublicAnswer(string $answer): string
+    {
+        $cleaned = trim(str_replace(["\r\n", "\r"], "\n", $answer));
+
+        $cleaned = preg_replace(
+            '/(?:^|\n)\s*(?:Nguồn\s+tham\s+khảo|Tài\s+liệu\s+tham\s+khảo|Tham\s+khảo|Sources?|References?)\s*:?\s*[\s\S]*$/iu',
+            '',
+            $cleaned
+        ) ?? $cleaned;
+
+        $cleaned = preg_replace(
+            '/\[([^\]]+)\]\(\s*\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^)\s]*\s*\)/iu',
+            '$1',
+            $cleaned
+        ) ?? $cleaned;
+
+        $cleaned = preg_replace(
+            '/(?:^|\n)\s*(?:Xem thêm|Đọc thêm|Chi tiết)(?:\s+tại)?\s*:?\s*\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^\n]*(?=\n|$)/iu',
+            '',
+            $cleaned
+        ) ?? $cleaned;
+
+        $cleaned = preg_replace(
+            '/\s*\(\s*\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^)\s]*\s*\)/iu',
+            '',
+            $cleaned
+        ) ?? $cleaned;
+
+        $cleaned = preg_replace(
+            "/\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^\s)\]}<>\"']*/iu",
+            '',
+            $cleaned
+        ) ?? $cleaned;
+
+        $cleaned = preg_replace('/[ \t]+\n/u', "\n", $cleaned) ?? $cleaned;
+        $cleaned = preg_replace('/\n{3,}/u', "\n\n", $cleaned) ?? $cleaned;
+
+        return trim($cleaned);
     }
 
     private function extractText(?array $payload): ?string

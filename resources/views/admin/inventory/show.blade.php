@@ -56,7 +56,7 @@
                 </div>
             </div>
             <div class="stat-body">
-                <h3 class="stat-value" style="color: #1e40af;">{{ number_format($totalQty, 2) }}</h3>
+                <h3 class="stat-value" style="color: #1e40af;">{{ number_format($totalQty, 0, '', '') }}</h3>
                 <span class="stat-badge bg-green-light">{{ $item->unit }}</span>
             </div>
             <div class="stat-footer">
@@ -153,7 +153,7 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="quantity-display">{{ number_format($batch->quantity_remaining, 2) }} {{ $item->unit }}</span>
+                                <span class="quantity-display">{{ number_format($batch->quantity_remaining, 0, '', '') }} {{ $item->unit }}</span>
                             </td>
                             <td>
                                 @if($batch->status === 'blocked')
@@ -226,7 +226,7 @@
         {{-- Right: Transaction History --}}
         <div class="main-content-card" style="padding: 1.5rem; height: fit-content;">
             <h3 style="margin: 0 0 1.25rem 0; font-size: 1rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 0.5rem;">
-                📊 10 Giao dịch gần nhất
+                📋 Lịch sử thao tác
             </h3>
 
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -249,8 +249,12 @@
                                 @endif
                             </span>
                             <span style="font-weight: 800; font-size: 0.9rem; font-family: monospace; {{ $mv->quantity > 0 ? 'color: #16a34a;' : 'color: #dc2626;' }}">
-                                {{ $mv->quantity > 0 ? '+' : '' }}{{ number_format($mv->quantity, 2) }}
+                                {{ $mv->quantity > 0 ? '+' : '' }}{{ number_format($mv->quantity, 0, '', '') }}
                             </span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.45rem; border-top: 1px dashed #e2e8f0; padding-top: 0.4rem; display: flex; align-items: center; justify-content: space-between;">
+                            <span>Người thực hiện:</span>
+                            <span style="font-weight: 600; color: #475569;">{{ $mv->user->name ?? 'Hệ thống' }}</span>
                         </div>
                     </div>
                 @empty

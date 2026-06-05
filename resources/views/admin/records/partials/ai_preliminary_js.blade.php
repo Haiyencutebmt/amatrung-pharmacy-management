@@ -3,10 +3,11 @@
     'use strict';
 
     const ASSESS_URL = "{{ route('admin.ai.preliminary-assessment') }}";
-    const APPLY_URL = "{{ route('admin.ai.preliminary-assessment.apply-diagnosis') }}";
+    const QUESTIONS_URL = "{{ route('admin.ai.preliminary-assessment.follow-up-questions') }}";
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
     let latestLogId = null;
+    let pendingOptionToApply = null;
 
     function el(id) { return document.getElementById(id); }
     function show(id, display = 'block') { const node = el(id); if (node) node.style.display = display; }
@@ -20,42 +21,201 @@
             .replace(/'/g, '&#39;');
     }
 
-    function setBusy(isBusy) {
-        const btn = el('btn-ai-preliminary');
-        if (!btn) return;
-        btn.disabled = isBusy;
-        btn.style.opacity = isBusy ? '0.7' : '1';
-        btn.style.cursor = isBusy ? 'not-allowed' : 'pointer';
+    function setButtonBusy(button, isBusy, busyText) {
+        if (!button) return;
+        if (!button.dataset.normalText) {
+            button.dataset.normalText = button.textContent;
+        }
+
+        button.disabled = isBusy;
+        button.textContent = isBusy ? busyText : button.dataset.normalText;
+        button.style.opacity = isBusy ? '0.7' : '1';
+        button.style.cursor = isBusy ? 'not-allowed' : 'pointer';
     }
 
-    function showLoading() {
+    function getRecordId() {
+        return el('btn-ai-preliminary')?.dataset.recordId
+            || el('btn-ai-followup-questions')?.dataset.recordId
+            || '0';
+    }
+
+    function getAdditionalSymptoms() {
+        const panelInput = el('ai-preliminary-additional-symptoms');
+        if (panelInput) {
+            return panelInput.value || '';
+        }
+
+        return el('additional_symptoms_inline')?.value || '';
+    }
+
+    function requestBody(recordId) {
+        return {
+            medical_record_id: parseInt(recordId, 10),
+            additional_symptoms: getAdditionalSymptoms().trim(),
+        };
+    }
+
+    function bindAdditionalSymptomsMirror() {
+        const panelInput = el('ai-preliminary-additional-symptoms');
+        const recordInput = el('additional_symptoms_inline');
+
+        if (!panelInput || !recordInput) return;
+
+        const mirrorValue = (source, target) => {
+            if (target.value !== source.value) {
+                target.value = source.value;
+            }
+        };
+
+        panelInput.addEventListener('input', () => mirrorValue(panelInput, recordInput));
+        recordInput.addEventListener('input', () => mirrorValue(recordInput, panelInput));
+    }
+
+    function showAssessmentLoading() {
         hide('ai-preliminary-status');
         hide('ai-preliminary-error');
         hide('ai-preliminary-result');
         show('ai-preliminary-loading');
     }
 
-    function showError(message) {
+    function showAssessmentError(message) {
         hide('ai-preliminary-loading');
         hide('ai-preliminary-result');
         show('ai-preliminary-error');
         el('ai-preliminary-error').textContent = '⚠️ ' + (message || 'AI chưa thể phản hồi. Vui lòng thử lại sau.');
     }
 
-    function renderQuestions(questions) {
-        const box = el('ai-preliminary-questions');
+    function showFollowupLoading() {
+        hide('ai-followup-placeholder');
+        hide('ai-followup-error');
+        hide('ai-followup-questions-list');
+        show('ai-followup-loading');
+    }
+
+    function showFollowupError(message) {
+        hide('ai-followup-loading');
+        hide('ai-followup-questions-list');
+        show('ai-followup-error');
+        el('ai-followup-error').textContent = '⚠️ ' + (message || 'AI chưa thể gợi ý câu hỏi. Vui lòng thử lại sau.');
+    }
+
+    function renderFollowupQuestions(questions, missingInformation = []) {
+        const box = el('ai-followup-questions-list');
         if (!box) return;
 
-        if (!Array.isArray(questions) || questions.length === 0) {
-            hide('ai-preliminary-questions');
-            box.innerHTML = '';
+        hide('ai-followup-loading');
+        hide('ai-followup-error');
+
+        const safeQuestions = Array.isArray(questions) ? questions.filter(Boolean) : [];
+        const safeMissing = Array.isArray(missingInformation) ? missingInformation.filter(Boolean) : [];
+
+        if (safeQuestions.length === 0 && safeMissing.length === 0) {
+            box.innerHTML = '<div style="border:1px dashed #cbd5e1; border-radius:0.35rem; padding:0.7rem 0.8rem; background:#f8fafc;">AI chưa đưa ra câu hỏi khai thác thêm.</div>';
+            show('ai-followup-questions-list');
             return;
         }
 
-        box.innerHTML = '<strong style="color:#1e3a8a;">Câu hỏi/thông tin nên khai thác thêm:</strong><ul style="margin:0.45rem 0 0 1rem; padding:0;">'
-            + questions.map(q => `<li>${escHtml(q)}</li>`).join('')
-            + '</ul>';
-        show('ai-preliminary-questions');
+        const sections = [];
+        if (safeQuestions.length > 0) {
+            sections.push(
+                '<strong style="color:#1e3a8a;">Câu hỏi nên hỏi thêm:</strong>'
+                + '<ul style="margin:0.45rem 0 0 1rem; padding:0;">'
+                + safeQuestions.map(q => `<li>${escHtml(q)}</li>`).join('')
+                + '</ul>'
+            );
+        }
+
+        if (safeMissing.length > 0) {
+            sections.push(
+                '<div style="margin-top:0.7rem;"><strong style="color:#1e3a8a;">Thông tin còn thiếu:</strong>'
+                + '<ul style="margin:0.45rem 0 0 1rem; padding:0;">'
+                + safeMissing.map(item => `<li>${escHtml(item)}</li>`).join('')
+                + '</ul></div>'
+            );
+        }
+
+        box.innerHTML = sections.join('');
+        show('ai-followup-questions-list');
+    }
+
+    function compactText(text, maxLength = 220) {
+        const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+        if (!normalized) return '';
+
+        return normalized.length > maxLength
+            ? normalized.slice(0, maxLength).trim() + '...'
+            : normalized;
+    }
+
+    function normalizeList(value, maxItems = 3) {
+        const values = Array.isArray(value) ? value : (value ? [value] : []);
+
+        return values
+            .map(item => compactText(item))
+            .filter(Boolean)
+            .slice(0, maxItems);
+    }
+
+    function formatAssessmentNotes(option) {
+        const doctorNotes = normalizeList(option.doctor_notes || option.reasoning || option.explanation, 8);
+        const cautionFlags = normalizeList(option.caution_flags || option.red_flags || option.caution, 8);
+        const blocks = [];
+
+        if (doctorNotes.length > 0) {
+            blocks.push('Lưu ý cho bác sĩ:\n' + doctorNotes.map(note => '- ' + note).join('\n'));
+        }
+
+        if (cautionFlags.length > 0) {
+            blocks.push('Cảnh báo nếu có:\n' + cautionFlags.map(flag => '- ' + flag).join('\n'));
+        }
+
+        return blocks.join('\n\n');
+    }
+
+    function setTextareaValue(textarea, value) {
+        textarea.value = value;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function fillAssessmentIntoRecordForm(option) {
+        const diagnosisInput = el('diagnosis_inline');
+        const doctorNoteInput = el('doctor_note_inline');
+
+        if (diagnosisInput?.readOnly || doctorNoteInput?.readOnly) {
+            alert('Bệnh án đã xác nhận chẩn đoán. Nếu cần chỉnh sửa, vui lòng sử dụng nút Sửa bệnh án này.');
+            return;
+        }
+
+        if (diagnosisInput) {
+            setTextareaValue(diagnosisInput, option.title || '');
+        }
+
+        if (doctorNoteInput) {
+            const aiNotes = formatAssessmentNotes(option);
+
+            if (aiNotes) {
+                const currentValue = doctorNoteInput.value.trim();
+
+                if (!currentValue) {
+                    setTextareaValue(doctorNoteInput, aiNotes);
+                } else {
+                    const shouldAppend = window.confirm(
+                        'Ô lưu ý cho bác sĩ đang có nội dung. Bấm OK để nối thêm nội dung từ nhận định AI vào cuối, hoặc Cancel để giữ nguyên nội dung lưu ý hiện tại.'
+                    );
+
+                    if (shouldAppend) {
+                        const separator = '\n\n--- Nội dung từ nhận định AI ---\n';
+                        setTextareaValue(doctorNoteInput, currentValue + separator + aiNotes);
+                    }
+                }
+            }
+        }
+
+        if (diagnosisInput) {
+            diagnosisInput.focus();
+            diagnosisInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     }
 
     function renderOptions(options) {
@@ -68,12 +228,18 @@
         }
 
         container.innerHTML = options.map((option, index) => {
-            const percent = Math.max(0, Math.min(100, parseInt(option.fit_percent || 0, 10)));
+            const percent = Math.max(0, Math.min(100, parseInt(option.fit_percent || option.confidence_percent || 0, 10)));
             const title = escHtml(option.title || 'Hướng nhận định');
-            const reasoning = escHtml(option.reasoning || 'Chưa có lý do cụ thể.');
-            const advice = escHtml(option.advice_draft || '');
-            const flags = Array.isArray(option.red_flags) && option.red_flags.length
-                ? `<div style="margin-top:0.65rem; color:#b91c1c; font-size:0.78rem; line-height:1.45;"><strong>Cảnh báo cần lưu ý:</strong><br>${option.red_flags.map(escHtml).join('<br>')}</div>`
+            const doctorNotes = normalizeList(option.doctor_notes || option.reasoning || option.explanation, 4);
+            const cautionFlags = normalizeList(option.caution_flags || option.red_flags || option.caution, 4);
+            const notes = doctorNotes.length
+                ? doctorNotes
+                : ['Cần tiếp tục đối chiếu triệu chứng, bệnh nền, dị ứng, thuốc đang dùng và thể trạng trước khi quyết định điều trị.'];
+            const notesHtml = '<ul style="margin:0.45rem 0 0 1rem; padding:0;">'
+                + notes.map(note => `<li>${escHtml(note)}</li>`).join('')
+                + '</ul>';
+            const flags = cautionFlags.length
+                ? `<div style="margin-top:0.7rem; color:#b91c1c; font-size:0.8rem; line-height:1.45;"><strong>Cảnh báo nếu có:</strong><ul style="margin:0.4rem 0 0 1rem; padding:0;">${cautionFlags.map(flag => `<li>${escHtml(flag)}</li>`).join('')}</ul></div>`
                 : '';
 
             return `
@@ -85,12 +251,13 @@
                     <div style="height:8px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-bottom:0.75rem;">
                         <div style="width:${percent}%; height:100%; background:#2563eb; border-radius:999px;"></div>
                     </div>
-                    <div style="color:#475569; font-size:0.82rem; line-height:1.5;">${reasoning}</div>
+                    <div style="color:#475569; font-size:0.82rem; line-height:1.5;">
+                        <strong style="color:#1e3a8a;">Lưu ý cho bác sĩ khi kê đơn/thăm khám:</strong>
+                        ${notesHtml}
+                    </div>
                     ${flags}
-                    ${advice ? `<div style="margin-top:0.7rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:0.35rem; padding:0.65rem; color:#334155; font-size:0.8rem; line-height:1.45;"><strong>Lời dặn tham khảo:</strong><br>${advice}</div>` : ''}
                     <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem;">
-                        <button type="button" class="btn-apply-ai-diagnosis" data-index="${index}" style="border:none; background:#16a34a; color:#fff; border-radius:0.3rem; padding:0.45rem 0.7rem; font-size:0.78rem; font-weight:750; cursor:pointer;">Áp dụng chẩn đoán</button>
-                        ${advice ? `<button type="button" class="btn-copy-ai-advice" data-index="${index}" style="border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:0.3rem; padding:0.45rem 0.7rem; font-size:0.78rem; font-weight:750; cursor:pointer;">Sao chép lời dặn</button>` : ''}
+                        <button type="button" class="btn-apply-ai-diagnosis" data-index="${index}" style="border:none; background:#16a34a; color:#fff; border-radius:0.3rem; padding:0.45rem 0.7rem; font-size:0.78rem; font-weight:750; cursor:pointer;">Áp dụng nhận định tham khảo</button>
                     </div>
                 </div>
             `;
@@ -98,13 +265,6 @@
 
         container.querySelectorAll('.btn-apply-ai-diagnosis').forEach(btn => {
             btn.addEventListener('click', () => applyDiagnosis(options[parseInt(btn.dataset.index, 10)]));
-        });
-
-        container.querySelectorAll('.btn-copy-ai-advice').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const option = options[parseInt(btn.dataset.index, 10)] || {};
-                copyText(option.advice_draft || '', btn);
-            });
         });
     }
 
@@ -129,70 +289,119 @@
             hide('ai-preliminary-warning');
         }
 
+        if (Array.isArray(suggestions.follow_up_questions) && suggestions.follow_up_questions.length > 0) {
+            renderFollowupQuestions(suggestions.follow_up_questions);
+        }
+
         renderOptions(suggestions.assessment_options || []);
-        renderQuestions(suggestions.follow_up_questions || []);
+    }
+
+    function showApplyConfirmModal(option) {
+        pendingOptionToApply = option;
+        const modal = el('ai-confirm-apply-modal');
+        const badge = el('ai-confirm-diagnosis-badge');
+        if (modal && badge) {
+            badge.textContent = option.title;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeApplyConfirmModal() {
+        pendingOptionToApply = null;
+        const modal = el('ai-confirm-apply-modal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    const btnCancelApply = el('btn-cancel-apply-ai');
+    if (btnCancelApply) {
+        btnCancelApply.addEventListener('click', closeApplyConfirmModal);
+    }
+
+    const btnConfirmApply = el('btn-confirm-apply-ai');
+    if (btnConfirmApply) {
+        btnConfirmApply.addEventListener('click', function () {
+            if (!pendingOptionToApply) return;
+
+            fillAssessmentIntoRecordForm(pendingOptionToApply);
+            closeApplyConfirmModal();
+        });
+    }
+
+    const applyModalEl = el('ai-confirm-apply-modal');
+    if (applyModalEl) {
+        applyModalEl.addEventListener('click', function(e) {
+            if (e.target === applyModalEl) {
+                closeApplyConfirmModal();
+            }
+        });
     }
 
     async function applyDiagnosis(option) {
         if (!option || !option.title) return;
-
-        const confirmed = window.confirm('Áp dụng nhận định này làm chẩn đoán cho bệnh án? Thầy thuốc vẫn cần tự rà soát và chịu trách nhiệm chuyên môn.');
-        if (!confirmed) return;
-
-        try {
-            const resp = await fetch(APPLY_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    medical_record_id: parseInt(el('btn-ai-preliminary')?.dataset.recordId || '0', 10),
-                    diagnosis: option.title,
-                    log_id: latestLogId,
-                }),
-            });
-
-            const data = await resp.json();
-            if (!resp.ok || data.status !== 'success') {
-                alert(data.message || 'Không thể áp dụng chẩn đoán.');
-                return;
-            }
-
-            window.location.reload();
-        } catch (err) {
-            alert('Lỗi kết nối khi áp dụng chẩn đoán: ' + err.message);
-        }
+        showApplyConfirmModal(option);
     }
 
-    async function copyText(text, button) {
-        if (!text) return;
+    bindAdditionalSymptomsMirror();
 
-        try {
-            await navigator.clipboard.writeText(text);
-        } catch (err) {
-            const temp = document.createElement('textarea');
-            temp.value = text;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-        }
+    const followupBtn = el('btn-ai-followup-questions');
+    if (followupBtn) {
+        followupBtn.addEventListener('click', async function () {
+            const recordId = this.dataset.recordId || getRecordId();
+            if (!recordId) return;
 
-        const oldText = button.textContent;
-        button.textContent = 'Đã sao chép';
-        setTimeout(() => button.textContent = oldText, 1400);
+            showFollowupLoading();
+            setButtonBusy(this, true, 'Đang gợi ý...');
+
+            try {
+                const resp = await fetch(QUESTIONS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody(recordId)),
+                });
+
+                const data = await resp.json();
+
+                if (!resp.ok || data.status === 'error') {
+                    showFollowupError(data.message || 'Không thể gọi AI gợi ý câu hỏi.');
+                    return;
+                }
+
+                if (data.status === 'ai_unavailable') {
+                    showFollowupError(data.message || 'Dịch vụ AI gợi ý câu hỏi tạm thời không khả dụng.');
+                    return;
+                }
+
+                if (data.status !== 'success') {
+                    showFollowupError(data.message || 'AI chưa trả về danh sách câu hỏi hợp lệ.');
+                    return;
+                }
+
+                const suggestions = data.suggestions || {};
+                renderFollowupQuestions(suggestions.follow_up_questions || [], suggestions.missing_information || []);
+            } catch (err) {
+                showFollowupError('Lỗi kết nối mạng: ' + err.message);
+            } finally {
+                setButtonBusy(this, false);
+            }
+        });
     }
 
     const btn = el('btn-ai-preliminary');
     if (btn) {
         btn.addEventListener('click', async function () {
-            const recordId = this.dataset.recordId;
+            const recordId = this.dataset.recordId || getRecordId();
             if (!recordId) return;
 
-            showLoading();
-            setBusy(true);
+            showAssessmentLoading();
+            setButtonBusy(this, true, 'Đang phân tích...');
 
             try {
                 const resp = await fetch(ASSESS_URL, {
@@ -202,31 +411,31 @@
                         'X-CSRF-TOKEN': CSRF_TOKEN,
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify({ medical_record_id: parseInt(recordId, 10) }),
+                    body: JSON.stringify(requestBody(recordId)),
                 });
 
                 const data = await resp.json();
 
                 if (!resp.ok || data.status === 'error') {
-                    showError(data.message || 'Không thể gọi AI nhận định sơ bộ.');
+                    showAssessmentError(data.message || 'Không thể gọi AI nhận định sơ bộ.');
                     return;
                 }
 
                 if (data.status === 'ai_unavailable') {
-                    showError(data.message || 'Dịch vụ AI nhận định sơ bộ tạm thời không khả dụng.');
+                    showAssessmentError(data.message || 'Dịch vụ AI nhận định sơ bộ tạm thời không khả dụng.');
                     return;
                 }
 
                 if (data.status !== 'success') {
-                    showError(data.message || 'AI chưa trả về nhận định hợp lệ.');
+                    showAssessmentError(data.message || 'AI chưa trả về nhận định hợp lệ.');
                     return;
                 }
 
                 renderResult(data);
             } catch (err) {
-                showError('Lỗi kết nối mạng: ' + err.message);
+                showAssessmentError('Lỗi kết nối mạng: ' + err.message);
             } finally {
-                setBusy(false);
+                setButtonBusy(this, false);
             }
         });
     }

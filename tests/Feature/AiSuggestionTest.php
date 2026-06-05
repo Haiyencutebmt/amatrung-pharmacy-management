@@ -49,7 +49,7 @@ class AiSuggestionTest extends TestCase
 
     private function createMedicalRecord($patientId, $staffId, array $extra = [])
     {
-        return MedicalRecord::create(array_merge([
+        $attributes = array_merge([
             'patient_id' => $patientId,
             'staff_id' => $staffId,
             'visit_date' => now()->format('Y-m-d'),
@@ -57,7 +57,16 @@ class AiSuggestionTest extends TestCase
             'symptoms' => 'Triệu chứng test',
             'diagnosis' => 'Chẩn đoán test',
             'treatment_direction' => 'oral_only',
-        ], $extra));
+        ], $extra);
+
+        if (!array_key_exists('diagnosis_confirmed_at', $attributes)
+            && !empty($attributes['diagnosis'])
+            && $attributes['diagnosis'] !== MedicalRecord::PENDING_DIAGNOSIS) {
+            $attributes['diagnosis_confirmed_at'] = now();
+            $attributes['diagnosis_confirmed_by'] = $staffId;
+        }
+
+        return MedicalRecord::create($attributes);
     }
 
     /**
@@ -172,6 +181,14 @@ class AiSuggestionTest extends TestCase
         $response->assertJsonPath('status', 'success');
         
         $suggestions = $response->json('suggestions');
+        $this->assertNotEmpty($suggestions['pre_prescription_note']);
+        $this->assertNotEmpty($suggestions['treatment_principles']);
+        $this->assertNotEmpty($suggestions['suggested_items']);
+        $this->assertNotEmpty($suggestions['safety_and_followup']);
+        $this->assertSame('herb', $suggestions['suggested_items'][0]['type']);
+        $this->assertArrayHasKey('role', $suggestions['suggested_items'][0]);
+        $this->assertArrayHasKey('draft_dosage', $suggestions['suggested_items'][0]);
+        $this->assertArrayHasKey('inventory_status', $suggestions['suggested_items'][0]);
         $this->assertNotEmpty($suggestions['oral_herbs']);
         $this->assertEmpty($suggestions['external_herbs']);
         $this->assertEmpty($suggestions['therapy_services']);

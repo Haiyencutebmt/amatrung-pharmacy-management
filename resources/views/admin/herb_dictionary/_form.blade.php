@@ -50,7 +50,7 @@
             <textarea name="effects" rows="5" required>{{ old('effects', $entry->effects ?? '') }}</textarea>
         </div>
         <div class="form-block">
-            <label>Lưu ý khi sử dụng</label>
+            <label>Cách dùng</label>
             <textarea name="usage_notes" rows="4">{{ old('usage_notes', $entry->usage_notes ?? '') }}</textarea>
         </div>
         <div class="form-block">

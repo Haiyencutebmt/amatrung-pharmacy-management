@@ -45,7 +45,7 @@ class ChatbotController extends Controller
 
         $safetyAnswer = $geminiService->safetyAnswer($normalizedQuery, $searchResult);
         if ($safetyAnswer !== null) {
-            return $this->jsonReply($safetyAnswer, $searchResult['sources']);
+            return $this->jsonReply($geminiService->sanitizePublicAnswer($safetyAnswer), $searchResult['sources']);
         }
 
         $answer = $geminiService->generateAnswer($message, $normalizedQuery, $searchResult);
@@ -53,7 +53,7 @@ class ChatbotController extends Controller
             $answer = $this->fallbackSearchAnswer($searchResult);
         }
 
-        return $this->jsonReply($answer, $searchResult['sources']);
+        return $this->jsonReply($geminiService->sanitizePublicAnswer($answer), $searchResult['sources']);
     }
 
     private function fallbackSearchAnswer(array $searchResult): string

@@ -208,6 +208,7 @@ Route::prefix('admin')
         Route::delete('herb-dictionary/bulk-destroy', [\App\Http\Controllers\Admin\HerbDictionaryController::class, 'bulkDestroy'])->name('herb-dictionary.bulk-destroy');
         Route::post('herb-dictionary/{herbDictionary}/images', [\App\Http\Controllers\Admin\HerbDictionaryController::class, 'storeImage'])->name('herb-dictionary.images.store');
         Route::delete('herb-dictionary/{herbDictionary}/images/{image}', [\App\Http\Controllers\Admin\HerbDictionaryController::class, 'destroyImage'])->name('herb-dictionary.images.destroy');
+        Route::get('herb-dictionary/export-excel', [\App\Http\Controllers\Admin\HerbDictionaryController::class, 'exportExcel'])->name('herb-dictionary.export-excel');
         Route::resource('herb-dictionary', \App\Http\Controllers\Admin\HerbDictionaryController::class)
              ->only(['index', 'create', 'store', 'edit', 'update'])
              ->parameters(['herb-dictionary' => 'herbDictionary']);
@@ -224,6 +225,8 @@ Route::prefix('admin')
 
         // Giai đoạn 4: AI gợi ý tham khảo (API nội bộ - an toàn)
         Route::middleware('permission:use_ai_suggestion')->group(function () {
+            Route::post('api/ai-preliminary-assessment/follow-up-questions', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'followUpQuestions'])
+                 ->name('ai.preliminary-assessment.follow-up-questions');
             Route::post('api/ai-preliminary-assessment', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'preliminaryAssessment'])
                  ->name('ai.preliminary-assessment');
             Route::post('api/ai-preliminary-assessment/apply-diagnosis', [\App\Http\Controllers\Admin\AiSuggestionController::class, 'applyDiagnosis'])

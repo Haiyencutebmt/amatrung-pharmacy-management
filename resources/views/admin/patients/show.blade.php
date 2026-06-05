@@ -704,13 +704,6 @@
                                 <textarea id="tcm_pulse_modal_patient" name="tcm_pulse" rows="2" oninput="syncTraditionalExamPatient()" placeholder="Ghi nhận mạch tượng: tả - hữu, phù - trầm, khẩn - hoãn...">{{ old('tcm_pulse') }}</textarea>
                             </div>
                         </div>
-                        <div class="patient-tcm-card">
-                            <span class="patient-tcm-icon">⚖️</span>
-                            <div class="patient-tcm-body">
-                                <label for="tcm_pattern_modal_patient">Biện chứng và luận pháp</label>
-                                <textarea id="tcm_pattern_modal_patient" name="tcm_pattern" rows="2" oninput="syncTraditionalExamPatient()" placeholder="Kết luận tứ chẩn, xác định chứng thể, hư - thực, hàn - nhiệt...">{{ old('tcm_pattern') }}</textarea>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -779,7 +772,7 @@
                         <label class="patient-bottom-field-label"><span>📋</span> Triệu chứng <strong>*</strong></label>
                         <textarea id="symptoms_modal_patient" name="symptoms" required rows="3" oninput="markTraditionalFieldManualPatient('symptoms')" placeholder="Ghi nhận lời khai và triệu chứng của bệnh nhân..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('symptoms') }}</textarea>
                     </div>
-                    <div id="diagnosis_col_modal_patient">
+                    <div id="diagnosis_col_modal_patient" style="display:none;">
                         <label class="patient-bottom-field-label"><span>🎯</span> Chẩn đoán <small style="color:#94a3b8;">(có thể bổ sung sau)</small></label>
                         <textarea id="diagnosis_modal_patient" name="diagnosis" rows="3" oninput="markTraditionalFieldManualPatient('diagnosis')" placeholder="Có thể để trống để AI hỗ trợ nhận định sơ bộ ở trang chi tiết..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;">{{ old('diagnosis') }}</textarea>
                     </div>
@@ -1120,7 +1113,7 @@
     }
     .patient-tcm-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 0.75rem 1rem;
     }
     .patient-tcm-card {
@@ -1286,7 +1279,7 @@ function updateRecordFieldsModalPatient() {
 
         // Show/Hide diagnosis based on injury type
         if (injuryType === 'khac') {
-            if (diagnosisCol) diagnosisCol.style.display = 'block';
+            if (diagnosisCol) diagnosisCol.style.display = 'none';
             if (diagnosisInput) {
                 if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value === '' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                     diagnosisInput.value = '';
@@ -1314,7 +1307,7 @@ function updateRecordFieldsModalPatient() {
             }
         }
 
-        if (diagnosisCol) diagnosisCol.style.display = 'block';
+        if (diagnosisCol) diagnosisCol.style.display = 'none';
         if (diagnosisInput) {
             if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                 diagnosisInput.value = '';

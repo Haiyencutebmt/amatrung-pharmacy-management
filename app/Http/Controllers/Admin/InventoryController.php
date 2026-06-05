@@ -109,7 +109,7 @@ class InventoryController extends Controller
             $q->orderBy('expiry_date', 'asc')->orderBy('created_at', 'desc');
         }, 'batches.stockMovements' => function ($q) {
             $q->orderBy('created_at', 'desc')->take(10);
-        }])->findOrFail($id);
+        }, 'batches.stockMovements.user'])->findOrFail($id);
 
         return view('admin.inventory.show', compact('item'));
     }

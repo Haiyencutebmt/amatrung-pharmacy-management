@@ -84,6 +84,8 @@ class Phase4AiSafetyTest extends TestCase
             'case_type'           => $caseType,
             'symptoms'            => 'Đau nhức thắt lưng vùng L4-L5',
             'diagnosis'           => 'Thoái hóa cột sống thắt lưng',
+            'diagnosis_confirmed_at' => now(),
+            'diagnosis_confirmed_by' => $staffId,
             'treatment_direction' => $direction,
             'weight'              => 65.0,
             'height'              => 170.0,

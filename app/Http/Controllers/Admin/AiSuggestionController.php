@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Log;
  *  - Controller tự load bệnh án và kiểm tra quyền truy cập.
  *  - Không nhận symptoms/diagnosis/patient data từ request.
  *  - Ghi log đầy đủ vào ai_suggestion_logs (payload đã ẩn danh).
+ *  - AI preliminary assessment only supports reference analysis. Final diagnosis
+ *    and treatment decision belongs to the practitioner.
  */
 class AiSuggestionController extends Controller
 {
@@ -38,8 +40,10 @@ class AiSuggestionController extends Controller
 
     public function preliminaryAssessment(Request $request)
     {
+        // AI preliminary assessment only supports reference analysis. Final diagnosis and treatment decision belongs to the practitioner.
         $validated = $request->validate([
             'medical_record_id' => 'required|integer|exists:medical_records,id',
+            'additional_symptoms' => 'nullable|string|max:5000',
         ], [
             'medical_record_id.required' => 'Thiếu ID bệnh án.',
             'medical_record_id.integer'  => 'ID bệnh án không hợp lệ.',
@@ -66,7 +70,10 @@ class AiSuggestionController extends Controller
         }
 
         try {
-            $result = $this->assessmentService->assessFromRecord($record);
+            $result = $this->assessmentService->assessFromRecord(
+                $record,
+                $validated['additional_symptoms'] ?? null
+            );
         } catch (\Exception $e) {
             Log::error("[AiSuggestionController] Preliminary assessment exception: " . $e->getMessage());
 
@@ -101,15 +108,86 @@ class AiSuggestionController extends Controller
         ]);
     }
 
+    public function followUpQuestions(Request $request)
+    {
+        // AI preliminary assessment is for reference support only. Final diagnosis and treatment decisions belong to the practitioner.
+        $validated = $request->validate([
+            'medical_record_id' => 'required|integer|exists:medical_records,id',
+            'additional_symptoms' => 'nullable|string|max:5000',
+        ], [
+            'medical_record_id.required' => 'Thiếu ID bệnh án.',
+            'medical_record_id.integer'  => 'ID bệnh án không hợp lệ.',
+            'medical_record_id.exists'   => 'Bệnh án không tồn tại.',
+        ]);
+
+        $record = MedicalRecord::with('patient')->find($validated['medical_record_id']);
+
+        if (!$record) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bệnh án không tồn tại.',
+            ], 404);
+        }
+
+        $user = Auth::user();
+        if (!$this->canUseAiForRecord($record, $user)) {
+            Log::warning("[AiSuggestionController] User #{$user->id} cố gọi AI gợi ý câu hỏi cho bệnh án #{$record->id} không được phân công.");
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bạn không có quyền truy cập bệnh án này.',
+            ], 403);
+        }
+
+        try {
+            $result = $this->assessmentService->generateFollowUpQuestions(
+                $record,
+                $validated['additional_symptoms'] ?? null
+            );
+        } catch (\Exception $e) {
+            Log::error("[AiSuggestionController] Follow-up questions exception: " . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Lỗi hệ thống khi xử lý gợi ý câu hỏi khai thác thêm.',
+            ], 500);
+        }
+
+        $logEntry = null;
+        try {
+            $logEntry = AiSuggestionLog::create([
+                'user_id'           => $user->id,
+                'medical_record_id' => $record->id,
+                'payload'           => $result['payload_sent'] ?? ['ai_flow' => 'generate_followup_questions'],
+                'response'          => $result['suggestions'] ?? [],
+                'status'            => ($result['status'] === 'success') ? 'generated' : 'failed',
+                'error_message'     => ($result['status'] === 'ai_unavailable')
+                                         ? ($result['message'] ?? null)
+                                         : null,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("[AiSuggestionController] Không thể ghi log follow-up questions: " . $e->getMessage());
+        }
+
+        return response()->json([
+            'status'      => $result['status'],
+            'log_id'      => $logEntry?->id,
+            'suggestions' => $result['suggestions'] ?? [],
+            'disclaimer'  => $result['disclaimer'] ?? $this->assessmentService->getDisclaimer(),
+            'message'     => $result['message'] ?? null,
+        ]);
+    }
+
     public function applyDiagnosis(Request $request)
     {
+        // This only fills the existing diagnosis field after user confirmation; AI never saves a diagnosis automatically.
         $validated = $request->validate([
             'medical_record_id' => 'required|integer|exists:medical_records,id',
             'diagnosis'         => 'required|string|max:2000',
             'log_id'            => 'nullable|integer|exists:ai_suggestion_logs,id',
         ], [
             'medical_record_id.required' => 'Thiếu ID bệnh án.',
-            'diagnosis.required'         => 'Thiếu nội dung chẩn đoán cần áp dụng.',
+            'diagnosis.required'         => 'Thiếu nội dung nhận định tham khảo cần điền.',
         ]);
 
         $record = MedicalRecord::with('patient')->find($validated['medical_record_id']);
@@ -125,7 +203,7 @@ class AiSuggestionController extends Controller
         if (!$this->canUseAiForRecord($record, $user) || !$user->hasPermission('medical_records.edit')) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Bạn không có quyền áp dụng chẩn đoán cho bệnh án này.',
+                'message' => 'Bạn không có quyền điền nhận định tham khảo vào bệnh án này.',
             ], 403);
         }
 
@@ -145,7 +223,7 @@ class AiSuggestionController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã áp dụng chẩn đoán vào bệnh án.',
+            'message' => 'Đã điền nhận định tham khảo vào trường chẩn đoán của bệnh án.',
             'diagnosis' => $record->diagnosis,
         ]);
     }

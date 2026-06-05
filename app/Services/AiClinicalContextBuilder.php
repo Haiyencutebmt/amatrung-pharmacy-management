@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\MedicalRecord;
 use App\Models\InventoryBatch;
 use App\Models\MedicinalHerb;
+use App\Models\TherapyService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\DB;
  *  - Không gửi PII định danh (tên, ngày sinh, số điện thoại, địa chỉ bệnh nhân).
  *  - Nếu treatment_direction = 'referral', available_inventory trả về mảng rỗng.
  *  - Inventory chỉ lấy vị thuốc UỐNG (medicinal_herbs có tồn kho > 0 qua batch FEFO).
+ *  - Danh mục dịch vụ trị liệu chỉ gồm tên/hướng dẫn mặc định, không chứa PII.
+ *  - AI preliminary assessment only supports reference analysis. Final diagnosis
+ *    and treatment decision belongs to the practitioner.
  */
 class AiClinicalContextBuilder
 {
@@ -25,6 +29,7 @@ class AiClinicalContextBuilder
      */
     private const CLINICAL_ALLOWLIST = [
         'symptoms',
+        'additional_symptoms',
         'diagnosis',
         'treatment_plan',
         'treatment_direction',
@@ -77,12 +82,14 @@ class AiClinicalContextBuilder
 
         // 4. Kho khả dụng
         $availableInventory = $this->buildAvailableInventory($record->treatment_direction);
+        $availableServices = $this->buildAvailableServices($record->treatment_direction);
 
         return [
             'clinical'            => $clinical,
             'age'                 => $age,
             'gender'              => $gender,
             'available_inventory' => $availableInventory,
+            'available_services'  => $availableServices,
         ];
     }
 
@@ -122,17 +129,40 @@ class AiClinicalContextBuilder
 
         $items = $query->select(
                 'inventory_items.name',
+                'inventory_items.item_type',
+                'inventory_items.usage_route',
                 'inventory_items.unit',
                 DB::raw('SUM(inventory_batches.quantity_remaining) as stock_quantity')
             )
-            ->groupBy('inventory_items.id', 'inventory_items.name', 'inventory_items.unit')
+            ->groupBy('inventory_items.id', 'inventory_items.name', 'inventory_items.item_type', 'inventory_items.usage_route', 'inventory_items.unit')
             ->orderBy('inventory_items.name')
             ->get();
 
         return $items->map(fn($item) => [
             'name'          => $item->name,
+            'type'          => $item->item_type,
+            'usage_route'   => $item->usage_route,
             'unit'          => $item->unit,
             'available_qty' => (float) $item->stock_quantity,
         ])->toArray();
+    }
+
+    /**
+     * Lấy danh sách dịch vụ trị liệu đang hoạt động nếu hướng điều trị cho phép.
+     */
+    public function buildAvailableServices(?string $treatmentDirection): array
+    {
+        if (in_array($treatmentDirection, ['oral_only', 'referral'], true)) {
+            return [];
+        }
+
+        return TherapyService::where('status', 'active')
+            ->orderBy('name')
+            ->get(['name', 'default_instruction'])
+            ->map(fn($service) => [
+                'name' => $service->name,
+                'default_instruction' => $service->default_instruction,
+            ])
+            ->toArray();
     }
 }

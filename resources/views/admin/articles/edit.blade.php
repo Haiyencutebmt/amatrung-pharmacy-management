@@ -3,11 +3,10 @@
 @section('title', 'Sửa Bài Viết — AmaTrung')
 @section('page-title', '')
 
-@section('content')
-<div class="article-compose-page">
-    <div class="article-compose-header">
-        <div class="article-compose-mark">
-            <svg width="44" height="44" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+@section('header-left')
+    <div class="article-compose-header" style="margin-bottom: 0;">
+        <div class="article-compose-mark" style="width: 48px; height: 48px;">
+            <svg width="32" height="32" viewBox="0 0 48 48" fill="none" aria-hidden="true">
                 <path d="M24 42V16" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
                 <path d="M24 24C14 22 10 15 9 8c8 0 14 4 15 16Z" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
                 <path d="M25 28c10-1 15-7 16-15-8 0-14 4-16 15Z" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
@@ -15,10 +14,14 @@
             </svg>
         </div>
         <div>
-            <h1>Sửa bài viết</h1>
-            <p>Cập nhật nội dung, danh mục, thẻ và hình ảnh minh họa của bài viết.</p>
+            <h1 style="font-size: 1.5rem; margin: 0; font-weight: 900; line-height: 1.1;">Sửa bài viết</h1>
+            <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">Cập nhật nội dung, danh mục, thẻ và hình ảnh minh họa của bài viết.</p>
         </div>
     </div>
+@endsection
+
+@section('content')
+<div class="article-compose-page" style="padding-top: 0;">
 
     @if($errors->any())
         <div class="article-form-alert">
@@ -64,7 +67,7 @@
                 <div class="article-field">
                     <label for="content">Nội dung bài viết <span>*</span></label>
                     <div class="article-editor-shell">
-                        <textarea name="content" id="content" rows="18" required>{{ old('content', $article->content) }}</textarea>
+                        <textarea name="content" id="content" rows="18">{{ old('content', $article->content) }}</textarea>
                     </div>
                     <div class="article-word-count"><span id="wordCount">0</span> từ</div>
                 </div>
@@ -677,7 +680,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.getElementById('articleForm').addEventListener('submit', syncTags);
+    document.getElementById('articleForm').addEventListener('submit', function (event) {
+        if (tinymce.get('content')) {
+            tinymce.get('content').save();
+        }
+        const contentVal = document.getElementById('content').value.trim();
+        if (!contentVal) {
+            alert('Vui lòng nhập nội dung bài viết.');
+            event.preventDefault();
+            return false;
+        }
+        syncTags();
+    });
 
     uploadZone.addEventListener('click', function (event) {
         if (event.target.closest('button')) return;

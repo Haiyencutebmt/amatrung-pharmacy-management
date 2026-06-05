@@ -50,7 +50,7 @@
                 <div class="article-field">
                     <label for="content">Nội dung bài viết <span>*</span></label>
                     <div class="article-editor-shell">
-                        <textarea name="content" id="content" rows="18" required placeholder="Bắt đầu viết nội dung bài viết tại đây...">{{ old('content') }}</textarea>
+                        <textarea name="content" id="content" rows="18" placeholder="Bắt đầu viết nội dung bài viết tại đây...">{{ old('content') }}</textarea>
                     </div>
                     <div class="article-word-count"><span id="wordCount">0</span> từ</div>
                 </div>
@@ -662,7 +662,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.getElementById('articleForm').addEventListener('submit', syncTags);
+    document.getElementById('articleForm').addEventListener('submit', function (event) {
+        if (tinymce.get('content')) {
+            tinymce.get('content').save();
+        }
+        const contentVal = document.getElementById('content').value.trim();
+        if (!contentVal) {
+            alert('Vui lòng nhập nội dung bài viết.');
+            event.preventDefault();
+            return false;
+        }
+        syncTags();
+    });
 
     uploadZone.addEventListener('click', function (event) {
         if (event.target.closest('button')) return;

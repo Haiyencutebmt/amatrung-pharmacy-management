@@ -230,7 +230,7 @@
 
                         <div>
                             <button type="button" id="btn-apply-ai" style="width: 100%; background: #e0f2fe; color: #0369a1; border: none; padding: 0.75rem; border-radius: 0.25rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s;" onclick="applyAI()" onmouseover="this.style.background='#bae6fd'" onmouseout="this.style.background='#e0f2fe'">
-                                ✨ Áp dụng gợi ý AI
+                                ✨ Áp dụng vào đơn nháp
                             </button>
                         </div>
                     </div>
@@ -737,41 +737,157 @@
         document.getElementById('service-page-controls').innerHTML = controls;
     }
 
+    function parseDraftQuantity(value, fallback) {
+        const text = String(value || '');
+        const match = text.match(/(\d+(?:[,.]\d+)?)/);
+        if (!match) return fallback;
+
+        const parsed = parseFloat(match[1].replace(',', '.'));
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+    }
+
+    function findByName(items, name) {
+        const needle = String(name || '').trim().toLowerCase();
+        if (!needle) return null;
+
+        return items.find(item => String(item.name || '').trim().toLowerCase() === needle)
+            || items.find(item => {
+                const candidate = String(item.name || '').trim().toLowerCase();
+                return candidate.includes(needle) || needle.includes(candidate);
+            })
+            || null;
+    }
+
+    function normalizeAiDraftItems(suggestions) {
+        const items = [];
+        const rawSuggestedItems = Array.isArray(suggestions.suggested_items) ? suggestions.suggested_items : [];
+
+        rawSuggestedItems.forEach(item => {
+            if (!item || typeof item !== 'object' || !item.name) return;
+            items.push({
+                type: item.type || 'herb',
+                name: item.name,
+                role: item.role || '',
+                draft_dosage: item.draft_dosage || '',
+                unit: item.unit || '',
+                safety_note: item.safety_note || '',
+            });
+        });
+
+        (suggestions.oral_herbs || []).forEach(item => {
+            if (!item.herb_name) return;
+            items.push({
+                type: 'herb',
+                name: item.herb_name,
+                role: item.usage_note || item.role || '',
+                draft_dosage: item.draft_dosage || '',
+                unit: item.unit || '',
+                safety_note: item.safety_note || '',
+            });
+        });
+
+        (suggestions.external_herbs || []).forEach(item => {
+            if (!item.custom_name) return;
+            items.push({
+                type: 'external_product',
+                name: item.custom_name,
+                role: item.usage_area || item.role || '',
+                draft_dosage: item.draft_dosage || '',
+                unit: item.unit || '',
+                safety_note: item.usage_instruction || item.safety_note || '',
+            });
+        });
+
+        (suggestions.therapy_services || []).forEach(item => {
+            if (!item.custom_name) return;
+            items.push({
+                type: 'service',
+                name: item.custom_name,
+                role: item.usage_area || item.role || '',
+                draft_dosage: item.draft_dosage || '',
+                unit: item.unit || 'lần',
+                safety_note: item.usage_instruction || item.safety_note || '',
+            });
+        });
+
+        const seen = new Set();
+        return items.filter(item => {
+            const key = `${item.type}|${String(item.name).trim().toLowerCase()}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
     // AI Integration
     function applyAI() {
         if (!window.aiSuggestionsData) {
             window.showToastMessage('Chưa có dữ liệu AI. Vui lòng lấy gợi ý AI trước.', 'warning');
             return;
         }
-        
-        const aiHerbs = window.aiSuggestionsData.oral_herbs || [];
-        if (aiHerbs.length === 0) {
-            window.showToastMessage('AI không gợi ý vị thuốc uống nào.', 'warning');
+
+        const aiItems = normalizeAiDraftItems(window.aiSuggestionsData);
+        if (aiItems.length === 0) {
+            window.showToastMessage('AI chưa có gợi ý đơn nháp phù hợp để áp dụng.', 'warning');
             return;
         }
 
-        let addedCount = 0;
-        aiHerbs.forEach(aiH => {
-            // Find in herbsData
-            const herb = herbsData.find(h => h.name.toLowerCase() === aiH.herb_name.toLowerCase());
-            if (herb && !cartItems.find(i => i.id === herb.id)) {
+        let addedHerbs = 0;
+        let addedExternal = 0;
+        let addedServices = 0;
+
+        aiItems.forEach(aiItem => {
+            if (aiItem.type === 'herb') {
+                const herb = findByName(herbsData, aiItem.name);
+                if (!herb || cartItems.find(i => i.id === herb.id)) return;
+
                 cartItems.push({
                     id: herb.id,
                     name: herb.name,
                     unit: herb.unit,
-                    dose: 10, // AI doesn't give dose, default to 10
-                    note: aiH.usage_note || ''
+                    dose: parseDraftQuantity(aiItem.draft_dosage, 10),
+                    note: [aiItem.role, aiItem.safety_note].filter(Boolean).join(' | ')
                 });
-                addedCount++;
+                addedHerbs++;
+                return;
+            }
+
+            if (aiItem.type === 'external_product') {
+                const product = findByName(externalProductsData, aiItem.name);
+                if (!product || selectedExternalProducts.find(item => item.id === product.id)) return;
+
+                selectedExternalProducts.push({
+                    id: product.id,
+                    name: product.name,
+                    item_type: product.item_type || 'packaged_product',
+                    unit: product.unit || aiItem.unit || 'đơn vị',
+                    quantity: parseDraftQuantity(aiItem.draft_dosage, 1),
+                    dosage: [aiItem.role, aiItem.safety_note].filter(Boolean).join(' | ') || 'Dùng ngoài theo hướng dẫn của thầy thuốc. Không được uống.',
+                });
+                addedExternal++;
+                return;
+            }
+
+            if (aiItem.type === 'service') {
+                const service = findByName(therapyServicesData, aiItem.name);
+                const serviceName = service ? service.name : aiItem.name;
+                if (selectedServices.includes(serviceName)) return;
+
+                selectedServices.push(serviceName);
+                addedServices++;
             }
         });
+
+        const addedCount = addedHerbs + addedExternal + addedServices;
 
         if (addedCount > 0) {
             renderCart();
             renderCatalog();
-            window.showToastMessage(`Đã thêm ${addedCount} vị thuốc theo gợi ý AI.`, 'success');
+            renderExternalProducts();
+            renderServices();
+            window.showToastMessage(`Đã áp dụng ${addedCount} hạng mục AI vào đơn nháp. Thầy thuốc cần rà soát và chỉnh sửa trước khi lưu.`, 'success');
         } else {
-            window.showToastMessage('Các vị thuốc AI gợi ý đã có trong đơn hoặc không tìm thấy trong kho.', 'warning');
+            window.showToastMessage('Các hạng mục AI đã có trong đơn nháp hoặc không khớp dữ liệu kho/dịch vụ hiện có.', 'warning');
         }
     }
 

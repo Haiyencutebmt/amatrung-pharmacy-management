@@ -717,22 +717,204 @@ window.onclick = function(event) {
 .patient-select-option:hover {
     background-color: #f8fafc;
 }
+.patient-case-type-panel,
+.patient-tcm-panel {
+    margin-bottom: 1rem;
+    border: 1px solid #d9f5e4;
+    border-radius: 0.6rem;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, #f7fef9 0%, #ffffff 100%);
+}
+.patient-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.8rem;
+    color: #15803d;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+.patient-section-title-green {
+    color: #047857;
+}
+.patient-case-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+.patient-case-type-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 74px;
+    padding: 0.8rem 1rem;
+    border: 1px solid #dbe5ef;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+.patient-case-type-card:hover {
+    border-color: #86efac;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+    transform: translateY(-1px);
+}
+.patient-case-type-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.patient-case-radio-dot {
+    width: 17px;
+    height: 17px;
+    border: 2px solid #94a3b8;
+    border-radius: 9999px;
+    box-shadow: inset 0 0 0 4px #fff;
+}
+.patient-case-type-card:has(input:checked) {
+    border-color: #22c55e;
+    background: #f0fdf4;
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.16);
+}
+.patient-case-type-card:has(input:checked) .patient-case-radio-dot {
+    background: #059669;
+    border-color: #059669;
+}
+.patient-case-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 0.45rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.patient-case-icon-green,
+.patient-tcm-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+.patient-case-icon-purple {
+    background: #f3e8ff;
+    color: #7e22ce;
+}
+.patient-case-icon-blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+.patient-case-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    line-height: 1.35;
+}
+.patient-case-copy strong {
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+.patient-case-copy small {
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+.patient-tcm-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+}
+@media (max-width: 768px) {
+    .patient-tcm-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.patient-tcm-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.75rem;
+    border: 1px solid #dbe5ef;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+.patient-tcm-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 0.45rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.patient-tcm-body label {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: #1e293b;
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+.patient-tcm-body textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.3rem 0.1rem;
+    border: none;
+    outline: none;
+    resize: vertical;
+    box-sizing: border-box;
+    color: #1e293b;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    background: transparent;
+}
+.patient-tcm-body textarea::placeholder {
+    color: #94a3b8;
+}
+.patient-bottom-field-label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.4rem;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+.patient-bottom-field-label span {
+    width: 28px;
+    height: 28px;
+    border-radius: 0.4rem;
+    background: #ecfdf5;
+    color: #16a34a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bbf7d0;
+}
+.patient-bottom-field-label strong {
+    color: #ef4444;
+}
 </style>
 
 {{-- MODAL: Tạo Bệnh Án Mới --}}
 <div id="createRecordModal" style="display:none; position:fixed; inset:0; z-index:1000; overflow-y:auto; background:rgba(15,23,42,0.45); backdrop-filter:blur(4px); padding:2rem 0; flex-direction:column; align-items:center; justify-content:flex-start; box-sizing:border-box;">
-    <div style="background:#fff; border-radius:0.5rem; width:95%; max-width:1250px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); animation: modalSlideIn 0.25s ease-out; margin:0 auto; box-sizing:border-box;">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:1.25rem 2rem; border-bottom:1px solid #f1f5f9;">
+    <div style="background:#fff; border-radius:0.5rem; width:95%; max-width:1250px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); animation: modalSlideIn 0.25s ease-out; margin:0 auto; padding:1.5rem 2rem; border:1px solid #5eb542; box-sizing:border-box;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; border-bottom:1px solid #f1f5f9; padding-bottom:1rem;">
             <div style="display:flex; align-items:center; gap:0.75rem;">
-                <div style="width:40px; height:40px; background:#eff6ff; color:#2563eb; border-radius:0.25rem; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🩺</div>
+                <div style="width:40px; height:40px; background:#f0fdf4; color:#16a34a; border-radius:0.25rem; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🩺</div>
                 <div>
-                    <h3 style="margin:0; font-size:1.2rem; font-weight:800; color:#0f172a;">Tạo Bệnh Án Mới</h3>
+                    <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#0f172a;">Tạo Bệnh Án Mới</h3>
                     <p style="margin:0; font-size:0.8rem; color:#64748b;">Lập bệnh án cho lượt khám hiện tại</p>
                 </div>
             </div>
-            <button onclick="document.getElementById('createRecordModal').style.display='none'" style="background:none; border:none; font-size:1.5rem; color:#94a3b8; cursor:pointer; width:36px; height:36px; border-radius:0.25rem; display:flex; align-items:center; justify-content:center;">&times;</button>
+            <button onclick="document.getElementById('createRecordModal').style.display='none'" style="background:none; border:none; font-size:1.5rem; color:#94a3b8; cursor:pointer; width:36px; height:36px; border-radius:0.25rem; display:flex; align-items:center; justify-content:center;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">&times;</button>
         </div>
-        <form action="{{ route('admin.medical-records.store') }}" method="POST" enctype="multipart/form-data" style="padding:1.5rem 2rem;">
+        <form action="{{ route('admin.medical-records.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             {{-- Row 1: General Info (4 columns) --}}
@@ -781,21 +963,68 @@ window.onclick = function(event) {
             </div>
 
             {{-- Row: Case Type --}}
-            <div style="margin-bottom: 1rem; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 0.85rem; border-radius: 0.25rem;">
-                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 0.4rem;">Phân loại ca khám bệnh</label>
-                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
-                    <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; font-weight: 600; color: #1e293b;">
-                        <input type="radio" name="case_type" value="normal" checked onchange="toggleCaseTypeModal(this.value)"> 
-                        Khám thông thường (Bốc thuốc uống...)
+            <div class="patient-case-type-panel">
+                <div class="patient-section-title">
+                    <span>🛡️</span>
+                    Phân loại ca khám bệnh
+                </div>
+                <div class="patient-case-type-grid">
+                    <label class="patient-case-type-card patient-case-type-card-green">
+                        <input type="radio" name="case_type" value="normal" checked onchange="toggleCaseTypeModal(this.value)">
+                        <span class="patient-case-radio-dot"></span>
+                        <span class="patient-case-icon patient-case-icon-green">🩺</span>
+                        <span class="patient-case-copy">
+                            <strong>Khám thông thường</strong>
+                            <small>(Bốc thuốc uống...)</small>
+                        </span>
                     </label>
-                    <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; font-weight: 700; color: #b91c1c;">
-                        <input type="radio" name="case_type" value="musculoskeletal" onchange="toggleCaseTypeModal(this.value)"> 
-                        🦴 Xương khớp - Chấn thương - Trị liệu ngoài
+                    <label class="patient-case-type-card patient-case-type-card-purple">
+                        <input type="radio" name="case_type" value="musculoskeletal" onchange="toggleCaseTypeModal(this.value)">
+                        <span class="patient-case-radio-dot"></span>
+                        <span class="patient-case-icon patient-case-icon-purple">🦴</span>
+                        <span class="patient-case-copy">
+                            <strong>Xương khớp - Chấn thương - Trị liệu ngoài</strong>
+                        </span>
                     </label>
-                    <label style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; font-weight: 700; color: #2563eb;">
-                        <input type="radio" name="case_type" value="combined" onchange="toggleCaseTypeModal(this.value)"> 
-                        🔄 Khám kết hợp cả hai
+                    <label class="patient-case-type-card patient-case-type-card-blue">
+                        <input type="radio" name="case_type" value="combined" onchange="toggleCaseTypeModal(this.value)">
+                        <span class="patient-case-radio-dot"></span>
+                        <span class="patient-case-icon patient-case-icon-blue">🔄</span>
+                        <span class="patient-case-copy">
+                            <strong>Khám kết hợp cả hai</strong>
+                        </span>
                     </label>
+                </div>
+            </div>
+
+            {{-- Row: Traditional Diagnosis Helper --}}
+            <div id="traditional_exam_modal" class="patient-tcm-panel">
+                <div class="patient-section-title patient-section-title-green">
+                    <span>🌿</span>
+                    Tứ chẩn & Biện chứng
+                </div>
+                <div class="patient-tcm-grid">
+                    <div class="patient-tcm-card">
+                        <span class="patient-tcm-icon">💬</span>
+                        <div class="patient-tcm-body">
+                            <label for="tcm_inquiry_modal">Hỏi bệnh</label>
+                            <textarea id="tcm_inquiry_modal" name="tcm_inquiry" rows="2" oninput="syncTraditionalExam()" placeholder="Ghi nhận diễn biến bệnh, hoàn cảnh, thói quen, khẩu vị, giấc ngủ..."></textarea>
+                        </div>
+                    </div>
+                    <div class="patient-tcm-card">
+                        <span class="patient-tcm-icon">👁️</span>
+                        <div class="patient-tcm-body">
+                            <label for="tcm_observation_modal">Vọng + Văn chẩn</label>
+                            <textarea id="tcm_observation_modal" name="tcm_observation" rows="2" oninput="syncTraditionalExam()" placeholder="Quan sát thần sắc, hình thái, lưỡi, rêu lưỡi, sắc mặt, khí sắc..."></textarea>
+                        </div>
+                    </div>
+                    <div class="patient-tcm-card">
+                        <span class="patient-tcm-icon">〰️</span>
+                        <div class="patient-tcm-body">
+                            <label for="tcm_pulse_modal">Bắt mạch</label>
+                            <textarea id="tcm_pulse_modal" name="tcm_pulse" rows="2" oninput="syncTraditionalExam()" placeholder="Ghi nhận mạch tượng: tả - hữu, phù - trầm, khẩn - hoãn..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -859,23 +1088,21 @@ window.onclick = function(event) {
             </div>
 
             {{-- Row 2: Symptoms & Diagnosis (2 columns side-by-side) --}}
-            <div class="modal-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
                 <div id="symptoms_col_modal">
-                    <label style="display:block; font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:0.4rem;">Triệu chứng <span style="color:#ef4444;">*</span></label>
-                    <textarea name="symptoms" required rows="3" placeholder="Ghi nhận lời khai và triệu chứng..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;"></textarea>
+                    <label class="patient-bottom-field-label"><span>📋</span> Triệu chứng <strong>*</strong></label>
+                    <textarea id="symptoms_modal" name="symptoms" required rows="3" oninput="markTraditionalFieldManual('symptoms')" placeholder="Ghi nhận lời khai và triệu chứng của bệnh nhân..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;"></textarea>
                 </div>
-                <div id="diagnosis_col_modal">
-                    <label style="display:block; font-size:0.82rem; font-weight:700; color:#475569; margin-bottom:0.4rem;">Chẩn đoán <span style="color:#94a3b8; font-size:0.75rem;">(có thể bổ sung sau)</span></label>
-                    <textarea name="diagnosis" rows="3" placeholder="Có thể để trống để AI hỗ trợ nhận định sơ bộ ở trang chi tiết..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;"></textarea>
+                <div id="diagnosis_col_modal" style="display:none;">
+                    <label class="patient-bottom-field-label"><span>🎯</span> Chẩn đoán <small style="color:#94a3b8;">(có thể bổ sung sau)</small></label>
+                    <textarea id="diagnosis_modal" name="diagnosis" rows="3" oninput="markTraditionalFieldManual('diagnosis')" placeholder="Có thể để trống để AI hỗ trợ nhận định sơ bộ ở trang chi tiết..." style="width:100%; padding:0.6rem 0.8rem; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; color:#1e293b; resize:vertical; box-sizing:border-box;"></textarea>
                 </div>
             </div>
-
-
 
             {{-- Footer Action Buttons --}}
             <div style="display:flex; gap:1rem; justify-content:flex-end; border-top:1px solid #f1f5f9; padding-top:1.25rem;">
                 <button type="button" onclick="document.getElementById('createRecordModal').style.display='none'" style="padding:0.6rem 1.5rem; background:#fff; color:#64748b; border:1px solid #cbd5e1; border-radius:0.25rem; font-size:0.9rem; font-weight:600; cursor:pointer;">Hủy</button>
-                <button type="submit" style="padding:0.6rem 1.5rem; background:#2563eb; color:#fff; border:none; border-radius:0.25rem; font-size:0.9rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(37,99,235,0.15);">Lưu Bệnh Án</button>
+                <button type="submit" style="padding:0.6rem 1.5rem; background:#5eb542; color:#fff; border:none; border-radius:0.25rem; font-size:0.9rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(94,181,66,0.15);">Lưu Bệnh Án</button>
             </div>
         </form>
     </div>
@@ -905,6 +1132,58 @@ window.onclick = function(event) {
 </form>
 
 <script>
+function getTraditionalExamValue(id) {
+    return (document.getElementById(id)?.value || '').trim();
+}
+
+function markTraditionalFieldManual(field) {
+    const input = field === 'diagnosis'
+        ? document.getElementById('diagnosis_modal')
+        : document.getElementById('symptoms_modal');
+
+    if (input) {
+        input.dataset.tcmAuto = '0';
+    }
+}
+
+function syncTraditionalExam() {
+    const caseType = document.querySelector('#createRecordModal input[name="case_type"]:checked')?.value || 'normal';
+    if (caseType === 'musculoskeletal') {
+        return;
+    }
+
+    const symptomsInput = document.getElementById('symptoms_modal');
+    const diagnosisInput = document.getElementById('diagnosis_modal');
+    const inquiry = getTraditionalExamValue('tcm_inquiry_modal');
+    const observation = getTraditionalExamValue('tcm_observation_modal');
+    const pulse = getTraditionalExamValue('tcm_pulse_modal');
+    const pattern = getTraditionalExamValue('tcm_pattern_modal');
+
+    const symptomsText = [
+        inquiry ? `Hỏi bệnh: ${inquiry}` : '',
+        observation ? `Vọng + Văn chẩn: ${observation}` : '',
+        pulse ? `Bắt mạch: ${pulse}` : '',
+    ].filter(Boolean).join("\n");
+
+    if (symptomsInput && symptomsText && (!symptomsInput.value.trim() || symptomsInput.dataset.tcmAuto === '1')) {
+        symptomsInput.value = symptomsText;
+        symptomsInput.dataset.tcmAuto = '1';
+    }
+
+    if (symptomsInput && !symptomsText && symptomsInput.dataset.tcmAuto === '1') {
+        symptomsInput.value = '';
+    }
+
+    if (diagnosisInput && pattern && (!diagnosisInput.value.trim() || diagnosisInput.dataset.tcmAuto === '1')) {
+        diagnosisInput.value = pattern;
+        diagnosisInput.dataset.tcmAuto = '1';
+    }
+
+    if (diagnosisInput && !pattern && diagnosisInput.dataset.tcmAuto === '1') {
+        diagnosisInput.value = '';
+    }
+}
+
 function updateRecordFieldsModal() {
     const caseType = document.querySelector('#createRecordModal input[name="case_type"]:checked')?.value || 'normal';
     const injuryTypeSelect = document.querySelector('#createRecordModal select[name="injury_type"]');
@@ -913,9 +1192,14 @@ function updateRecordFieldsModal() {
     const symptomsCol = document.getElementById('symptoms_col_modal');
     const diagnosisCol = document.getElementById('diagnosis_col_modal');
     const gridRow = symptomsCol?.parentElement;
+    const traditionalExam = document.getElementById('traditional_exam_modal');
 
     const symptomsInput = document.querySelector('#createRecordModal textarea[name="symptoms"]');
     const diagnosisInput = document.querySelector('#createRecordModal textarea[name="diagnosis"]');
+
+    if (traditionalExam) {
+        traditionalExam.style.display = caseType === 'musculoskeletal' ? 'none' : 'block';
+    }
 
     if (caseType === 'musculoskeletal') {
         // Hide symptoms
@@ -927,7 +1211,7 @@ function updateRecordFieldsModal() {
 
         // Show/Hide diagnosis based on injury type
         if (injuryType === 'khac') {
-            if (diagnosisCol) diagnosisCol.style.display = 'block';
+            if (diagnosisCol) diagnosisCol.style.display = 'none';
             if (diagnosisInput) {
                 if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value === '' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                     diagnosisInput.value = '';
@@ -955,7 +1239,7 @@ function updateRecordFieldsModal() {
             }
         }
 
-        if (diagnosisCol) diagnosisCol.style.display = 'block';
+        if (diagnosisCol) diagnosisCol.style.display = 'none';
         if (diagnosisInput) {
             if (diagnosisInput.value === 'Khám Xương khớp - Chấn thương' || diagnosisInput.value.startsWith('Bong gân') || diagnosisInput.value.startsWith('Trật khớp') || diagnosisInput.value.startsWith('Nghi gãy xương') || diagnosisInput.value.startsWith('Đau vai gáy') || diagnosisInput.value.startsWith('Đau lưng') || diagnosisInput.value.startsWith('Đau khớp gối')) {
                 diagnosisInput.value = '';
@@ -978,6 +1262,8 @@ function updateRecordFieldsModal() {
             gridRow.style.display = 'none'; // both hidden
         }
     }
+
+    syncTraditionalExam();
 }
 
 function toggleCaseTypeModal(value) {

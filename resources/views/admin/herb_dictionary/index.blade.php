@@ -33,7 +33,10 @@
                 <button type="submit">Lọc</button>
                 <a href="{{ route('admin.herb-dictionary.index') }}">Reset</a>
             </div>
-            <a href="{{ route('admin.herb-dictionary.create') }}" class="dict-add">Thêm mục mới</a>
+            <div style="display:flex; gap:0.5rem; justify-content: flex-end;">
+                <a href="{{ route('admin.herb-dictionary.export-excel') }}" class="dict-add" style="background:#10b981;">Xuất Excel</a>
+                <a href="{{ route('admin.herb-dictionary.create') }}" class="dict-add">Thêm mục mới</a>
+            </div>
         </form>
 
         <div class="dict-import-panel">

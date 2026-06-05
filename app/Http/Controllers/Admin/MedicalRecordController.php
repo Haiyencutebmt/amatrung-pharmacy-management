@@ -109,6 +109,7 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'weight'         => 'nullable|numeric|min:0|max:500',
             'height'         => 'nullable|numeric|min:0|max:300',
             'symptoms'       => 'required|string',
+            'additional_symptoms' => 'nullable|string',
             'diagnosis'      => 'nullable|string',
             'treatment_plan' => 'nullable|string',
             'doctor_note'    => 'nullable|string',
@@ -219,6 +220,7 @@ class MedicalRecordController extends Controller implements HasMiddleware
     public function update(Request $request, MedicalRecord $medicalRecord)
     {
         $this->mergeDefaultTreatmentDirection($request);
+        $isConfirmingDiagnosis = $request->boolean('confirm_diagnosis');
 
         $validated = $request->validate([
             'patient_id'     => 'required|exists:patients,id',
@@ -226,6 +228,7 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'weight'         => 'nullable|numeric|min:0|max:500',
             'height'         => 'nullable|numeric|min:0|max:300',
             'symptoms'       => 'required|string',
+            'additional_symptoms' => 'nullable|string',
             'diagnosis'      => 'nullable|string',
             'treatment_plan' => 'nullable|string',
             'doctor_note'    => 'nullable|string',
@@ -249,6 +252,12 @@ class MedicalRecordController extends Controller implements HasMiddleware
         $validated['diagnosis'] = $this->normalizeDiagnosis($validated['diagnosis'] ?? null);
         $validated['case_type'] = $this->normalizeCaseType($validated['case_type'] ?? null);
 
+        if ($isConfirmingDiagnosis && !$this->hasMeaningfulDiagnosis($validated['diagnosis'])) {
+            return back()
+                ->withErrors(['diagnosis' => 'Vui lòng nhập Chẩn đoán / Nhận định trước khi xác nhận.'])
+                ->withInput();
+        }
+
         // Upload ảnh phim mới: xóa ảnh cũ nếu tồn tại
         // Upload ảnh/phim private mới
         if ($request->hasFile('xray_image')) {
@@ -259,6 +268,11 @@ class MedicalRecordController extends Controller implements HasMiddleware
             unset($validated['xray_image']);
         } else {
             unset($validated['xray_image']);
+        }
+
+        if ($isConfirmingDiagnosis) {
+            $validated['diagnosis_confirmed_at'] = now();
+            $validated['diagnosis_confirmed_by'] = auth()->id();
         }
 
         $originalData = $medicalRecord->getOriginal();
@@ -272,7 +286,19 @@ class MedicalRecordController extends Controller implements HasMiddleware
             'redirect_url' => route('admin.medical-records.show', $medicalRecord),
         ]);
 
-        return redirect()->route('admin.medical-records.show', $medicalRecord)->with('success', 'Đã cập nhật bệnh án thành công.');
+        $message = $isConfirmingDiagnosis
+            ? 'Đã xác nhận chẩn đoán. Nội dung chẩn đoán và lưu ý đã chuyển sang chế độ chỉ đọc trên trang chi tiết.'
+            : 'Đã cập nhật bệnh án thành công.';
+
+        $redirect = redirect()
+            ->route('admin.medical-records.show', $medicalRecord)
+            ->with('success', $message);
+
+        if ($isConfirmingDiagnosis) {
+            $redirect->with('scroll_to_treatment_action', true);
+        }
+
+        return $redirect;
     }
 
     public function destroy(MedicalRecord $medicalRecord)
@@ -315,6 +341,13 @@ class MedicalRecordController extends Controller implements HasMiddleware
         $diagnosis = trim((string) $diagnosis);
 
         return $diagnosis !== '' ? $diagnosis : MedicalRecord::PENDING_DIAGNOSIS;
+    }
+
+    private function hasMeaningfulDiagnosis(?string $diagnosis): bool
+    {
+        $diagnosis = trim((string) $diagnosis);
+
+        return $diagnosis !== '' && $diagnosis !== MedicalRecord::PENDING_DIAGNOSIS;
     }
 
     private function mergeDefaultTreatmentDirection(Request $request): void

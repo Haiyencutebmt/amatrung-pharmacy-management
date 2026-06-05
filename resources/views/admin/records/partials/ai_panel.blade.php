@@ -67,42 +67,57 @@
         {{-- Error box --}}
         <div id="ai-error-box" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.25rem; padding: 0.75rem 1rem; font-size: 0.85rem; color: #991b1b; font-weight: 600;"></div>
 
-        {{-- Kết quả (3 cột grid) --}}
-        <div id="ai-result-box" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+        {{-- Kết quả gợi ý đơn nháp --}}
+        <div id="ai-result-box" style="display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem;">
             
-            {{-- Cột 1: Nhận xét lâm sàng --}}
+            {{-- Khối 1: Nhận xét trước kê đơn --}}
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <div style="background: #eff6ff; color: #3b82f6; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
-                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Nhận xét lâm sàng</span>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Nhận xét trước kê đơn</span>
                 </div>
-                <div id="ai-reasoning-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+                <div id="ai-pre-note-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
             </div>
 
-            {{-- Cột 2: Gợi ý dược liệu --}}
+            {{-- Khối 2: Nguyên tắc điều trị tham khảo --}}
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="background: #fef3c7; color: #d97706; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Nguyên tắc điều trị tham khảo</span>
+                </div>
+                <div id="ai-principles-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+            </div>
+
+            {{-- Khối 3: Gợi ý đơn thuốc / dịch vụ nháp --}}
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <div style="background: #f0fdf4; color: #22c55e; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
                     </div>
-                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý dược liệu / Dịch vụ</span>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý đơn thuốc / dịch vụ nháp</span>
                 </div>
-                <div id="ai-herbs-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+                <div id="ai-draft-items-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
             </div>
 
-            {{-- Cột 3: Gợi ý theo dõi --}}
+            {{-- Khối 4: Lưu ý an toàn và theo dõi --}}
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <div style="background: #faf5ff; color: #a855f7; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     </div>
-                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý theo dõi</span>
+                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Lưu ý an toàn và theo dõi</span>
                 </div>
-                <div id="ai-followup-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+                <div id="ai-safety-followup-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
             </div>
 
+        </div>
+
+        <div id="ai-suggestion-disclaimer" style="display: none; margin-top: 0.9rem; border: 1px solid #fed7aa; background: #fff7ed; color: #9a3412; border-radius: 0.4rem; padding: 0.65rem 0.85rem; font-size: 0.82rem; font-weight: 700;">
+            Gợi ý AI chỉ mang tính tham khảo. Thầy thuốc cần kiểm tra, chỉnh sửa và xác nhận trước khi lập đơn.
         </div>
     </div>
 </div>

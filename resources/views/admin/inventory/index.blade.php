@@ -192,7 +192,7 @@
                         </td>
                         <td style="font-weight: 600; color: #475569;">{{ $item->unit }}</td>
                         <td>
-                            <span class="quantity-display">{{ number_format($item->total_quantity) }}</span>
+                            <span class="quantity-display">{{ number_format($item->total_quantity, 0, '', '') }}</span>
                         </td>
                         <td style="text-align: center;">
                             <span class="batch-count">{{ $item->batches->count() }}</span>

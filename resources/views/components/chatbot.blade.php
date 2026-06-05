@@ -407,11 +407,26 @@
                 .replace(/'/g, '&#039;');
         }
 
+        function sanitizeBotText(value) {
+            return String(value || '')
+                .replace(/(?:^|\n)\s*(?:Nguồn\s+tham\s+khảo|Tài\s+liệu\s+tham\s+khảo|Tham\s+khảo|Sources?|References?)\s*:?\s*[\s\S]*$/iu, '')
+                .replace(/\[([^\]]+)\]\(\s*\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^)\s]*\s*\)/giu, '$1')
+                .replace(/(?:^|\n)\s*(?:Xem thêm|Đọc thêm|Chi tiết)(?:\s+tại)?\s*:?\s*\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^\n]*(?=\n|$)/giu, '')
+                .replace(/\s*\(\s*\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^)\s]*\s*\)/giu, '')
+                .replace(/\/(?:bai-viet|tu-dien-thuoc-nam|duoc-lieu)\/[^\s)\]}<>"']*/giu, '')
+                .replace(/[ \t]+\n/g, '\n')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
         function appendMessage(text, isUser = false, saveToHistory = true) {
             if (!text) return;
+
+            const messageText = isUser ? text : sanitizeBotText(text);
+            if (!messageText) return;
             
             if (saveToHistory) {
-                saveMessageToHistory(text, isUser);
+                saveMessageToHistory(messageText, isUser);
             }
 
             const msgDiv = document.createElement('div');
@@ -429,7 +444,7 @@
             }
 
             // Simple markdown parser for bold and line breaks
-            let formattedText = escapeHtml(text).replace(/\n/g, '<br>');
+            let formattedText = escapeHtml(messageText).replace(/\n/g, '<br>');
             formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
             msgDiv.innerHTML = `
@@ -451,20 +466,6 @@
             ];
 
             return !transientErrors.some(errorText => String(text || '').includes(errorText));
-        }
-
-        function formatAnswerWithSources(answer, sources = []) {
-            if (!Array.isArray(sources) || sources.length === 0) {
-                return answer;
-            }
-
-            const sourceLines = sources.slice(0, 5).map((source, index) => {
-                const title = source.title || 'Nguồn tham khảo';
-                const url = source.url || '';
-                return `${index + 1}. ${title}${url ? ` (${url})` : ''}`;
-            });
-
-            return `${answer}\n\nNguồn tham khảo:\n${sourceLines.join('\n')}`;
         }
 
         function appendTyping() {
@@ -519,11 +520,10 @@
             .then(data => {
                 removeTyping();
                 const botAnswer = data.answer || data.reply || "Xin lỗi, đã có lỗi xảy ra. Hãy thử lại sau nhé.";
-                const answerWithSources = formatAnswerWithSources(botAnswer, data.sources || []);
                 if (data.success) {
-                    appendMessage(answerWithSources, false, shouldSaveBotMessage(botAnswer));
+                    appendMessage(botAnswer, false, shouldSaveBotMessage(botAnswer));
                 } else {
-                    appendMessage(answerWithSources, false, false);
+                    appendMessage(botAnswer, false, false);
                 }
             })
             .catch(err => {

@@ -29,6 +29,11 @@ class MedicalRecord extends Model
 
     public function hasConfirmedDiagnosis(): bool
     {
+        return $this->hasDiagnosisText() && !empty($this->diagnosis_confirmed_at);
+    }
+
+    public function hasDiagnosisText(): bool
+    {
         $diagnosis = trim((string) $this->diagnosis);
 
         return $diagnosis !== '' && $diagnosis !== self::PENDING_DIAGNOSIS;
@@ -36,7 +41,7 @@ class MedicalRecord extends Model
 
     public function displayDiagnosis(): string
     {
-        return $this->hasConfirmedDiagnosis() ? (string) $this->diagnosis : self::PENDING_DIAGNOSIS;
+        return $this->hasDiagnosisText() ? (string) $this->diagnosis : self::PENDING_DIAGNOSIS;
     }
 
     protected $fillable = [
@@ -47,7 +52,10 @@ class MedicalRecord extends Model
         'weight',
         'height',
         'symptoms',
+        'additional_symptoms',
         'diagnosis',
+        'diagnosis_confirmed_at',
+        'diagnosis_confirmed_by',
         'treatment_plan',
         'doctor_note',
         'treatment_direction',
@@ -82,6 +90,7 @@ class MedicalRecord extends Model
             'weight' => 'decimal:1',
             'height' => 'decimal:1',
             'pain_level' => 'integer',
+            'diagnosis_confirmed_at' => 'datetime',
             'is_legacy_data' => 'boolean',
             'imported_at' => 'datetime',
         ];
