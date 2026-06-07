@@ -245,7 +245,7 @@
                 <div class="bg-[#f0f7ff] rounded-[2.5rem] p-6 md:p-8 border border-sky-100 shadow-sm flex flex-col md:flex-row gap-6 md:gap-8 items-stretch">
                     <!-- Map Frame -->
                     <div class="w-full md:w-1/2 rounded-[2rem] overflow-hidden shadow-md border border-white min-h-[250px]">
-                        <iframe src="https://maps.google.com/maps?q=54/36%20Ama%20Jhao,%20Ph%C6%B0%E1%BB%9Dng%20T%C3%A2n%20L%E1%BA%ADp,%20Bu%C3%B4n%20Ma%20Thu%E1%BB%99t,%20%C4%90%E1%BA%AFk%20L%E1%BA%AFk&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" class="w-full h-full object-cover"></iframe>
+                        <iframe src="https://maps.google.com/maps?q=Nh%C3%A0%20s%C3%A0n%20th%C3%A2n%20y%C3%AAu,%2054/36%20Ama%20Jhao,%20Ph%C6%B0%E1%BB%9Dng%20T%C3%A2n%20L%E1%BA%ADp,%20Bu%C3%B4n%20Ma%20Thu%E1%BB%99t,%20%C4%90%E1%BA%AFk%20L%E1%BA%AFk&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" class="w-full h-full object-cover"></iframe>
                     </div>
 
                     <!-- Directions & Address Info -->
@@ -254,7 +254,7 @@
                         <h3 class="text-xl md:text-2xl font-black text-[#1a5b8f] mb-4">Phòng Khám Y Học Cổ Truyền AmaTrung</h3>
                         
                         <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                            Tọa lạc tại địa chỉ <strong class="text-slate-800">54/36 Amajhao, Phường Tân Lập, TP. Buôn Ma Thuột, Tỉnh Đắk Lắk</strong>. 
+                            Tọa lạc tại địa chỉ <a href="https://maps.app.goo.gl/A7pamE9PfwgbvNLj7" target="_blank" rel="noopener noreferrer" class="text-[#1a5b8f] hover:underline font-bold">54/36 Amajhao, Phường Tân Lập, TP. Buôn Ma Thuột, Tỉnh Đắk Lắk</a>. 
                         </p>
                         
                         <p class="text-slate-500 text-xs italic leading-relaxed">

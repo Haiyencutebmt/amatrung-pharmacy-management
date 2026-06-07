@@ -244,7 +244,9 @@
                     <ul class="space-y-4 text-sm text-primary-100/80">
                         <li class="flex items-start gap-2.5">
                             <svg class="w-5 h-5 shrink-0 text-sky-300 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span>54/36 Ama Jhao, Phường Tân Lập, Buôn Ma Thuột, Đắk Lắk</span>
+                            <a href="https://maps.app.goo.gl/A7pamE9PfwgbvNLj7" target="_blank" rel="noopener noreferrer" class="hover:underline hover:text-sky-300 transition-colors">
+                                54/36 Ama Jhao, Phường Tân Lập, Buôn Ma Thuột, Đắk Lắk
+                            </a>
                         </li>
                         <li class="flex items-center gap-2.5">
                             <svg class="w-5 h-5 shrink-0 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>

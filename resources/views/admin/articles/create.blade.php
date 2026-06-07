@@ -509,8 +509,10 @@
     }
 }
 </style>
+<script type="application/json" id="initial-tags-data">{!! json_encode(old('tags', ''), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
 <script>
-const initialTags = @json(old('tags', ''));
+const initialTagsElement = document.getElementById('initial-tags-data');
+const initialTags = initialTagsElement ? JSON.parse(initialTagsElement.textContent || '""') : '';
 let articleTags = initialTags ? initialTags.split(',').map(tag => tag.trim()).filter(Boolean) : [];
 
 tinymce.init({

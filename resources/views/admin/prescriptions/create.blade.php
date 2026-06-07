@@ -172,7 +172,7 @@
                     <div style="padding: 1rem;">
                         <div style="margin-bottom: 1rem;">
                             <label style="font-size: 0.75rem; font-weight: 800; color: #475569; display: block; margin-bottom: 0.3rem;">Tên bài thuốc (Hiển thị thay vì liệt kê từng vị)</label>
-                            <input type="text" name="prescription_name" value="{{ old('prescription_name') }}" placeholder="Ví dụ: Bát trân thang gia giảm..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.5rem; font-size: 0.8rem; outline: none;">
+                            <input type="text" name="prescription_name" id="prescription-name-input" value="{{ old('prescription_name') }}" placeholder="Ví dụ: Bát trân thang gia giảm..." style="width: 100%; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.5rem; font-size: 0.8rem; outline: none;">
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1.5rem;">
                             <div>
@@ -183,9 +183,9 @@
                                     <button type="button" style="background: #f8fafc; border: none; border-left: 1px solid #cbd5e1; padding: 0 0.75rem; font-weight: bold; color: #475569; cursor: pointer;" onclick="changeDoses(1)">+</button>
                                 </div>
                             </div>
-                            <div>
+                            <div id="usage-instruction-container">
                                 <label style="font-size: 0.75rem; font-weight: 800; color: #475569; display: block; margin-bottom: 0.3rem;">Cách sắc / cách uống</label>
-                                <input type="text" name="usage_instruction" value="{{ old('usage_instruction', 'Sắc với 1.5 lít nước, còn 600ml, chia 2 lần uống trong ngày') }}" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.5rem; font-size: 0.8rem; outline: none;">
+                                <input type="text" name="usage_instruction" id="prescription-usage-instruction" value="{{ old('usage_instruction', 'Sắc với 1.5 lít nước, còn 600ml, chia 2 lần uống trong ngày') }}" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.5rem; font-size: 0.8rem; outline: none;">
                             </div>
                         </div>
 
@@ -292,7 +292,7 @@
         </div>
 
         {{-- LỜI DẶN BÁC SĨ --}}
-        <div style="margin-top: 2rem;">
+        <div style="margin-top: 2rem;" id="section-doctor-note">
             <h4 style="font-size: 1rem; font-weight: 800; color: #3b82f6; margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 4. LỜI DẶN BÁC SĨ
@@ -301,7 +301,7 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                     <div>
                         <label style="font-weight: 800; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 0.3rem;">Lời dặn chung</label>
-                        <textarea name="note" placeholder="Nhập lời dặn cho bệnh nhân..." style="width: 100%; height: 80px; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.75rem; font-size: 0.85rem; resize: vertical; outline: none;"></textarea>
+                        <textarea name="note" id="prescription-note" placeholder="Nhập lời dặn cho bệnh nhân..." style="width: 100%; height: 80px; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.75rem; font-size: 0.85rem; resize: vertical; outline: none;"></textarea>
                     </div>
                     <div>
                         <label style="font-weight: 800; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 0.3rem;">Ghi chú mức tiến triển</label>
@@ -551,6 +551,25 @@
 
         document.getElementById('summary-count').innerText = cartItems.length;
         document.getElementById('summary-weight').innerText = totalWeight.toFixed(1) + ' g';
+
+        // Tự động ẩn/hiện và xóa/khôi phục hướng dẫn sử dụng sắc uống
+        const usageContainer = document.getElementById('usage-instruction-container');
+        const usageInput = document.getElementById('prescription-usage-instruction');
+        if (usageContainer && usageInput) {
+            if (cartItems.length === 0) {
+                usageContainer.style.display = 'none';
+                usageInput.value = '';
+            } else {
+                usageContainer.style.display = 'block';
+                if (!usageInput.value.trim()) {
+                    usageInput.value = 'Sắc với 1.5 lít nước, còn 600ml, chia 2 lần uống trong ngày';
+                }
+            }
+        }
+
+        if (typeof window.updateAiSuggestionsView === 'function') {
+            window.updateAiSuggestionsView();
+        }
     }
 
     // External Products Functions
@@ -644,6 +663,9 @@
                 ? `Đã chọn ${totalSelected} chế phẩm dùng ngoài.`
                 : 'Chưa chọn chế phẩm dùng ngoài.';
         }
+        if (typeof window.updateAiSuggestionsView === 'function') {
+            window.updateAiSuggestionsView();
+        }
     }
 
     // Services Variables
@@ -713,6 +735,9 @@
         
         container.innerHTML = html;
         renderServicePagination(totalItems, totalPages);
+        if (typeof window.updateAiSuggestionsView === 'function') {
+            window.updateAiSuggestionsView();
+        }
     }
 
     function renderServicePagination(totalItems, totalPages) {

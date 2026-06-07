@@ -68,7 +68,7 @@
         <div id="ai-error-box" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.25rem; padding: 0.75rem 1rem; font-size: 0.85rem; color: #991b1b; font-weight: 600;"></div>
 
         {{-- Kết quả gợi ý đơn nháp --}}
-        <div id="ai-result-box" style="display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem;">
+        <div id="ai-result-box" style="display: none; flex-direction: column; gap: 1rem;">
             
             {{-- Khối 1: Nhận xét trước kê đơn --}}
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
@@ -94,22 +94,43 @@
 
             {{-- Khối 3: Gợi ý đơn thuốc / dịch vụ nháp --}}
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <div style="background: #f0fdf4; color: #22c55e; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="background: #f0fdf4; color: #22c55e; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý đơn thuốc / dịch vụ nháp</span>
                     </div>
-                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Gợi ý đơn thuốc / dịch vụ nháp</span>
+                    <button id="btn-apply-all-ai" type="button" style="display: none; background: #22c55e; color: #fff; border: none; padding: 0.35rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; align-items: center; gap: 0.25rem; transition: background 0.2s;" onclick="applyAI()" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
+                        ✨ Áp dụng tất cả
+                    </button>
                 </div>
+                
+                {{-- Container gợi ý tên đơn thuốc từ AI --}}
+                <div id="ai-suggested-name-container" style="display: none; margin-bottom: 0.85rem; padding: 0.6rem 0.85rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.35rem; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.82rem; color: #166534; font-weight: 600;">
+                        Tên đơn thuốc gợi ý: <strong id="ai-suggested-prescription-name-text"></strong>
+                    </span>
+                    <button type="button" onclick="applySuggestedPrescriptionName()" style="background: #16a34a; color: #fff; border: none; padding: 0.25rem 0.6rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+                        Áp dụng
+                    </button>
+                </div>
+
                 <div id="ai-draft-items-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
             </div>
 
             {{-- Khối 4: Lưu ý an toàn và theo dõi --}}
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem;">
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <div style="background: #faf5ff; color: #a855f7; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="background: #faf5ff; color: #a855f7; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </div>
+                        <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Lưu ý an toàn và theo dõi</span>
                     </div>
-                    <span style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">Lưu ý an toàn và theo dõi</span>
+                    <button id="btn-apply-ai-advice" type="button" style="display: none; background: #faf5ff; color: #a855f7; border: 1px solid #d8b4fe; padding: 0.35rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; align-items: center; gap: 0.25rem; transition: all 0.2s;" onclick="applyAISafetyNote()" onmouseover="this.style.background='#f3e8ff'" onmouseout="this.style.background='#faf5ff'">
+                        ✍️ Áp dụng vào lời dặn
+                    </button>
                 </div>
                 <div id="ai-safety-followup-text" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
             </div>

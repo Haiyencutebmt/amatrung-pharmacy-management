@@ -41,32 +41,41 @@ class PublicChatbotGeminiService
         }
 
         try {
-            $response = Http::timeout(20)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
-                    'system_instruction' => [
-                        'parts' => [
-                            ['text' => $this->buildSystemPrompt($searchResult)],
-                        ],
-                    ],
-                    'contents' => [
-                        [
-                            'role' => 'user',
+            $response = null;
+            for ($attempt = 1; $attempt <= 3; $attempt++) {
+                $response = Http::timeout(20)
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+                        'system_instruction' => [
                             'parts' => [
-                                ['text' => $question],
+                                ['text' => $this->buildSystemPrompt($searchResult)],
                             ],
                         ],
-                    ],
-                    'generationConfig' => [
-                        'temperature' => 0.45,
-                        'maxOutputTokens' => 900,
-                    ],
-                ]);
+                        'contents' => [
+                            [
+                                'role' => 'user',
+                                'parts' => [
+                                    ['text' => $question],
+                                ],
+                            ],
+                        ],
+                        'generationConfig' => [
+                            'temperature' => 0.45,
+                            'maxOutputTokens' => 900,
+                        ],
+                    ]);
 
-            if (!$response->successful()) {
-                Log::warning('[PublicChatbot] Gemini HTTP error', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
+                if ($response->successful() || !$this->shouldRetryGeminiStatus($response->status())) {
+                    break;
+                }
+
+                usleep(500000 * $attempt);
+            }
+
+            if (!$response || !$response->successful()) {
+                Log::warning('[PublicChatbot] Gemini HTTP error after retries', [
+                    'status' => $response ? $response->status() : 'unknown',
+                    'body' => $response ? $response->body() : 'No response',
                 ]);
 
                 return self::UNAVAILABLE_MESSAGE;
@@ -92,29 +101,38 @@ class PublicChatbotGeminiService
         }
 
         try {
-            $response = Http::timeout(12)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
-                    'system_instruction' => [
-                        'parts' => [[
-                            'text' => 'Bạn chỉ sửa lỗi chính tả tiếng Việt và nhận diện từ khóa tra cứu cho website y học cổ truyền. Trả về JSON hợp lệ dạng {"keywords":["..."]}. Tối đa 5 từ khóa, không giải thích thêm.',
-                        ]],
-                    ],
-                    'contents' => [
-                        [
-                            'role' => 'user',
+            $response = null;
+            for ($attempt = 1; $attempt <= 3; $attempt++) {
+                $response = Http::timeout(12)
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+                        'system_instruction' => [
                             'parts' => [[
-                                'text' => "Câu hỏi người dùng: {$question}",
+                                'text' => 'Bạn chỉ sửa lỗi chính tả tiếng Việt và nhận diện từ khóa tra cứu cho website y học cổ truyền. Trả về JSON hợp lệ dạng {"keywords":["..."]}. Tối đa 5 từ khóa, không giải thích thêm.',
                             ]],
                         ],
-                    ],
-                    'generationConfig' => [
-                        'temperature' => 0.1,
-                        'maxOutputTokens' => 160,
-                    ],
-                ]);
+                        'contents' => [
+                            [
+                                'role' => 'user',
+                                'parts' => [[
+                                    'text' => "Câu hỏi người dùng: {$question}",
+                                ]],
+                            ],
+                        ],
+                        'generationConfig' => [
+                            'temperature' => 0.1,
+                            'maxOutputTokens' => 160,
+                        ],
+                    ]);
 
-            if (!$response->successful()) {
+                if ($response->successful() || !$this->shouldRetryGeminiStatus($response->status())) {
+                    break;
+                }
+
+                usleep(500000 * $attempt);
+            }
+
+            if (!$response || !$response->successful()) {
                 return [];
             }
 
@@ -229,5 +247,10 @@ PROMPT;
         $decoded = json_decode(trim($text), true);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function shouldRetryGeminiStatus(int $status): bool
+    {
+        return in_array($status, [429, 500, 502, 503, 504], true);
     }
 }

@@ -36,9 +36,8 @@ class MedicalRecordDiagnosisConfirmationTest extends TestCase
             'confirm_diagnosis' => '1',
         ]);
 
-        $response->assertRedirect(route('admin.medical-records.show', $record));
+        $response->assertRedirect(route('admin.medical-records.prescriptions.create', $record));
         $response->assertSessionHas('success');
-        $response->assertSessionHas('scroll_to_treatment_action', true);
 
         $record->refresh();
         $this->assertTrue($record->hasConfirmedDiagnosis());
@@ -57,7 +56,6 @@ class MedicalRecordDiagnosisConfirmationTest extends TestCase
         $this->assertMatchesRegularExpression('/id="diagnosis_inline"[^>]*readonly/s', $html);
         $this->assertMatchesRegularExpression('/id="doctor_note_inline"[^>]*readonly/s', $html);
         $this->assertStringContainsString('id="treatment-action-section"', $html);
-        $this->assertStringContainsString('scrollIntoView({ behavior: \'smooth\', block: \'center\' })', $html);
     }
 
     public function test_confirming_diagnosis_requires_diagnosis_text(): void

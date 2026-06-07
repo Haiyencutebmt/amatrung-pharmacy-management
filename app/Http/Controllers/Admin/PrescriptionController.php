@@ -82,11 +82,12 @@ class PrescriptionController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'medical_record_id'    => 'required|exists:medical_records,id',
             'treatment_type'       => 'nullable|string|max:50',
+            'prescription_name'    => 'nullable|string|max:255',
             'note'                 => 'nullable|string',
             'num_of_doses'         => 'nullable|integer|min:1',
             'usage_instruction'    => 'nullable|string',
             'course_days'          => 'nullable|integer|min:1',
-            'follow_up_date'       => 'nullable|date|after:today',
+            'follow_up_date'       => 'nullable|date|after_or_equal:today',
             'items'                => 'required|array|min:1',
             'items.*.item_type'    => 'required|in:herb,packaged_product,external_product,therapy_service',
             'items.*.inventory_item_id' => 'nullable|exists:inventory_items,id',
@@ -98,9 +99,17 @@ class PrescriptionController extends Controller implements HasMiddleware
             'items.*.sessions'     => 'nullable|integer|min:1',
         ], [
             'items.required'            => 'Đơn điều trị phải có ít nhất một hạng mục.',
+            'follow_up_date.date'       => 'Ngày hẹn tái khám không đúng định dạng.',
+            'follow_up_date.after_or_equal' => 'Ngày hẹn tái khám phải là ngày hôm nay hoặc sau ngày hôm nay.',
         ]);
 
         try {
+            // Map form inputs to database columns
+            if ($request->has('prescription_name')) {
+                $validated['public_instruction'] = $validated['note'] ?? null;
+                $validated['note'] = $validated['prescription_name'] ?? null;
+            }
+
             $prescription = $this->prescriptionService->createPrescription($validated, auth()->id());
 
             // Create appointment if needed

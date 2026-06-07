@@ -4,6 +4,8 @@
 --}}
 <script>
 window.aiSuggestionsData = null; // Biến toàn cục để chức năng "Áp dụng vào đơn nháp" có thể đọc
+window.aiSuggestedItemsList = null; // Biến toàn cục chứa danh sách dược liệu gợi ý
+
 
 (function () {
     'use strict';
@@ -17,9 +19,9 @@ window.aiSuggestionsData = null; // Biến toàn cục để chức năng "Áp d
     function show(id) { 
         const e = el(id);
         if (e) {
-            // Check if it's the grid box
+            // Check if it's the flex box
             if (id === 'ai-result-box') {
-                e.style.display = 'grid';
+                e.style.display = 'flex';
             } else {
                 e.style.display = 'block'; 
             }
@@ -75,7 +77,32 @@ window.aiSuggestionsData = null; // Biến toàn cục để chức năng "Áp d
         ));
 
         const suggestedItems = normalizeSuggestedItems(suggestions);
+        window.aiSuggestedItemsList = suggestedItems;
         setHtml('ai-draft-items-text', renderSuggestedItems(suggestedItems));
+
+        // Hiển thị gợi ý tên đơn thuốc
+        const suggestedName = suggestions.suggested_prescription_name || '';
+        const nameContainer = el('ai-suggested-name-container');
+        const nameText = el('ai-suggested-prescription-name-text');
+        if (nameContainer && nameText) {
+            if (suggestedName) {
+                nameText.textContent = suggestedName;
+                nameContainer.style.display = 'flex';
+            } else {
+                nameContainer.style.display = 'none';
+            }
+        }
+
+        // Hiện các nút áp dụng tương ứng
+        const applyAllBtn = el('btn-apply-all-ai');
+        if (applyAllBtn) {
+            applyAllBtn.style.display = 'flex';
+        }
+
+        const applyAdviceBtn = el('btn-apply-ai-advice');
+        if (applyAdviceBtn) {
+            applyAdviceBtn.style.display = 'flex';
+        }
 
         const safetyItems = normalizeList(suggestions.safety_and_followup);
         if (suggestions.safety_note) safetyItems.push(suggestions.safety_note);
@@ -190,15 +217,24 @@ window.aiSuggestionsData = null; // Biến toàn cục để chức năng "Áp d
         return Object.entries(groups)
             .filter(([, groupItems]) => groupItems.length > 0)
             .map(([type, groupItems]) => {
-                const body = groupItems.map((item, index) => `
+                const body = groupItems.map((item, index) => {
+                    const isApplied = isItemAlreadyApplied(item.type, item.name);
+                    const btnHtml = isApplied
+                        ? `<span style="color: #16a34a; font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 0.2rem;">✓ Đã thêm</span>`
+                        : `<button type="button" onclick="applySingleAIItem('${escHtml(item.type)}', '${escHtml(item.name)}')" style="background: #fff; border: 1px solid #bfdbfe; color: #3b82f6; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#fff'">➕ Áp dụng</button>`;
+
+                    return `
                     <div style="border-top:1px dashed #e2e8f0; padding-top:0.55rem; margin-top:0.55rem;">
-                        <div style="font-weight:800; color:#1e293b;">${index + 1}. ${escHtml(item.name)}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-weight:800; color:#1e293b;">
+                            <div>${index + 1}. ${escHtml(item.name)}</div>
+                            <div>${btnHtml}</div>
+                        </div>
                         <div><strong>Vai trò:</strong> ${escHtml(item.role || 'Cần thầy thuốc kiểm tra thêm trước khi áp dụng.')}</div>
                         <div><strong>Liều lượng nháp:</strong> ${escHtml(item.draft_dosage || 'Thầy thuốc chỉnh khi lập đơn')} ${escHtml(item.unit || '')}</div>
                         <div><strong>Lưu ý:</strong> ${escHtml(item.safety_note || 'Cần thầy thuốc kiểm tra thêm trước khi áp dụng.')}</div>
                         <div><strong>Tình trạng kho:</strong> ${escHtml(item.inventory_status || 'Không rõ tồn kho')}</div>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('');
 
                 return `<div style="margin-bottom:0.75rem;"><strong style="color:#1e3a8a;">${labelForItemType(type)}</strong>${body}</div>`;
             })
@@ -292,6 +328,175 @@ window.aiSuggestionsData = null; // Biến toàn cục để chức năng "Áp d
             }
         });
     }
+
+    function isItemAlreadyApplied(type, name) {
+        const needle = String(name || '').trim().toLowerCase();
+        if (!needle) return false;
+
+        if (type === 'herb') {
+            return typeof cartItems !== 'undefined' && cartItems.some(i => String(i.name).trim().toLowerCase() === needle);
+        }
+        if (type === 'external_product') {
+            return typeof selectedExternalProducts !== 'undefined' && selectedExternalProducts.some(p => String(p.name).trim().toLowerCase() === needle);
+        }
+        if (type === 'service') {
+            return typeof selectedServices !== 'undefined' && selectedServices.some(s => String(s).trim().toLowerCase() === needle);
+        }
+        return false;
+    }
+
+    window.updateAiSuggestionsView = function() {
+        if (window.aiSuggestedItemsList) {
+            setHtml('ai-draft-items-text', renderSuggestedItems(window.aiSuggestedItemsList));
+        }
+    };
+
+    window.applySingleAIItem = function(type, name) {
+        if (!window.aiSuggestionsData) {
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage('Chưa có dữ liệu AI. Vui lòng lấy gợi ý AI trước.', 'warning');
+            }
+            return;
+        }
+
+        const aiItems = normalizeSuggestedItems(window.aiSuggestionsData);
+        const aiItem = aiItems.find(item => item.type === type && String(item.name).trim().toLowerCase() === String(name).trim().toLowerCase());
+        if (!aiItem) {
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage('Không tìm thấy thông tin gợi ý cho vị này.', 'warning');
+            }
+            return;
+        }
+
+        if (aiItem.type === 'herb') {
+            if (typeof herbsData === 'undefined') return;
+            const herb = findByName(herbsData, aiItem.name);
+            if (!herb) {
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage(`Không tìm thấy vị thuốc "${aiItem.name}" trong danh mục của nhà thuốc.`, 'warning');
+                }
+                return;
+            }
+            if (cartItems.some(i => i.id === herb.id)) {
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage('Vị thuốc đã được thêm vào đơn.', 'warning');
+                }
+                return;
+            }
+
+            cartItems.push({
+                id: herb.id,
+                name: herb.name,
+                unit: herb.unit,
+                dose: parseDraftQuantity(aiItem.draft_dosage, 10),
+                note: [aiItem.role, aiItem.safety_note].filter(Boolean).join(' | ')
+            });
+            renderCart();
+            renderCatalog();
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage(`Đã thêm vị thuốc "${herb.name}" vào đơn.`, 'success');
+            }
+            return;
+        }
+
+        if (aiItem.type === 'external_product') {
+            if (typeof externalProductsData === 'undefined') return;
+            const product = findByName(externalProductsData, aiItem.name);
+            if (!product) {
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage(`Không tìm thấy chế phẩm "${aiItem.name}" trong danh mục sản phẩm dùng ngoài.`, 'warning');
+                }
+                return;
+            }
+            if (selectedExternalProducts.some(item => item.id === product.id)) {
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage('Chế phẩm dùng ngoài đã được thêm vào đơn.', 'warning');
+                }
+                return;
+            }
+
+            selectedExternalProducts.push({
+                id: product.id,
+                name: product.name,
+                item_type: product.item_type || 'packaged_product',
+                unit: product.unit || aiItem.unit || 'đơn vị',
+                quantity: parseDraftQuantity(aiItem.draft_dosage, 1),
+                dosage: [aiItem.role, aiItem.safety_note].filter(Boolean).join(' | ') || 'Dùng ngoài theo hướng dẫn của thầy thuốc. Không được uống.',
+            });
+            renderExternalProducts();
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage(`Đã thêm chế phẩm "${product.name}" vào đơn.`, 'success');
+            }
+            return;
+        }
+
+        if (aiItem.type === 'service') {
+            if (typeof therapyServicesData === 'undefined') return;
+            const service = findByName(therapyServicesData, aiItem.name);
+            const serviceName = service ? service.name : aiItem.name;
+            if (selectedServices.includes(serviceName)) {
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage('Dịch vụ trị liệu đã được chọn.', 'warning');
+                }
+                return;
+            }
+
+            selectedServices.push(serviceName);
+            renderServices();
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage(`Đã chọn dịch vụ "${serviceName}".`, 'success');
+            }
+        }
+    };
+
+    window.applySuggestedPrescriptionName = function() {
+        if (!window.aiSuggestionsData) return;
+        const suggestedName = window.aiSuggestionsData.suggested_prescription_name || '';
+        const nameInput = document.getElementById('prescription-name-input');
+        if (nameInput && suggestedName) {
+            nameInput.value = suggestedName;
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage('Đã áp dụng tên đơn thuốc gợi ý.', 'success');
+            }
+        }
+    };
+
+    window.applyAISafetyNote = function() {
+        if (!window.aiSuggestionsData) return;
+        const safetyItems = normalizeList(window.aiSuggestionsData.safety_and_followup || []);
+        if (window.aiSuggestionsData.safety_note) safetyItems.push(window.aiSuggestionsData.safety_note);
+        if (window.aiSuggestionsData.follow_up_suggestion) safetyItems.push(window.aiSuggestionsData.follow_up_suggestion);
+        
+        const uniqueItems = uniqueList(safetyItems);
+        if (uniqueItems.length === 0) return;
+
+        const noteTextarea = document.getElementById('prescription-note');
+        if (noteTextarea) {
+            const formattedAdvice = uniqueItems.map(item => `• ${item}`).join('\n');
+            if (noteTextarea.value.trim()) {
+                noteTextarea.value = noteTextarea.value.trim() + '\n' + formattedAdvice;
+            } else {
+                noteTextarea.value = formattedAdvice;
+            }
+
+            // Scroll to the doctor notes section
+            const section = document.getElementById('section-doctor-note');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Highlight textarea briefly to draw attention
+            noteTextarea.style.transition = 'background-color 0.3s';
+            noteTextarea.style.backgroundColor = '#fef08a'; // light yellow highlight
+            setTimeout(() => {
+                noteTextarea.style.backgroundColor = '';
+            }, 1000);
+
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage('Đã điền các lưu ý an toàn và theo dõi vào lời dặn.', 'success');
+            }
+        }
+    };
 
 })();
 </script>

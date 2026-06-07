@@ -173,7 +173,7 @@ class AiPrescriptionService
                 ->join("\n");
 
             // 5. Xây dựng prompt cho Gemini
-            $promptText = "Bạn là một Trợ lý Y khoa AI có chuyên môn cao về Y học Cổ truyền và Vật lý trị liệu tại Nhà thuốc Đông Y AmaTrung.
+            $promptText = "Bạn là một Trợ lý Y khoa AI có chuyên môn cao về Y học Cổ truyền và Vật lý trị liệu tại Nhà thuốc YHCT AmaTrung.
 Nhiệm vụ của bạn là đưa ra đề xuất phác đồ điều trị và đơn thuốc cá nhân hóa tối ưu cho bệnh nhân dựa trên các thông tin lâm sàng sau:
 
 THÔNG TIN BỆNH NHÂN:

@@ -64,13 +64,15 @@ class PrescriptionService
                     $inventoryItem = InventoryItem::find($inventoryItemId);
                     if (!$inventoryItem) throw new Exception('Mặt hàng không tồn tại.');
                     
-                    // Validate treatment direction
-                    if ($direction === 'oral_only' && $inventoryItem->usage_route === 'external' && !in_array($inventoryItem->item_type, ['packaged_product', 'external_product'], true)) {
+                    // Validate treatment direction (Đóng lại theo yêu cầu của bác sĩ để mọi ca bệnh có thể kê tự do các sản phẩm)
+                    /*
+                    if ($direction === 'oral_only' && $inventoryItem->usage_route === 'external') {
                         throw new Exception("Hồ sơ chỉ định 'oral_only' nhưng mặt hàng '{$inventoryItem->name}' dùng ngoài.");
                     }
                     if ($direction === 'external_only' && $inventoryItem->usage_route === 'oral') {
                         throw new Exception("Hồ sơ chỉ định 'external_only' nhưng mặt hàng '{$inventoryItem->name}' đường uống.");
                     }
+                    */
 
                     $totalQty = $quantityPerDose * $numDoses;
                     if ($inventoryItem->item_type !== 'herb') {

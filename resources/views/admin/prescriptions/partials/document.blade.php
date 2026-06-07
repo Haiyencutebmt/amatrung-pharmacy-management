@@ -65,7 +65,7 @@
 <div class="doc-header">
     <div class="doc-clinic">
         <div style="font-weight: bold; font-size: 11pt;">SỞ Y TẾ TỈNH ĐẮK LẮK</div>
-        <h1 style="margin: 0; font-size: 15pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">NHÀ THUỐC ĐÔNG Y AMATRUNG</h1>
+        <h1 style="margin: 0; font-size: 15pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">NHÀ THUỐC YHCT AMATRUNG</h1>
         <p style="margin: 2px 0; font-size: 9.5pt; color: #111;">Địa chỉ: 54/46 Amajhao, Phường Tân Lập, Tỉnh Đắk Lắk</p>
         <p style="margin: 2px 0; font-size: 9.5pt; color: #111;">Hotline: 0983009748 | amatrung.vn</p>
     </div>

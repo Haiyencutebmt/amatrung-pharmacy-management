@@ -87,21 +87,33 @@ class AiClinicalSuggestionService
         try {
             // 5. Gọi Gemini API
             $url      = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
-            $response = Http::timeout(30)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post($url, [
-                    'contents' => [
-                        ['parts' => [['text' => $promptText]]]
-                    ],
-                    'generationConfig' => [
-                        'responseMimeType' => 'application/json',
-                        'responseSchema'   => $this->getResponseSchema(),
-                    ],
-                ]);
+            $response = null;
 
-            if (!$response->successful()) {
-                Log::error('[AiClinicalSuggestion] Gemini API lỗi HTTP: ' . $response->status() . ' - ' . $response->body());
-                return $this->unavailableResponse($payload, 'Gemini API trả về lỗi HTTP ' . $response->status());
+            for ($attempt = 1; $attempt <= 3; $attempt++) {
+                $response = Http::timeout(30)
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post($url, [
+                        'contents' => [
+                            ['parts' => [['text' => $promptText]]]
+                        ],
+                        'generationConfig' => [
+                            'responseMimeType' => 'application/json',
+                            'responseSchema'   => $this->getResponseSchema(),
+                        ],
+                    ]);
+
+                if ($response->successful() || !$this->shouldRetryGeminiStatus($response->status())) {
+                    break;
+                }
+
+                usleep(500000 * $attempt);
+            }
+
+            if (!$response || !$response->successful()) {
+                $status = $response ? $response->status() : 'unknown';
+                $body = $response ? $response->body() : 'No response';
+                Log::error('[AiClinicalSuggestion] Gemini API lỗi HTTP sau 3 lần thử: ' . $status . ' - ' . $body);
+                return $this->unavailableResponse($payload, 'Gemini API trả về lỗi HTTP ' . $status);
             }
 
             $responseBody = $response->json();
@@ -201,6 +213,7 @@ QUAN TRỌNG:
 - Đây là GỢI Ý THAM KHẢO, KHÔNG phải kê đơn chính thức.
 - Mọi quyết định điều trị đều thuộc thẩm quyền của thầy thuốc.
 - Không phân tích bệnh học dài dòng, không lặp lại nhận định sơ bộ, không đưa kết luận chắc chắn.
+- "suggested_prescription_name" là tên bài thuốc hoặc đơn thuốc gợi ý phù hợp (ví dụ: "Bát trân thang gia giảm", "Độc hoạt ký sinh thang", "Tiêu dao tán"...).
 - Khối "pre_prescription_note" chỉ tóm tắt ngắn tình trạng đã xác nhận và điểm cần kiểm tra; KHÔNG liệt kê tên dược liệu/dịch vụ.
 - "treatment_principles" chỉ ghi pháp trị/nguyên tắc điều trị, KHÔNG ghi bài thuốc cụ thể.
 - "suggested_items" mới được liệt kê dược liệu/dịch vụ. Mỗi item phải có vai trò, liều nháp nếu phù hợp, đơn vị, lưu ý an toàn, trạng thái kho.
@@ -251,6 +264,7 @@ PROMPT;
         return [
             'type' => 'OBJECT',
             'properties' => [
+                'suggested_prescription_name' => ['type' => 'STRING'],
                 'pre_prescription_note' => ['type' => 'STRING'],
                 'treatment_principles' => [
                     'type'  => 'ARRAY',
@@ -284,6 +298,7 @@ PROMPT;
                 ],
             ],
             'required' => [
+                'suggested_prescription_name',
                 'pre_prescription_note',
                 'treatment_principles',
                 'suggested_items',
@@ -301,6 +316,10 @@ PROMPT;
         $direction = $payload['clinical']['treatment_direction'] ?? '';
         $inventory = $payload['available_inventory'] ?? [];
         $services = $payload['available_services'] ?? [];
+
+        $suggestedPrescriptionName = $this->compactText(
+            $data['suggested_prescription_name'] ?? ''
+        );
 
         $prePrescriptionNote = $this->compactText(
             $data['pre_prescription_note']
@@ -530,6 +549,7 @@ PROMPT;
         }
 
         return [
+            'suggested_prescription_name' => $suggestedPrescriptionName,
             'pre_prescription_note' => $prePrescriptionNote,
             'treatment_principles'  => array_slice($treatmentPrinciples, 0, 5),
             'suggested_items'       => array_values($suggestedItems),
@@ -659,5 +679,10 @@ PROMPT;
     {
         return 'Gợi ý AI chỉ mang tính tham khảo (GỢI Ý THAM KHẢO). '
              . 'Thầy thuốc cần kiểm tra, chỉnh sửa và xác nhận trước khi lập đơn.';
+    }
+
+    private function shouldRetryGeminiStatus(int $status): bool
+    {
+        return in_array($status, [429, 500, 502, 503, 504], true);
     }
 }

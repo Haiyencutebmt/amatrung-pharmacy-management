@@ -1037,7 +1037,7 @@
                 <div class="doc-header" style="font-family: 'Times New Roman', Times, serif;">
                     <div class="doc-clinic">
                         <div style="font-weight: bold; font-size: 11pt; color: #111;">SỞ Y TẾ TỈNH ĐẮK LẮK</div>
-                        <h1 style="font-size: 14pt; font-weight: 800; color: #111; margin: 2px 0 6px 0; text-transform: uppercase;">NHÀ THUỐC ĐÔNG Y AMATRUNG</h1>
+                        <h1 style="font-size: 14pt; font-weight: 800; color: #111; margin: 2px 0 6px 0; text-transform: uppercase;">NHÀ THUỐC YHCT AMATRUNG</h1>
                         <p style="font-size: 9pt; color: #222; margin: 0;">Địa chỉ: 54/46 Amajhao, Phường Tân Lập, Tỉnh Đắk Lắk</p>
                         <p style="font-size: 9pt; color: #222; margin: 0;">Hotline: 0983009748 — Email: contact@amatrung.vn</p>
                     </div>
@@ -1144,6 +1144,111 @@
                         @endif
                     </table>
                 </div>
+
+                {{-- Treatment plan & prescriptions --}}
+                @php
+                    $activePrescriptionsForPrint = $medicalRecord->prescriptions->where('status', '!=', 'cancelled');
+                @endphp
+                @if($activePrescriptionsForPrint->count() > 0)
+                <div class="doc-section" style="font-family: 'Times New Roman', Times, serif; color: #111; margin-bottom: 15px;">
+                    <div style="font-weight: bold; font-size: 11.5pt; border-bottom: 1.5px solid #111; padding-bottom: 3px; margin-bottom: 8px; color: #111; text-transform: uppercase;">
+                        II. PHÁC ĐỒ ĐIỀU TRỊ & CHỈ ĐỊNH DÙNG THUỐC
+                    </div>
+                    
+                    @foreach($activePrescriptionsForPrint as $prescription)
+                    <table class="rx-table" style="width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 12px; font-family: 'Times New Roman', Times, serif; color: #111;">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding: 5px; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; background-color: #fafafa; font-weight: bold; width: 6%;">STT</th>
+                                <th style="text-align: left; padding: 5px; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; background-color: #fafafa; font-weight: bold; width: 44%;">Tên Vị thuốc / Phương pháp</th>
+                                <th style="text-align: right; padding: 5px; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; background-color: #fafafa; font-weight: bold; width: 18%;">Số lượng</th>
+                                <th style="text-align: left; padding: 5px; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; background-color: #fafafa; font-weight: bold; width: 32%;">Hướng dẫn chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $stt = 1;
+                                $pHerbs = $prescription->items->whereIn('item_type', ['formula_herb', 'herb']);
+                                $pExtHerbs = $prescription->items->whereIn('item_type', ['external_product', 'packaged_product', 'external_herb']);
+                                $pServices = $prescription->items->whereIn('item_type', ['service', 'therapy_service']);
+                            @endphp
+
+                            {{-- Group A --}}
+                            @if($pHerbs->count() > 0)
+                                <tr style="background: #f5f5f5;">
+                                    <td colspan="4" style="font-weight: bold; padding: 4px; border-top: 1px solid #111; border-bottom: 1px solid #111; font-size: 9.5pt; text-transform: uppercase;">🌱 A. THUỐC UỐNG DẠNG SẮC (Kê: {{ $prescription->num_of_doses ?? 1 }} thang)</td>
+                                </tr>
+                                @foreach($pHerbs as $item)
+                                <tr>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd;">{{ $stt++ }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; font-weight: bold;">{{ $item->display_name }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; text-align: right; font-weight: bold;">{{ floatval($item->quantity) }} {{ $item->unit }} / thang</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; font-size: 9.5pt; color: #333;">{{ $item->dosage }} {{ $item->note ? ' ('.$item->note.')' : '' }}</td>
+                                </tr>
+                                @endforeach
+                            @endif
+
+                            {{-- Group B --}}
+                            @if($pExtHerbs->count() > 0)
+                                <tr style="background: #f5f5f5;">
+                                    <td colspan="4" style="font-weight: bold; padding: 4px; border-top: 1px solid #111; border-bottom: 1px solid #111; font-size: 9.5pt; text-transform: uppercase;">🩹 B. THUỐC BÓ / THUỐC DÙNG NGOÀI DA</td>
+                                </tr>
+                                @foreach($pExtHerbs as $item)
+                                <tr>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd;">{{ $stt++ }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; font-weight: bold;">{{ $item->display_name }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; text-align: right; font-weight: bold;">{{ floatval($item->quantity) }} {{ $item->unit }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; font-size: 9.5pt; color: #333;">
+                                        @if($item->usage_area) <strong>Vùng đắp:</strong> {{ $item->usage_area }}<br>@endif
+                                        {{ $item->usage_instruction ?? $item->dosage }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @endif
+
+                            {{-- Group C --}}
+                            @if($pServices->count() > 0)
+                                <tr style="background: #f5f5f5;">
+                                    <td colspan="4" style="font-weight: bold; padding: 4px; border-top: 1px solid #111; border-bottom: 1px solid #111; font-size: 9.5pt; text-transform: uppercase;">👐 C. VẬT LÝ TRỊ LIỆU / DỊCH VỤ TÁC ĐỘNG NGOÀI</td>
+                                </tr>
+                                @foreach($pServices as $item)
+                                <tr>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd;">{{ $stt++ }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; font-weight: bold;">{{ $item->display_name }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; text-align: right; font-weight: bold;">{{ $item->sessions ? $item->sessions . ' lần' : '1 lần' }}</td>
+                                    <td style="padding: 4px 5px; border-bottom: 1px dashed #ddd; font-size: 9.5pt; color: #333;">
+                                        @if($item->usage_area) <strong>Vùng:</strong> {{ $item->usage_area }}<br>@endif
+                                        {{ $item->usage_instruction ?? $item->note }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+
+                    @if($prescription->public_instruction)
+                    <div style="padding: 6px; font-size: 9.5pt; color: #222; font-style: italic; background: #fafafa; border: 1px dashed #111; margin-bottom: 8px; line-height: 1.4; font-family: 'Times New Roman', Times, serif;">
+                        <strong>Hướng dẫn đặc biệt của thầy thuốc:</strong> {{ $prescription->public_instruction }}
+                    </div>
+                    @endif
+
+                    <div style="font-size: 10pt; color: #111; background: #fafafa; border: 1px solid #111; padding: 6px 10px; display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; font-family: 'Times New Roman', Times, serif;">
+                        @if($pHerbs->count() > 0)
+                            <span><strong>Tổng số thang sắc:</strong> {{ $prescription->num_of_doses ?? 1 }} thang</span>
+                        @endif
+                        @if($prescription->course_days)
+                            <span><strong>Thời gian liệu trình:</strong> {{ $prescription->course_days }} ngày</span>
+                        @endif
+                        @if($prescription->usage_instruction)
+                            <span><strong>Cách dùng chung:</strong> {{ $prescription->usage_instruction }}</span>
+                        @endif
+                        @if($prescription->follow_up_date)
+                            <span style="color: #000; font-weight: bold;">📅 Hẹn ngày tái khám: {{ $prescription->follow_up_date->format('d/m/Y') }}</span>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+                @endif
 
 
 

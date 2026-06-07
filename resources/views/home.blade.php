@@ -474,7 +474,7 @@
 
             <!-- Right: Google Map -->
             <div class="bg-white rounded-[2.5rem] p-2 relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden mt-10 lg:mt-0 min-h-[350px]">
-                <iframe src="https://maps.google.com/maps?q=54/36%20Ama%20Jhao,%20Ph%C6%B0%E1%BB%9Dng%20T%C3%A2n%20L%E1%BA%ADp,%20Bu%C3%B4n%20Ma%20Thu%E1%BB%99t,%20%C4%90%E1%BA%AFk%20L%E1%BA%AFk&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0; border-radius: 2.2rem;" allowfullscreen="" loading="lazy" class="w-full h-full object-cover"></iframe>
+                <iframe src="https://maps.google.com/maps?q=Nh%C3%A0%20s%C3%A0n%20th%C3%A2n%20y%C3%AAu,%2054/36%20Ama%20Jhao,%20Ph%C6%B0%E1%BB%9Dng%20T%C3%A2n%20L%E1%BA%ADp,%20Bu%C3%B4n%20Ma%20Thu%E1%BB%99t,%20%C4%90%E1%BA%AFk%20L%E1%BA%AFk&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0; border-radius: 2.2rem;" allowfullscreen="" loading="lazy" class="w-full h-full object-cover"></iframe>
             </div>
             
         </div>
@@ -528,17 +528,32 @@
         </div>
     </div>
 
-    <!-- Bottom Banner -->
-    <div class="hidden sm:block max-w-4xl mx-auto px-4 mt-24 relative z-10 text-center pb-8">
-        <div class="inline-block bg-[#fffcf5] border-y-[6px] border-[#e8d5b5] py-5 px-10 md:px-20 shadow-2xl relative rounded-[2px]">
-            <div class="absolute top-0 left-0 w-6 h-full bg-[#cca673] block border-r-2 border-[#b58f5c] shadow-[inset_2px_0_4px_rgba(0,0,0,0.1)]"></div>
-            <div class="absolute top-0 right-0 w-6 h-full bg-[#cca673] block border-l-2 border-[#b58f5c] shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]"></div>
+    <!-- Survey / Feedback Section -->
+    <div class="max-w-4xl mx-auto px-4 mt-16 sm:mt-24 relative z-10 text-center pb-8">
+        <div class="bg-gradient-to-br from-[#1a5b8f] via-[#2978c4] to-[#5ca8e6] rounded-[2.5rem] p-8 md:p-12 shadow-[0_20px_50px_rgba(59,130,246,0.18)] border border-white/20 text-white relative overflow-hidden group">
+            <!-- Decorative Background Shapes -->
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+            <div class="absolute -bottom-16 -left-16 w-52 h-52 bg-sky-200/10 rounded-full blur-2xl pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
             
-            <p class="text-xl md:text-2xl text-[#875525] font-extrabold italic mb-2">AMATRUNG – Gìn giữ tinh hoa Y học cổ truyền</p>
-            <p class="text-2xl md:text-3xl text-[#d15e12] font-black italic flex items-center justify-center gap-3">
-                Vì sức khỏe và hạnh phúc của bạn!
-                <svg class="w-8 h-8 text-red-500 drop-shadow-md animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
-            </p>
+            <div class="relative z-10 max-w-2xl mx-auto">
+                <span class="inline-flex items-center gap-1.5 px-4.5 py-1.5 rounded-full border border-white/20 bg-white/10 text-white font-bold text-xs md:text-sm tracking-wider shadow-sm mb-4">
+                    <span>📋</span> Khảo sát & Đánh giá
+                </span>
+                
+                <h3 class="text-xl md:text-3xl font-black mb-3 leading-snug uppercase">
+                    Đóng góp ý kiến của bạn
+                </h3>
+                
+                <p class="text-blue-100/90 text-sm md:text-base mb-8 leading-relaxed font-medium">
+                    Sự hài lòng của bạn là động lực phát triển lớn nhất của AmaTrung. Hãy dành ít phút để làm bài khảo sát giúp chúng tôi cải thiện chất lượng phục vụ ngày một tốt hơn!
+                </p>
+                
+                <a href="https://forms.gle/g2MLGBGG5uSMoMoj7" target="_blank" rel="noopener noreferrer" 
+                   class="inline-flex items-center gap-2.5 px-8 py-3.5 bg-white hover:bg-amber-500 text-[#1a5b8f] hover:text-white font-black rounded-full transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 transform hover:scale-[1.03] text-sm md:text-base uppercase tracking-wider">
+                    <span>Tham gia khảo sát</span>
+                    <svg class="w-4.5 h-4.5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
         </div>
     </div>
 </div>

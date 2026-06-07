@@ -290,6 +290,12 @@ class MedicalRecordController extends Controller implements HasMiddleware
             ? 'Đã xác nhận chẩn đoán. Nội dung chẩn đoán và lưu ý đã chuyển sang chế độ chỉ đọc trên trang chi tiết.'
             : 'Đã cập nhật bệnh án thành công.';
 
+        if ($isConfirmingDiagnosis && auth()->user()->hasPermission('prescriptions.create')) {
+            return redirect()
+                ->route('admin.medical-records.prescriptions.create', $medicalRecord)
+                ->with('success', $message);
+        }
+
         $redirect = redirect()
             ->route('admin.medical-records.show', $medicalRecord)
             ->with('success', $message);
