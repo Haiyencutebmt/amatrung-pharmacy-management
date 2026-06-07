@@ -85,7 +85,7 @@
                             </div>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chuyên môn</h4>
-                                <p class="text-sm font-bold text-slate-700">Y sĩ đa khoa, Y Học Cổ Truyền Tây Nguyên, Vật lý trị liệu</p>
+                                <p class="text-sm font-bold text-slate-700">Y sĩ đa khoa, Y Học Cổ Truyền Tây Nguyên, Y học cổ truyền khoa Cơ-Xương-Khớp</p>
                             </div>
                         </div>
 
@@ -95,7 +95,7 @@
                             </div>
                             <div>
                                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kinh nghiệm công tác</h4>
-                                <p class="text-sm font-bold text-slate-700">Từng công tác tại Bệnh viện Đa khoa Cao Nguyên</p>
+                                <p class="text-sm font-bold text-slate-700">Hơn 20 năm hành nghề, từng công tác tại Bệnh viện Đa khoa Cao Nguyên</p>
                             </div>
                         </div>
 
