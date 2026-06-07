@@ -38,10 +38,8 @@
 <div class="bg-gradient-to-b from-sky-50 via-white to-sky-100/50 min-h-screen py-10 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
 
-
-
         {{-- Search & Category Dropdown --}}
-        <form action="{{ route('articles.index') }}" method="GET" class="flex flex-col md:flex-row gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 max-w-3xl mx-auto w-full">
+        <form id="search-form" action="{{ route('articles.index') }}" method="GET" class="flex flex-col md:flex-row gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 max-w-3xl mx-auto w-full">
             {{-- Keyword Input --}}
             <div class="flex-1 relative">
                 <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"/><path d="m21 21-4.3-4.3" stroke-width="2" stroke-linecap="round"/></svg>
@@ -49,17 +47,43 @@
             </div>
 
             {{-- Category Dropdown Selector --}}
-            <div class="w-full md:w-60 relative border-t md:border-t-0 md:border-l border-slate-100 pt-2 md:pt-0 md:pl-3 flex items-center">
-                <select name="category" onchange="this.form.submit()" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 text-sm font-bold focus:outline-none appearance-none pr-8 cursor-pointer">
-                    <option value="">Tất cả danh mục</option>
-                    @foreach($articleCategories as $categoryKey => $categoryLabel)
-                        <option value="{{ $categoryKey }}" {{ $selectedCategory === $categoryKey ? 'selected' : '' }}>
-                            {{ $categoryLabel }}
-                        </option>
-                    @endforeach
-                </select>
-                <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 flex items-center text-slate-400">
+            <div class="w-full md:w-60 relative border-t md:border-t-0 md:border-l border-slate-100 pt-2 md:pt-0 md:pl-3 flex items-center" id="custom-category-dropdown-container">
+                <input type="hidden" name="category" id="hidden-category-input" value="{{ $selectedCategory }}">
+                
+                {{-- Trigger Button --}}
+                <button type="button" id="category-dropdown-trigger" class="w-full flex items-center justify-between bg-transparent border-none focus:ring-0 text-slate-700 text-sm font-bold focus:outline-none pr-8 cursor-pointer select-none py-2 text-left">
+                    <span id="selected-category-label" class="truncate">
+                        {{ $articleCategories[$selectedCategory] ?? 'Tất cả danh mục' }}
+                    </span>
+                </button>
+                
+                <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 flex items-center text-slate-400 transition-transform duration-300" id="category-dropdown-arrow" style="transform-origin: center;">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+
+                {{-- Dropdown Menu options --}}
+                <div id="category-dropdown-menu" class="hidden absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-md border border-slate-100 rounded-2xl shadow-xl z-50 overflow-hidden transition-all duration-200 transform origin-top scale-95 opacity-0">
+                    <div class="py-2 max-h-60 overflow-y-auto">
+                        <div class="dropdown-item px-4 py-2.5 text-slate-650 hover:bg-sky-50 hover:text-sky-600 text-xs font-bold cursor-pointer transition-all duration-200 flex items-center gap-2 {{ $selectedCategory === '' ? 'bg-sky-50/50 text-sky-600' : '' }}" data-value="">
+                            <span class="w-2.5 h-2.5 rounded-full border border-slate-300 {{ $selectedCategory === '' ? 'bg-sky-500 border-sky-400 shadow-sm shadow-sky-200' : 'bg-transparent' }}"></span>
+                            Tất cả danh mục
+                        </div>
+                        @foreach($articleCategories as $categoryKey => $categoryLabel)
+                            @php
+                                $isActive = $selectedCategory === $categoryKey;
+                                $dotColor = 'bg-slate-300 border-slate-200';
+                                if ($categoryKey === 'duoc-lieu-bai-thuoc') $dotColor = 'bg-emerald-500 border-emerald-400 shadow-emerald-100';
+                                elseif ($categoryKey === 'benh-hoc-phuong-phap-dieu-tri') $dotColor = 'bg-blue-500 border-blue-400 shadow-blue-100';
+                                elseif ($categoryKey === 'cham-soc-suc-khoe-duong-sinh') $dotColor = 'bg-cyan-500 border-cyan-400 shadow-cyan-100';
+                                elseif ($categoryKey === 'tin-tuc-phong-kham') $dotColor = 'bg-indigo-500 border-indigo-400 shadow-indigo-100';
+                                elseif ($categoryKey === 'y-hoc-hien-dai-ket-hop') $dotColor = 'bg-violet-500 border-violet-400 shadow-violet-100';
+                            @endphp
+                            <div class="dropdown-item px-4 py-2.5 text-slate-650 hover:bg-sky-50 hover:text-sky-600 text-xs font-bold cursor-pointer transition-all duration-200 flex items-center gap-2 {{ $isActive ? 'bg-sky-50/50 text-sky-600' : '' }}" data-value="{{ $categoryKey }}">
+                                <span class="w-2.5 h-2.5 rounded-full border {{ $isActive ? $dotColor . ' shadow-sm' : 'bg-slate-300 border-slate-200' }}"></span>
+                                {{ $categoryLabel }}
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
@@ -272,6 +296,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Like button handler
     document.querySelectorAll('.article-like-btn').forEach(function (button) {
         button.addEventListener('click', function () {
             if (button.dataset.authenticated !== '1') {
@@ -325,6 +350,61 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    // Custom dropdown handler
+    const trigger = document.getElementById('category-dropdown-trigger');
+    const menu = document.getElementById('category-dropdown-menu');
+    const arrow = document.getElementById('category-dropdown-arrow');
+    const container = document.getElementById('custom-category-dropdown-container');
+    const hiddenInput = document.getElementById('hidden-category-input');
+    const form = document.getElementById('search-form');
+
+    if (trigger && menu && arrow && container && hiddenInput && form) {
+        function openMenu() {
+            menu.classList.remove('hidden');
+            setTimeout(() => {
+                menu.classList.remove('scale-95', 'opacity-0');
+                menu.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            arrow.style.transform = 'translateY(-50%) rotate(180deg)';
+        }
+
+        function closeMenu() {
+            menu.classList.remove('scale-100', 'opacity-100');
+            menu.classList.add('scale-95', 'opacity-0');
+            arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+            setTimeout(() => {
+                if (menu.classList.contains('opacity-0')) {
+                    menu.classList.add('hidden');
+                }
+            }, 200);
+        }
+
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                openMenu();
+            } else {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!container.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        menu.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const val = this.dataset.value;
+                hiddenInput.value = val;
+                closeMenu();
+                form.submit();
+            });
+        });
+    }
 });
 </script>
 @endpush
